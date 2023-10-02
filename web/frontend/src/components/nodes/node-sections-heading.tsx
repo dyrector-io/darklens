@@ -7,13 +7,13 @@ interface NodeSectionsHeadingProps {
   setSection: (section: NodeDetailsSection) => void
 }
 
-const NodeSectionsHeading = (props: NodeSectionsHeadingProps) => {
-  const { section, setSection } = props
+const NodeSectionsHeading = (props: React.PropsWithChildren<NodeSectionsHeadingProps>) => {
+  const { section, setSection, children } = props
 
   const { t } = useTranslation('nodes')
 
   return (
-    <div className="flex flex-row my-4">
+    <div className="flex flex-row mb-4 mt-6">
       <DyoButton
         text
         thin
@@ -35,6 +35,8 @@ const NodeSectionsHeading = (props: NodeSectionsHeadingProps) => {
       >
         {t('logs')}
       </DyoButton>
+
+      { children }
     </div>
   )
 }

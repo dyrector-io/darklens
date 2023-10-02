@@ -19,7 +19,7 @@ const Page500 = () => {
 
       <div className="flex flex-row mb-auto mt-12">
         <DyoButton className="px-12" outlined onClick={navigateToIndex}>
-          {t('common:dashboard')}
+          {t('common:back')}
         </DyoButton>
 
         <DyoButton className="ml-2 mr-auto px-12" href={ROUTE_STATUS}>

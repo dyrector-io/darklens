@@ -7,7 +7,6 @@
     "/404": ["404"],
     "/500": [],
     "/status": ["status"],
-    "/dashboard": ["dashboard"],
     "/nodes": ["nodes", "tokens"],
     "/nodes/[nodeId]": ["nodes", "tokens"],
     "/nodes/[nodeId]/log": []

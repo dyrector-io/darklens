@@ -1,14 +1,14 @@
-import DyoIcon from '@app/elements/dyo-icon'
-import { ROUTE_DASHBOARD, ROUTE_INDEX } from '@app/routes'
+import { ROUTE_INDEX } from '@app/routes'
 import useTranslation from 'next-translate/useTranslation'
 import Image from 'next/image'
 import Link from 'next/link'
 import NavButton from './nav-button'
-import { MenuOption, NavSection } from './nav-section'
+import DyoIcon from '@app/elements/dyo-icon'
 
-export type MenuSection = {
-  title: string
-  items: MenuOption[]
+export type MenuOption = {
+  icon: string
+  text: string
+  link: string
 }
 
 export interface SidebarProps {
@@ -17,14 +17,9 @@ export interface SidebarProps {
 
 export const sidebarSections = [
   {
-    title: 'components',
-    items: [
-      {
-        icon: '/servers.svg',
-        text: 'nodes',
-        link: '/nodes',
-      },
-    ],
+    icon: '/servers.svg',
+    text: 'nodes',
+    link: '/nodes',
   },
 ]
 
@@ -33,24 +28,26 @@ export const Sidebar = (props: SidebarProps) => {
 
   const { t } = useTranslation('common')
 
+  const optionToIcon = (it: MenuOption) => <DyoIcon src={it.icon} alt={t(it.text)} />
+
   return (
     <div className={className}>
       <div className="mx-12">
         <Link href={ROUTE_INDEX} passHref>
-          <Image className="cursor-pointer mt-4" src="/darklens_logo.svg" alt={t('logoAlt')} width={160} height={27} />
+          <Image className="cursor-pointer mt-1" src="/darklens_logo.svg" alt={t('logoAlt')} width={160} height={27} />
         </Link>
       </div>
 
       <div className="flex flex-col flex-grow pb-4">
-        <div className="mt-6 flex text-lens-bright">
-          <NavButton href={ROUTE_DASHBOARD} icon={<DyoIcon src="/dashboard.svg" alt={t('dashboard')} />}>
-            {t('dashboard')}
-          </NavButton>
-        </div>
-
-        {sidebarSections.map((it, index) => (
-          <NavSection key={index} className="mt-6" title={t(it.title)} options={it.items} />
-        ))}
+        <ul className="list-none flex flex-col text-lens-bright">
+          {sidebarSections.map((option, index) => (
+            <li key={index} className="flex flex-row items-center mt-2">
+              <NavButton href={option.link} icon={optionToIcon(option)} target={option.link}>
+                {t(option.text)}
+              </NavButton>
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   )

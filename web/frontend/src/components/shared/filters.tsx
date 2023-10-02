@@ -17,7 +17,7 @@ const Filters = (props: FiltersProps) => {
   const { t } = useTranslation('common')
 
   return (
-    <DyoCard className="flex flex-col p-8">
+    <DyoCard className="flex flex-col p-6">
       <DyoHeading element="h3" className="text-xl text-lens-bright">
         {t('common:filters')}
       </DyoHeading>

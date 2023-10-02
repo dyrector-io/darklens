@@ -27,7 +27,7 @@ const Page404 = () => {
           <p className="text-center text-lens-light font-semibold my-6">{t('nothingYet')}</p>
 
           <DyoButton className="px-12" outlined onClick={navigateToIndex}>
-            {t('common:dashboard')}
+            {t('common:back')}
           </DyoButton>
         </div>
       </div>

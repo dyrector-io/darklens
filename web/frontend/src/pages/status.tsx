@@ -47,7 +47,7 @@ const StatusPage = () => {
 
       <div className="flex flex-row mb-auto mt-12">
         <DyoButton className="px-12" outlined onClick={navigateToIndex}>
-          {t('common:dashboard')}
+          {t('common:back')}
         </DyoButton>
       </div>
     </SingleFormLayout>

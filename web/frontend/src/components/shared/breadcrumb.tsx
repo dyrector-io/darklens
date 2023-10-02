@@ -22,7 +22,7 @@ const Breadcrumb = (props: BreadcrumbProps) => {
 
   const { t } = useTranslation('common')
 
-  const homeMenu = sidebarSections.flatMap(it => it.items).find(it => it.link === pageUrl)
+  const homeMenu = sidebarSections.find(it => it.link === pageUrl)
 
   return (
     <div key="breadcrumb" className="flex flex-row items-center w-1/2 flex-grow">
@@ -47,7 +47,7 @@ const Breadcrumb = (props: BreadcrumbProps) => {
         return (
           <div key={`breadcrumb-link-${index}`} className="flex flex-row max-w-lg">
             <div className="mx-4 mt-1">
-              <DyoIcon className="aspect-square" src="/breadcrumb_next.svg" alt={t('rightArrowIcon')} size="sm" />
+              <DyoIcon className="aspect-square" src="/breadcrumb_next.svg" alt="" size="sm" />
             </div>
 
             {last ? (

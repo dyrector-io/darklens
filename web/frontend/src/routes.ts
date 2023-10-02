@@ -8,13 +8,11 @@ export const ROUTE_DOCS = 'https://docs.dyrector.io' // TODO(@robot9706): Replac
 export const ROUTE_INDEX = '/'
 export const ROUTE_STATUS = '/status'
 export const ROUTE_404 = '/404'
-export const ROUTE_DASHBOARD = '/dashboard'
 export const ROUTE_NODES = '/nodes'
 
 export const API_ROOT = '/api'
 export const API_NODES = `${API_ROOT}/nodes`
 export const API_HEALTH = `${API_ROOT}/health`
-export const API_DASHBOARD = `${API_ROOT}/dashboard`
 export const API_STATUS = '/api/status'
 
 export const WS_NODES = '/nodes'

@@ -58,7 +58,7 @@ const NodeContainersList = (props: NodeContainersListProps) => {
 
   const headers = [
     'common:name',
-    'images:imageTag',
+    'common:imageTag',
     'common:state',
     'common:reason',
     'common:createdAt',
@@ -142,7 +142,7 @@ const NodeContainersList = (props: NodeContainersListProps) => {
   ]
 
   return (
-    <DyoCard className="mt-4">
+    <DyoCard className="mt-2">
       <DyoList
         headers={headers}
         headerClassName={headerClasses}
@@ -154,7 +154,7 @@ const NodeContainersList = (props: NodeContainersListProps) => {
           sorting,
           {
             'common:name': 'name',
-            'images:imageTag': 'imageTag',
+            'common:imageTag': 'imageTag',
             'common:state': 'state',
             'common:reason': 'reason',
             'common:createdAt': 'createdAt',

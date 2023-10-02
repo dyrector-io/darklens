@@ -108,31 +108,31 @@ set_environment() {
 }
 
 dagent_clean() {
-  if [ -n "$($CRI_EXECUTABLE container list --filter name=^dagent$ --filter=status=running --filter=status=restarting --filter=status=paused --format '\{{ .Names }}' 2>/dev/null)" ]; then
+  if [ -n "$($CRI_EXECUTABLE container list --filter name=^{{name}}$ --filter=status=running --filter=status=restarting --filter=status=paused --format '\{{ .Names }}' 2>/dev/null)" ]; then
     set +e
-    echo "Stopping existing dyrector.io agent (dagent)..."
-    $CRI_EXECUTABLE stop dagent
-    if ! $CRI_EXECUTABLE stop dagent; then
+    echo "Stopping existing dyrector.io agent ({{name}})..."
+    $CRI_EXECUTABLE stop '{{name}}'
+    if ! $CRI_EXECUTABLE stop '{{name}}'; then
       set -e
-      $CRI_EXECUTABLE kill dagent
+      $CRI_EXECUTABLE kill '{{name}}'
     fi
     set -e
   fi
 
-  if [ -n "$($CRI_EXECUTABLE container list --filter name=^dagent$ --filter=status=exited --filter=status=created --filter=status=dead --format '\{{ .Names }}' 2>/dev/null)" ]; then
+  if [ -n "$($CRI_EXECUTABLE container list --filter name=^{{name}}$ --filter=status=exited --filter=status=created --filter=status=dead --format '\{{ .Names }}' 2>/dev/null)" ]; then
     set +e
-    echo "Removing existing dyrector.io agent (dagent)..."
-    $CRI_EXECUTABLE rm dagent
-    if $CRI_EXECUTABLE rm dagent; then
+    echo "Removing existing dyrector.io agent ({{name}})..."
+    $CRI_EXECUTABLE rm '{{name}}'
+    if $CRI_EXECUTABLE rm '{{name}}'; then
       set -e
-      $CRI_EXECUTABLE rm -f dagent
+      $CRI_EXECUTABLE rm -f '{{name}}'
     fi
     set -e
   fi
 }
 
 dagent_install() {
-  echo "Installing dyrector.io agent (dagent)..."
+  echo "Installing dyrector.io agent ({{name}})..."
 
   if ! {{disableForcePull}}; then
     $CRI_EXECUTABLE pull ghcr.io/dyrector-io/dyrectorio/agent/dagent:{{agentImageTag}}
@@ -156,7 +156,7 @@ dagent_install() {
     {{/if}}
     -e HOST_DOCKER_SOCK_PATH="$HOST_DOCKER_SOCK_PATH" \
     --add-host=host.docker.internal:host-gateway \
-    --name 'dagent' \
+    --name '{{name}}' \
     -v "$PERSISTENCE_FOLDER/":/srv/dagent \
     -v "$HOST_DOCKER_SOCK_PATH":/var/run/docker.sock \
     -d ghcr.io/dyrector-io/dyrectorio/agent/dagent:{{agentImageTag}}

@@ -4,12 +4,13 @@
   "goBack": "Go back",
   "back": "Back",
   "copy": "Copy",
+  "copiedToClipboard": "Copied to clipboad.",
   "delete": "Delete",
   "required": "Required",
   "default": "Default",
   "none": "None",
   "logoAlt": "Logo",
-
+  "createdAt": "Created at",
   "new": "New",
   "filters": "Filters",
   "search": "Search",
@@ -48,10 +49,10 @@
   "areYouSureDeleteName": "Are you sure you want to delete {{name}}?",
   "areYouSure": "Are you sure?",
 
-  "dashboard": "Dashboard",
   "node": "Node",
   "nodes": "Nodes",
   "container": "Container",
+  "imageTag": "Image:Tag",
 
   "days": "{{days}} days",
   "hours": "{{hours}} hours",
@@ -103,7 +104,7 @@
 
   "event": "Event",
   "data": "Data",
-  "log": "Log",
+  "logOf": "Log of {{name}}",
 
   "openSource": "is an open-source project."
 }

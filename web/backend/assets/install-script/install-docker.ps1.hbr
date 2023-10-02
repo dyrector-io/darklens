@@ -2,11 +2,11 @@ Set-PSDebug -strict
 Set-StrictMode -version latest
 $ErrorActionPreference = 'Stop'
 
-try { docker stop dagent }
-catch { Write-Output "dagent couldn't be found or stopped" }
+try { docker stop '{{name}}' }
+catch { Write-Output "{{name}} couldn't be found or stopped" }
 finally {
-  try { docker rm dagent }
-  catch { Write-Output "dagent couldn't be found or removed" }
+  try { docker rm '{{name}}' }
+  catch { Write-Output "{{name}} couldn't be found or removed" }
 }
 
 If ( $env:PERSISTENCE_FOLDER ) {
@@ -53,7 +53,7 @@ docker run `
   {{/if}}
   -e HOST_DOCKER_SOCK_PATH=//var/run/docker.sock `
   --add-host=host.docker.internal:host-gateway `
-  --name 'dagent' `
+  --name '{{name}}' `
   -v ${DATA_MOUNT_PATH}:/srv/dagent `
   -v //var/run/docker.sock:/var/run/docker.sock `
   -d ghcr.io/dyrector-io/dyrectorio/agent/dagent:{{agentImageTag}}

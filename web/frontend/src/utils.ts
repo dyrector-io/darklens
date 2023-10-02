@@ -276,7 +276,7 @@ export const parseStringUnionType = <T>(value: string, fallback: T, validValues:
 export const writeToClipboard = async (t: Translate, content: string) => {
   if (window.isSecureContext) {
     await navigator.clipboard.writeText(content)
-    toast(t('common:copied'))
+    toast(t('common:copiedToClipboard'))
   } else {
     toast(t('errors:insecure'))
   }

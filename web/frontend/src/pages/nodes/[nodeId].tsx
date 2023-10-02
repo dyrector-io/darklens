@@ -10,6 +10,7 @@ import { BreadcrumbLink } from '@app/components/shared/breadcrumb'
 import Filters from '@app/components/shared/filters'
 import PageHeading from '@app/components/shared/page-heading'
 import { DetailsPageMenu } from '@app/components/shared/page-menu'
+import { DyoInput } from '@app/elements/dyo-input'
 import { DyoConfirmationModal } from '@app/elements/dyo-modal'
 import { defaultApiErrorHandler } from '@app/errors'
 import { NodeDetails } from '@app/models'
@@ -97,20 +98,26 @@ const NodeDetailsPage = (props: NodeDetailsPageProps) => {
         <EditNodeSection node={node} onNodeEdited={onNodeEdited} submitRef={submitRef} />
       ) : (
         <>
-          <div className="flex flex-row gap-4 mb-4">
+          <div className="flex flex-row gap-4">
             <DyoNodeCard className="w-2/3 p-6" node={node} hideConnectionInfo />
 
             <NodeConnectionCard className="w-1/3 px-6 py-4" node={node} />
           </div>
 
-          <NodeSectionsHeading section={state.section} setSection={actions.setSection} />
+          <NodeSectionsHeading section={state.section} setSection={actions.setSection}>
+            {state.section === 'containers' && (
+              <div className="flex-1 flex flex-row justify-end">
+                <DyoInput
+                  className={t('grow')}
+                  placeholder={t('common:search')}
+                  onChange={e => state.containerFilters.setFilter({ text: e.target.value })}
+                />
+              </div>
+            )}
+          </NodeSectionsHeading>
 
           {state.section === 'containers' ? (
-            <>
-              <Filters setTextFilter={it => state.containerFilters.setFilter({ text: it })} />
-
-              <NodeContainersList state={state} actions={actions} />
-            </>
+            <NodeContainersList state={state} actions={actions} />
           ) : (
             <NodeAuditList node={node} />
           )}

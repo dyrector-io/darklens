@@ -24,6 +24,7 @@ module.exports = {
         'lens-light-grey-muted': '#404656',
         'lens-lens-medium-eased': '#343d55',
         'lens-medium': '#283046',
+        'lens-medium-eased': '#343d55',
         'lens-dark': '#161d31',
         'lens-error-red': '#ea5455',
         'lens-warning-orange': '#ff9f43',
