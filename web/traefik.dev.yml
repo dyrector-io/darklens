@@ -1,0 +1,23 @@
+log:
+  level: DEBUG
+http:
+  routers:
+    frontend:
+      rule: Host(`localhost`)
+      service: local-frontend
+      entryPoints:
+        - web
+    backend:
+      rule: Host(`localhost`) && PathPrefix(`/api`) && !PathPrefix(`/api/status`)
+      service: local-backend
+      entryPoints:
+        - web
+  services:
+    local-frontend:
+      loadBalancer:
+        servers:
+          - url: http://host.docker.internal:3000/
+    local-backend:
+      loadBalancer:
+        servers:
+          - url: http://host.docker.internal:1848/

@@ -1,0 +1,44 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "darwin-arm64"]
+  engineType    = "binary"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:dev.db"
+}
+
+model Node {
+  id             String        @id @default(uuid())
+  name           String
+  description    String?
+  icon           String?
+  address        String?
+  connectedAt    DateTime?
+  disconnectedAt DateTime?
+
+  events      NodeEvent[]
+  token       NodeToken?
+
+  @@unique([name])
+}
+
+model NodeToken {
+  nodeId    String @id @unique
+  nonce     String
+
+  node Node @relation(fields: [nodeId], references: [id], onDelete: Cascade)
+}
+
+model NodeEvent {
+  id        String            @id @default(uuid())
+  nodeId    String
+  createdAt DateTime          @default(now())
+  event     String
+  data      String?
+
+  node Node @relation(fields: [nodeId], references: [id], onDelete: Cascade)
+
+  @@map("NodeEvent")
+}

@@ -1,0 +1,24 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Start backend debug session",
+            "args": [
+                "${workspaceFolder}/web/backend/src/main.ts"
+            ],
+            "runtimeArgs": [
+                "--nolazy",
+                "-r",
+                "ts-node/register",
+                "-r",
+                "tsconfig-paths/register"
+            ],
+            "sourceMaps": true,
+            "envFile": "${workspaceFolder}/web/backend/.env",
+            "cwd": "${workspaceRoot}/web/backend",
+            "console": "integratedTerminal",
+        }
+    ]
+}

@@ -1,0 +1,19 @@
+version: "3.3"
+services:
+  dev-traefik:
+    container_name: dev-traefik
+    image: traefik:v2.8
+    restart: unless-stopped
+    ports:
+      - 8000:8000
+      - 8080:8080
+    volumes:
+      - ./traefik.dev.yml:/etc/traefik/traefik.dev.yml
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    command:
+      - --log.level=INFO
+      - --api.insecure=true
+      - --entrypoints.web.address=:8000
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --providers.file.filename=/etc/traefik/traefik.dev.yml

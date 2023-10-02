@@ -1,0 +1,175 @@
+#!/bin/sh
+
+set -eu
+
+case $(uname) in
+  Linux*)
+    ROOTLESS="${ROOTLESS:-false}"
+    ;;
+  *)
+    ROOTLESS="${ROOTLESS:-true}"
+    ;;
+esac
+
+if [ "$ROOTLESS" = "false" ]; then
+  if [ "$(id -u)" -ne 0 ]; then
+    echo "Installation process needs root privileges" 1>&2
+    # This will quit the non-root script & restart the script as root
+    exec sudo -s "$0"
+  fi
+fi
+
+case $(uname) in
+  Darwin*)
+    PLATFORM="OSX"
+    ;;
+  Linux*)
+    PLATFORM="LINUX"
+    ;;
+  MINGW*)
+    PLATFORM="WINDOWS"
+    if [ -n "${MSYS_NO_PATHCONV+x}" ]; then
+        ORIGINAL_PATHCONV_CONFIG=$MSYS_NO_PATHCONV
+    fi
+
+    export MSYS_NO_PATHCONV=1
+    HOST_DOCKER_SOCK_PATH="${HOST_DOCKER_SOCK_PATH:-//var/run/docker.sock}"
+    ;;
+  *)
+    echo "Not Supported OS"
+    exit 1
+    ;;
+esac
+
+set_environment() {
+  # Set folder for persisting data
+  PERSISTENCE_FOLDER_SETTING="{{#if rootPath}}{{{rootPath}}}{{/if}}"
+  if [ -z "${PERSISTENCE_FOLDER:-}" ]; then
+    if [ -z "${PERSISTENCE_FOLDER_SETTING:-}" ]; then
+      case $PLATFORM in
+        OSX*)
+          echo "Detected: Mac OS X"
+          PERSISTENCE_FOLDER=~/.dyrectorio-persistence/
+          ;;
+        LINUX*)
+          echo "Detected: Linux"
+          if [ "$ROOTLESS" = "false" ]; then
+            PERSISTENCE_FOLDER=/srv/dyrectorio-persistence/
+          else
+            PERSISTENCE_FOLDER=~/.dyrectorio-persistence/
+          fi
+          ;;
+        WINDOWS*)
+          echo "Detected: Windows(mingw64)"
+          PERSISTENCE_FOLDER="C:/.dyrectorio-persistence"
+          ;;
+        *)
+          echo "Not supported OS and PERSISTENCE_FOLDER is not set!"
+          exit 1
+          ;;
+      esac
+    else
+      PERSISTENCE_FOLDER=$PERSISTENCE_FOLDER_SETTING
+    fi
+  fi
+
+  mkdir -p "$PERSISTENCE_FOLDER"
+
+  if [ "$PLATFORM" = "WINDOWS" ]; then
+    PERSISTENCE_FOLDER_TMP=$(echo "$PERSISTENCE_FOLDER" | tr '[:upper:]' '[:lower:]')
+    PERSISTENCE_FOLDER=$(echo "/run/desktop/mnt/host/${PERSISTENCE_FOLDER_TMP}" | tr -d ":")
+  fi
+
+  if [ -z "${CRI_EXECUTABLE:-}" ]; then
+    if ! command -v docker >/dev/null 2>&1; then
+      if ! command -v podman >/dev/null 2>&1; then
+        echo "Docker is required, make sure it is installed and available in PATH!"
+        exit 1
+      else
+        CRI_EXECUTABLE="podman"
+      fi
+    else
+      CRI_EXECUTABLE="docker"
+    fi
+  fi
+
+  if [ -z "${HOST_DOCKER_SOCK_PATH:-}" ]; then
+    if [ -z "${DOCKER_HOST:-}" ]; then
+      HOST_DOCKER_SOCK_PATH="/var/run/docker.sock"
+    else
+      if [ $(echo "$DOCKER_HOST" | cut -b -7) = "unix://" ]; then
+        HOST_DOCKER_SOCK_PATH=$(echo "$DOCKER_HOST" | cut -b 7-)
+      else
+        echo "Invalid DOCKER_HOST variable please set HOST_DOCKER_SOCK_PATH if your socket is in a custom location otherwise unset DOCKER_HOST!"
+        exit 1
+      fi
+    fi
+  fi
+}
+
+dagent_clean() {
+  if [ -n "$($CRI_EXECUTABLE container list --filter name=^dagent$ --filter=status=running --filter=status=restarting --filter=status=paused --format '\{{ .Names }}' 2>/dev/null)" ]; then
+    set +e
+    echo "Stopping existing dyrector.io agent (dagent)..."
+    $CRI_EXECUTABLE stop dagent
+    if ! $CRI_EXECUTABLE stop dagent; then
+      set -e
+      $CRI_EXECUTABLE kill dagent
+    fi
+    set -e
+  fi
+
+  if [ -n "$($CRI_EXECUTABLE container list --filter name=^dagent$ --filter=status=exited --filter=status=created --filter=status=dead --format '\{{ .Names }}' 2>/dev/null)" ]; then
+    set +e
+    echo "Removing existing dyrector.io agent (dagent)..."
+    $CRI_EXECUTABLE rm dagent
+    if $CRI_EXECUTABLE rm dagent; then
+      set -e
+      $CRI_EXECUTABLE rm -f dagent
+    fi
+    set -e
+  fi
+}
+
+dagent_install() {
+  echo "Installing dyrector.io agent (dagent)..."
+
+  if ! {{disableForcePull}}; then
+    $CRI_EXECUTABLE pull ghcr.io/dyrector-io/dyrectorio/agent/dagent:{{agentImageTag}}
+  fi
+
+  $CRI_EXECUTABLE run \
+    --restart on-failure \
+    {{#if network}}
+    --network {{networkName}} \
+    {{/if}}
+    -e GRPC_TOKEN='{{token}}' \
+    -e NAME='{{name}}' \
+    {{#if traefik}}
+    -e TRAEFIK_ENABLED='true' \
+    -e TRAEFIK_ACME_MAIL='{{traefik.acmeEmail}}' \
+    -e TRAEFIK_TLS='true' \
+    {{/if}}
+    -e DATA_MOUNT_PATH="$PERSISTENCE_FOLDER" \
+    {{#if debugMode}}
+    -e DEBUG='true' \
+    {{/if}}
+    -e HOST_DOCKER_SOCK_PATH="$HOST_DOCKER_SOCK_PATH" \
+    --add-host=host.docker.internal:host-gateway \
+    --name 'dagent' \
+    -v "$PERSISTENCE_FOLDER/":/srv/dagent \
+    -v "$HOST_DOCKER_SOCK_PATH":/var/run/docker.sock \
+    -d ghcr.io/dyrector-io/dyrectorio/agent/dagent:{{agentImageTag}}
+
+  if [ -z "${ORIGINAL_PATHCONV_CONFIG+x}" ]; then
+    unset MSYS_NO_PATHCONV
+  else
+    export MSYS_NO_PATHCONV="$ORIGINAL_PATHCONV_CONFIG"
+  fi
+}
+
+set_environment
+
+dagent_clean
+
+dagent_install

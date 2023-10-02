@@ -1,0 +1,109 @@
+{
+  "name": "Name",
+  "home": "Home",
+  "goBack": "Go back",
+  "back": "Back",
+  "copy": "Copy",
+  "delete": "Delete",
+  "required": "Required",
+  "default": "Default",
+  "none": "None",
+  "logoAlt": "Logo",
+
+  "new": "New",
+  "filters": "Filters",
+  "search": "Search",
+  "all": "All",
+  "id": "#",
+  "description": "Description",
+  "icon": "Icon",
+  "date": "Date",
+  "type": "Type",
+  "status": "Status",
+  "state": "State",
+  "reason": "Reason",
+  "loading": "Loading...",
+  "noNameFound": "No {{name}} found",
+  "address": "Address",
+  "actions": "Actions",
+  "note": "Note",
+
+  "editName": "Edit {{name}}",
+  "add": "Add",
+  "edit": "Edit",
+  "save": "Save",
+  "close": "Close",
+  "continue": "Continue",
+  "discard": "Discard",
+  "create": "Create",
+  "cancel": "Cancel",
+  "showAll": "Show all",
+  "inspect": "Inspect",
+  "view": "View",
+  "down": "Down",
+  "never": "Never",
+  "prefix": "Prefix",
+
+  "confirm": "Confirm",
+  "areYouSureDeleteName": "Are you sure you want to delete {{name}}?",
+  "areYouSure": "Are you sure?",
+
+  "dashboard": "Dashboard",
+  "node": "Node",
+  "nodes": "Nodes",
+  "container": "Container",
+
+  "days": "{{days}} days",
+  "hours": "{{hours}} hours",
+  "minutes": "{{minutes}} minutes",
+  "seconds": "{{seconds}} seconds",
+  "secondsAgo": "{{seconds}} seconds ago",
+  "minutesAgo": "{{minutes}} minutes ago",
+  "hoursAgo": "{{hours}} hours ago",
+  "daysAgo": "{{days}} days ago",
+  "dateFormat": "yyyy. MM. dd.",
+
+  "nodeStatuses": {
+    "connected": "Connected",
+    "unreachable": "Unreachable",
+    "outdated": "Outdated",
+    "updating": "Updating"
+  },
+
+  "containerStatuses": {
+    "running": "Running",
+    "waiting": "Waiting",
+    "exited": "Exited"
+  },
+
+  "daysOfTheWeekShort": ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"],
+  "months": [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December"
+  ],
+
+  "proceedYouLoseAllDataToName": "If you proceed, you will lose all your data related to {{name}}. This action is not revocable.",
+
+  "itemsPerPage": "Items per page",
+  "showingItems": "Showing {{pageFrom}} to {{pageTo}} of {{total}} entries",
+  "first": "First",
+  "last": "Last",
+  "next": "Next",
+  "previous": "Previous",
+
+  "event": "Event",
+  "data": "Data",
+  "log": "Log",
+
+  "openSource": "is an open-source project."
+}

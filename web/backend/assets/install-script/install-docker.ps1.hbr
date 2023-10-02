@@ -1,0 +1,59 @@
+Set-PSDebug -strict
+Set-StrictMode -version latest
+$ErrorActionPreference = 'Stop'
+
+try { docker stop dagent }
+catch { Write-Output "dagent couldn't be found or stopped" }
+finally {
+  try { docker rm dagent }
+  catch { Write-Output "dagent couldn't be found or removed" }
+}
+
+If ( $env:PERSISTENCE_FOLDER ) {
+  $PERSISTENCE_FOLDER = $env:PERSISTENCE_FOLDER
+} else {
+  $PERSISTENCE_FOLDER = {{#if rootPath}}"{{{rootPath}}}"{{else}}"C:/.dyrectorio-persistence"{{/if}}
+}
+
+$PERSISTENCE_FOLDER_ELEMENTS = $PERSISTENCE_FOLDER.Split("/\")
+$PERSISTENCE_FOLDER_ELEMENTS[0] = $PERSISTENCE_FOLDER_ELEMENTS[0].ToLower().Replace(":", "")
+$DATA_MOUNT_PATH = "/run/desktop/mnt/host/$($PERSISTENCE_FOLDER_ELEMENTS -Join "/")"
+
+if ( $env:HOSTNAME ) {
+  $HOSTNAME = $env:HOSTNAME
+} elseif ( $env:COMPUTERNAME) {
+  $HOSTNAME = $env:COMPUTERNAME
+} else {
+  Write-Output "HOSTNAME couldn't be determined"
+}
+
+If ( -not (Test-Path $PERSISTENCE_FOLDER -PathType Container) ) {
+  New-Item -ItemType Directory -Path $PERSISTENCE_FOLDER | Out-Null
+}
+
+If ( -not ${{disableForcePull}} ) {
+  docker pull ghcr.io/dyrector-io/dyrectorio/agent/dagent:{{agentImageTag}}
+}
+
+docker run `
+  --restart on-failure `
+  {{#if network}}
+  --network {{networkName}} `
+  {{/if}}
+  -e GRPC_TOKEN='{{token}}' `
+  -e NAME='{{name}}' `
+  {{#if traefik}}
+  -e TRAEFIK_ENABLED='true' `
+  -e TRAEFIK_ACME_MAIL='{{traefik.acmeEmail}}' `
+  -e TRAEFIK_TLS='true' `
+  {{/if}}
+  -e DATA_MOUNT_PATH=$DATA_MOUNT_PATH `
+  {{#if debugMode}}
+  -e DEBUG='true' `
+  {{/if}}
+  -e HOST_DOCKER_SOCK_PATH=//var/run/docker.sock `
+  --add-host=host.docker.internal:host-gateway `
+  --name 'dagent' `
+  -v ${DATA_MOUNT_PATH}:/srv/dagent `
+  -v //var/run/docker.sock:/var/run/docker.sock `
+  -d ghcr.io/dyrector-io/dyrectorio/agent/dagent:{{agentImageTag}}
