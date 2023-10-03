@@ -1,4 +1,12 @@
-# DarkLens
+<p align="center">
+    <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/darklens_logo_horizontal_dark.png">
+    <source media="(prefers-color-scheme: light)" srcset="docs/darklens_logo_horizontal_light.png">
+    <img alt="darklens logo" src="docs/darklens_logo_horizontal.png" width="400">
+    </picture>
+</p>
+
+Lightweight container manager.
 
 ## Getting started
 
@@ -10,8 +18,7 @@ TODO: One liner `docker run`
 
     1. Goto `web/backend`
     2. Run `npm i`
-    3. Run `npx prisma migrate dev`
-    4. Copy `.env.example` to `.env`
+    3. Copy `.env.example` to `.env`
 
 2. Setup frontend
 
