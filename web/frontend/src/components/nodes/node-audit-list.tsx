@@ -1,20 +1,10 @@
 import Paginator, { PaginationSettings } from '@app/components/shared/paginator'
 import { DyoCard } from '@app/elements/dyo-card'
-import DyoChips from '@app/elements/dyo-chips'
-import DyoDatePicker from '@app/elements/dyo-date-picker'
-import { DyoHeading } from '@app/elements/dyo-heading'
 import DyoIcon from '@app/elements/dyo-icon'
 import { DyoList } from '@app/elements/dyo-list'
 import DyoModal from '@app/elements/dyo-modal'
 import { useThrottling } from '@app/hooks/use-throttleing'
-import {
-  DyoNode,
-  NodeAuditLog,
-  NodeAuditLogList,
-  NodeAuditLogQuery,
-  NodeEventType,
-  NODE_EVENT_TYPE_VALUES,
-} from '@app/models'
+import { NodeAuditLog, NodeAuditLogList, NodeAuditLogQuery } from '@app/models'
 import { getEndOfToday, utcDateToLocale } from '@app/utils'
 import clsx from 'clsx'
 import useTranslation from 'next-translate/useTranslation'
@@ -22,15 +12,10 @@ import { useEffect, useState } from 'react'
 import JsonEditor from '../shared/json-editor'
 import { dateSort, sortHeaderBuilder, stringSort, useSorting } from '@app/hooks/use-sorting'
 import { nodeApiAuditUrl } from '@app/routes'
-
-type NodeAuditFilter = {
-  from: Date
-  to: Date
-  eventType: NodeEventType
-}
+import { NodeDetailsState } from './use-node-details-state'
 
 interface NodeAuditListProps {
-  node: DyoNode
+  state: NodeDetailsState
 }
 
 type NodeAuditLogSorting = 'createdAt' | 'event'
@@ -42,7 +27,8 @@ const sixDays = 1000 * 60 * 60 * 24 * 6 // ms * minutes * hours * day * six
 const defaultPagination: PaginationSettings = { pageNumber: 0, pageSize: 10 }
 
 const NodeAuditList = (props: NodeAuditListProps) => {
-  const { node } = props
+  const { state } = props
+  const { node, auditFilter } = state
 
   const { t } = useTranslation('nodes')
   const throttle = useThrottling(1000)
@@ -51,23 +37,18 @@ const NodeAuditList = (props: NodeAuditListProps) => {
 
   const [total, setTotal] = useState(0)
   const [data, setData] = useState<NodeAuditLog[]>([])
-  const [filter, setFilter] = useState<NodeAuditFilter>({
-    from: new Date(endOfToday.getTime() - sixDays),
-    to: new Date(endOfToday),
-    eventType: null,
-  })
   const [pagination, setPagination] = useState<PaginationSettings>(defaultPagination)
   const [showInfo, setShowInfo] = useState<NodeAuditLog>(null)
 
   const fetchData = async () => {
-    const { from, to } = filter
+    const { from, to } = auditFilter
 
     const query: NodeAuditLogQuery = {
       skip: pagination.pageNumber * pagination.pageSize,
       take: pagination.pageSize,
       from: (from ?? new Date(endOfToday.getTime() - sixDays)).toISOString(),
       to: (to ?? endOfToday).toISOString(),
-      filterEventType: filter.eventType,
+      filterEventType: auditFilter.eventType,
     }
     const res = await fetch(nodeApiAuditUrl(node.id, query))
 
@@ -93,16 +74,9 @@ const NodeAuditList = (props: NodeAuditListProps) => {
   useEffect(() => {
     throttle(fetchData, true)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pagination, filter])
+  }, [pagination, auditFilter])
 
   const onShowInfoClick = (logEntry: NodeAuditLog) => setShowInfo(logEntry)
-
-  const onDateRangedChanged = dates => {
-    const [start, end] = dates
-    if (end !== null) end.setHours(23, 59, 59, 999) // end of the day
-
-    setFilter({ ...filter, from: start, to: end })
-  }
 
   const listHeaders = ['common:date', 'common:event', 'common:data', 'common:actions']
   const headerClasses = [
@@ -139,34 +113,7 @@ const NodeAuditList = (props: NodeAuditListProps) => {
 
   return (
     <>
-      <DyoCard className="flex flex-col p-8">
-        <DyoHeading element="h3" className="text-xl text-lens-bright">
-          {t('common:filters')}
-        </DyoHeading>
-
-        <div className="flex flex-row items-center mt-4">
-          <DyoChips
-            className="mr-4"
-            choices={['none', ...NODE_EVENT_TYPE_VALUES]}
-            converter={it => t(`auditEvents.${it}`)}
-            selection={filter.eventType ?? 'none'}
-            onSelectionChange={it => setFilter({ ...filter, eventType: it === 'none' ? null : (it as NodeEventType) })}
-          />
-
-          <DyoDatePicker
-            selectsRange
-            startDate={filter.from}
-            endDate={filter.to}
-            onChange={onDateRangedChanged}
-            shouldCloseOnSelect={false}
-            maxDate={new Date()}
-            isClearable
-            className="w-1/4"
-          />
-        </div>
-      </DyoCard>
-
-      <DyoCard className="relative mt-4 overflow-auto">
+      <DyoCard className="relative overflow-auto">
         <DyoList
           noSeparator
           headerClassName={headerClasses}

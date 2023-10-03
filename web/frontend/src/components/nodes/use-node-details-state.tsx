@@ -16,17 +16,26 @@ import {
   WS_TYPE_CONTAINER_COMMAND,
   WS_TYPE_DELETE_CONTAINER,
   WS_TYPE_WATCH_CONTAINERS_STATE,
+  NodeEventType,
 } from '@app/models'
-import { utcDateToLocale } from '@app/utils'
+import { getEndOfToday, utcDateToLocale } from '@app/utils'
 import useTranslation from 'next-translate/useTranslation'
 import { useEffect, useState } from 'react'
 import { PaginationSettings } from '../shared/paginator'
 import useNodeState from './use-node-state'
 import { nodeWsDetailsUrl } from '@app/routes'
 
+const sixDays = 1000 * 60 * 60 * 24 * 6 // ms * minutes * hours * day * six
+
 export type NodeDetailsSection = 'editing' | 'containers' | 'logs'
 
 export type ContainerTargetStates = { [key: string]: ContainerState } // containerName to targetState
+
+export type NodeAuditFilter = {
+  from: Date
+  to: Date
+  eventType: NodeEventType
+}
 
 export type NodeDetailsState = {
   section: NodeDetailsSection
@@ -36,6 +45,7 @@ export type NodeDetailsState = {
   containerFilters: FilterConfig<Container, TextFilter>
   containerPagination: PaginationSettings
   containerItems: Container[]
+  auditFilter: NodeAuditFilter
 }
 
 export type NodeDetailsActions = {
@@ -47,6 +57,7 @@ export type NodeDetailsActions = {
   onStopContainer: (container: Container) => void
   onRestartContainer: (container: Container) => void
   onDeleteContainer: (container: Container) => void
+  onAuditFilterChange: (filter: Partial<NodeAuditFilter>) => void
 }
 
 export type NodeDetailsStateOptions = {
@@ -88,6 +99,13 @@ const useNodeDetailsState = (options: NodeDetailsStateOptions): [NodeDetailsStat
         utcDateToLocale(it.createdAt),
       ]),
     ],
+  })
+
+  const endOfToday = getEndOfToday()
+  const [auditFilter, setAuditFilter] = useState<NodeAuditFilter>({
+    from: new Date(endOfToday.getTime() - sixDays),
+    to: new Date(endOfToday),
+    eventType: null,
   })
 
   const currentPageNumber =
@@ -136,6 +154,13 @@ const useNodeDetailsState = (options: NodeDetailsStateOptions): [NodeDetailsStat
       setContainerTargetStates(newTargetStates)
     }
   })
+
+  const onAuditFilterChange = (filter: Partial<NodeAuditFilter>) => {
+    setAuditFilter({
+      ...auditFilter,
+      ...filter,
+    })
+  }
 
   const setEditing = (editing: boolean) => setSection(editing ? 'editing' : 'containers')
 
@@ -202,6 +227,7 @@ const useNodeDetailsState = (options: NodeDetailsStateOptions): [NodeDetailsStat
       containerPagination,
       containerItems,
       confirmationModal,
+      auditFilter,
     },
     {
       onNodeEdited,
@@ -212,6 +238,7 @@ const useNodeDetailsState = (options: NodeDetailsStateOptions): [NodeDetailsStat
       onStopContainer,
       onRestartContainer,
       onDeleteContainer,
+      onAuditFilterChange,
     },
   ]
 }

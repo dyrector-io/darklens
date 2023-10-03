@@ -142,7 +142,7 @@ const NodeContainersList = (props: NodeContainersListProps) => {
   ]
 
   return (
-    <DyoCard className="mt-2">
+    <DyoCard className="">
       <DyoList
         headers={headers}
         headerClassName={headerClasses}

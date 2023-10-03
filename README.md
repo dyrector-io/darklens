@@ -10,7 +10,8 @@ TODO: One liner `docker run`
 
     1. Goto `web/backend`
     2. Run `npm i`
-    3. Copy `.env.example` to `.env`
+    3. Run `npx prisma migrate dev`
+    4. Copy `.env.example` to `.env`
 
 2. Setup frontend
 

@@ -10,10 +10,13 @@ import { BreadcrumbLink } from '@app/components/shared/breadcrumb'
 import Filters from '@app/components/shared/filters'
 import PageHeading from '@app/components/shared/page-heading'
 import { DetailsPageMenu } from '@app/components/shared/page-menu'
+import DyoChips from '@app/elements/dyo-chips'
+import DyoDatePicker from '@app/elements/dyo-date-picker'
 import { DyoInput } from '@app/elements/dyo-input'
 import { DyoConfirmationModal } from '@app/elements/dyo-modal'
+import { DyoSelect } from '@app/elements/dyo-select'
 import { defaultApiErrorHandler } from '@app/errors'
-import { NodeDetails } from '@app/models'
+import { NODE_EVENT_TYPE_VALUES, NodeDetails, NodeEventType } from '@app/models'
 import { API_NODES, ROUTE_NODES, nodeApiDetailsUrl, nodeDetailsUrl } from '@app/routes'
 import { withContextAuthorization } from '@app/utils'
 import { getBackendFromContext } from '@server/api'
@@ -41,7 +44,7 @@ const NodeDetailsPage = (props: NodeDetailsPageProps) => {
   })
   const submitRef = useRef<() => Promise<any>>()
 
-  const { node } = state
+  const { node, auditFilter } = state
 
   const handleApiError = defaultApiErrorHandler(t)
 
@@ -64,6 +67,16 @@ const NodeDetailsPage = (props: NodeDetailsPageProps) => {
     if (shouldClose) {
       await router.replace(ROUTE_NODES)
     }
+  }
+
+  const onAuditDateChange = dates => {
+    const [start, end] = dates
+    if (end !== null) end.setHours(23, 59, 59, 999) // end of the day
+
+    actions.onAuditFilterChange({
+      from: start,
+      to: end,
+    })
   }
 
   const pageLink: BreadcrumbLink = {
@@ -105,21 +118,48 @@ const NodeDetailsPage = (props: NodeDetailsPageProps) => {
           </div>
 
           <NodeSectionsHeading section={state.section} setSection={actions.setSection}>
-            {state.section === 'containers' && (
-              <div className="flex-1 flex flex-row justify-end">
+            <div className="flex-1 flex flex-row justify-end">
+              {state.section === 'containers' ? (
                 <DyoInput
                   className={t('grow')}
                   placeholder={t('common:search')}
                   onChange={e => state.containerFilters.setFilter({ text: e.target.value })}
                 />
-              </div>
-            )}
+              ) : (
+                <>
+                  <DyoSelect
+                    className="mr-4"
+                    value={auditFilter.eventType ?? 'none'}
+                    onChange={it =>
+                      actions.onAuditFilterChange({
+                        eventType: it.target.value === 'none' ? null : (it.target.value as NodeEventType),
+                      })
+                    }
+                  >
+                    {['none', ...NODE_EVENT_TYPE_VALUES].map(it => (
+                      <option value={it}>{t(`auditEvents.${it}`)}</option>
+                    ))}
+                  </DyoSelect>
+
+                  <DyoDatePicker
+                    selectsRange
+                    startDate={auditFilter.from}
+                    endDate={auditFilter.to}
+                    onChange={onAuditDateChange}
+                    shouldCloseOnSelect={false}
+                    maxDate={new Date()}
+                    isClearable
+                    className="w-1/4"
+                  />
+                </>
+              )}
+            </div>
           </NodeSectionsHeading>
 
           {state.section === 'containers' ? (
             <NodeContainersList state={state} actions={actions} />
           ) : (
-            <NodeAuditList node={node} />
+            <NodeAuditList state={state} />
           )}
         </>
       )}

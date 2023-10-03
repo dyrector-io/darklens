@@ -36,7 +36,7 @@ const NodeSectionsHeading = (props: React.PropsWithChildren<NodeSectionsHeadingP
         {t('logs')}
       </DyoButton>
 
-      { children }
+      {children}
     </div>
   )
 }

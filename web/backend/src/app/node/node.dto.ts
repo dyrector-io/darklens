@@ -20,8 +20,17 @@ export type NodeScriptTypeDto = (typeof NODE_SCRIPT_TYPE_VALUES)[number]
 export const NODE_CONNECTION_STATUS_VALUES = ['unreachable', 'connected', 'outdated', 'updating'] as const
 export type NodeConnectionStatus = (typeof NODE_CONNECTION_STATUS_VALUES)[number]
 
-export const NODE_EVENT_TYPE_VALUES = ['connected', 'kicked', 'left', 'update', 'containerCommand'] as const
-export type NodeEventType = (typeof NODE_EVENT_TYPE_VALUES)[number]
+export const NODE_EVENT_TYPE_VALUES = [
+  'installed',
+  'connected',
+  'left',
+  'kicked',
+  'update',
+  'updateCompleted',
+  'containerCommand',
+  'tokenReplaced',
+] as const
+export type NodeEventTypeEnum = (typeof NODE_EVENT_TYPE_VALUES)[number]
 
 export const CONTAINER_STATE_VALUES = ['running', 'waiting', 'exited'] as const
 export type ContainerState = (typeof CONTAINER_STATE_VALUES)[number]
@@ -202,7 +211,7 @@ export class NodeAuditLogQueryDto extends PaginationQuery {
   @IsString()
   @IsIn(NODE_EVENT_TYPE_VALUES)
   @IsOptional()
-  readonly filterEventType?: NodeEventType
+  readonly filterEventType?: NodeEventTypeEnum
 }
 
 export class NodeAuditLogDto {

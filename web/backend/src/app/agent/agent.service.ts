@@ -20,9 +20,9 @@ import PrismaService from 'src/services/prisma.service'
 import GrpcNodeConnection from 'src/shared/grpc-node-connection'
 import { getAgentVersionFromPackage, getPackageVersion } from 'src/shared/package'
 import { AGENT_SUPPORTED_MINIMUM_VERSION } from '../../shared/const'
-import { DagentTraefikOptionsDto, NodeConnectionStatus, NodeScriptTypeDto } from '../node/node.dto'
+import { DagentTraefikOptionsDto, NodeConnectionStatus, NodeEventTypeEnum, NodeScriptTypeDto } from '../node/node.dto'
 import AgentConnectionStrategyProvider from './agent.connection-strategy.provider'
-import { AgentKickReason, NodeEventTypeEnum } from './agent.dto'
+import { AgentKickReason } from './agent.dto'
 import AgentConnectionLegacyStrategy from './connection-strategies/agent.connection.legacy.strategy'
 
 @Injectable()
