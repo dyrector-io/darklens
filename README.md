@@ -1,8 +1,8 @@
 <p align="center">
     <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/darklens_logo_horizontal_dark.png">
+    <source media="(prefers-color-scheme: dark)" srcset="docs/darklens_logo_horizontal_transparent.png">
     <source media="(prefers-color-scheme: light)" srcset="docs/darklens_logo_horizontal_light.png">
-    <img alt="darklens logo" src="docs/darklens_logo_horizontal.png" width="400">
+    <img alt="darklens logo" src="docs/darklens_logo_horizontal_dark.png" width="400">
     </picture>
 </p>
 
