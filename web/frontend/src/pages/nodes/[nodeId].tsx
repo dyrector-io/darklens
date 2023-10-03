@@ -1,30 +1,30 @@
-import { Layout } from '@app/components/layout'
-import DyoNodeCard from '@app/components/nodes/dyo-node-card'
-import EditNodeSection from '@app/components/nodes/edit-node-section'
-import NodeAuditList from '@app/components/nodes/node-audit-list'
-import NodeConnectionCard from '@app/components/nodes/node-connection-card'
-import NodeContainersList from '@app/components/nodes/node-containers-list'
-import NodeSectionsHeading from '@app/components/nodes/node-sections-heading'
-import useNodeDetailsState from '@app/components/nodes/use-node-details-state'
-import { BreadcrumbLink } from '@app/components/shared/breadcrumb'
-import Filters from '@app/components/shared/filters'
-import PageHeading from '@app/components/shared/page-heading'
-import { DetailsPageMenu } from '@app/components/shared/page-menu'
-import DyoChips from '@app/elements/dyo-chips'
-import DyoDatePicker from '@app/elements/dyo-date-picker'
-import { DyoInput } from '@app/elements/dyo-input'
-import { DyoConfirmationModal } from '@app/elements/dyo-modal'
-import { DyoSelect } from '@app/elements/dyo-select'
-import { defaultApiErrorHandler } from '@app/errors'
-import { NODE_EVENT_TYPE_VALUES, NodeDetails, NodeEventType } from '@app/models'
-import { API_NODES, ROUTE_NODES, nodeApiDetailsUrl, nodeDetailsUrl } from '@app/routes'
-import { withContextAuthorization } from '@app/utils'
-import { getBackendFromContext } from '@server/api'
-import { NextPageContext } from 'next'
-import useTranslation from 'next-translate/useTranslation'
-import { useRouter } from 'next/dist/client/router'
-import { useRef } from 'react'
-import { useSWRConfig } from 'swr'
+import { Page } from 'src/components/layout'
+import DyoNodeCard from 'src/components/nodes/dyo-node-card'
+import EditNodeSection from 'src/components/nodes/edit-node-section'
+import NodeAuditList from 'src/components/nodes/node-audit-list'
+import NodeConnectionCard from 'src/components/nodes/node-connection-card'
+import NodeContainersList from 'src/components/nodes/node-containers-list'
+import NodeSectionsHeading from 'src/components/nodes/node-sections-heading'
+import useNodeDetailsState from 'src/components/nodes/use-node-details-state'
+import { BreadcrumbLink } from 'src/components/shared/breadcrumb'
+import PageHeading from 'src/components/shared/page-heading'
+import { DetailsPageMenu } from 'src/components/shared/page-menu'
+import DyoDatePicker from 'src/elements/dyo-date-picker'
+import { DyoInput } from 'src/elements/dyo-input'
+import { DyoConfirmationModal } from 'src/elements/dyo-modal'
+import { DyoSelect } from 'src/elements/dyo-select'
+import { defaultApiErrorHandler } from 'src/errors'
+import { NODE_EVENT_TYPE_VALUES, NodeDetails, NodeEventType } from 'src/models'
+import { ROUTE_NODES, nodeApiDetailsUrl, nodeDetailsUrl } from 'src/routes'
+import { fetcher } from 'src/utils'
+import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useNavigate, useParams } from 'react-router-dom'
+import LoadingIndicator from 'src/elements/loading-indicator'
+
+type NodeDetailsPageParams = {
+  nodeId: string
+}
 
 interface NodeDetailsPageProps {
   node: NodeDetails
@@ -34,10 +34,7 @@ const NodeDetailsPage = (props: NodeDetailsPageProps) => {
   const { node: propsNode } = props
 
   const { t } = useTranslation('nodes')
-
-  const { mutate } = useSWRConfig()
-
-  const router = useRouter()
+  const nav = useNavigate()
 
   const [state, actions] = useNodeDetailsState({
     node: propsNode,
@@ -58,14 +55,13 @@ const NodeDetailsPage = (props: NodeDetailsPageProps) => {
       return
     }
 
-    await mutate(API_NODES, null)
-    await router.push(ROUTE_NODES)
+    await nav(ROUTE_NODES)
   }
 
   const onNodeEdited = async (edited: NodeDetails, shouldClose?: boolean) => {
     actions.onNodeEdited(edited, shouldClose)
     if (shouldClose) {
-      await router.replace(ROUTE_NODES)
+      await nav(ROUTE_NODES, { replace: true })
     }
   }
 
@@ -84,16 +80,18 @@ const NodeDetailsPage = (props: NodeDetailsPageProps) => {
     url: ROUTE_NODES,
   }
 
+  const subLinks: BreadcrumbLink[] = [
+    {
+      name: node.name,
+      url: `${nodeDetailsUrl(node.id)}`,
+    },
+  ]
+
   return (
-    <Layout title={t('nodesName', node)}>
+    <Page title={t('nodesName', node)}>
       <PageHeading
         pageLink={pageLink}
-        sublinks={[
-          {
-            name: node.name,
-            url: `${nodeDetailsUrl(node.id)}`,
-          },
-        ]}
+        sublinks={subLinks}
       >
         <DetailsPageMenu
           onDelete={onDelete}
@@ -137,7 +135,9 @@ const NodeDetailsPage = (props: NodeDetailsPageProps) => {
                     }
                   >
                     {['none', ...NODE_EVENT_TYPE_VALUES].map(it => (
-                      <option value={it}>{t(`auditEvents.${it}`)}</option>
+                      <option key={it} value={it}>
+                        {t(`auditEvents.${it}`)}
+                      </option>
                     ))}
                   </DyoSelect>
 
@@ -165,22 +165,27 @@ const NodeDetailsPage = (props: NodeDetailsPageProps) => {
       )}
 
       {!state.confirmationModal ? null : <DyoConfirmationModal config={state.confirmationModal} />}
-    </Layout>
+    </Page>
   )
 }
 
-export default NodeDetailsPage
+export default () => {
+  const { nodeId } = useParams<NodeDetailsPageParams>()
+  const [node, setNode] = useState<NodeDetails>(null)
 
-const getPageServerSideProps = async (context: NextPageContext) => {
-  const nodeId = context.query.nodeId as string
+  useEffect(() => {
+    const fetchData = async () => {
+      const node: NodeDetails = await fetcher(nodeApiDetailsUrl(nodeId))
+      setNode(node)
+    }
+    fetchData()
+  }, [])
 
-  const node = await getBackendFromContext<NodeDetails>(context, nodeApiDetailsUrl(nodeId))
-
-  return {
-    props: {
-      node,
-    },
-  }
+  return node ? (
+    <NodeDetailsPage node={node} />
+  ) : (
+    <div className="flex-1 flex items-center justify-center">
+      <LoadingIndicator size="xl" />
+    </div>
+  )
 }
-
-export const getServerSideProps = withContextAuthorization(getPageServerSideProps)

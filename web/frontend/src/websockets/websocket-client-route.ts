@@ -1,4 +1,4 @@
-import { Logger } from '@app/logger'
+import { Logger } from 'src/logger'
 import { SubscriptionMessage, SubscriptionMessageType, WebSocketSendMessage, WsMessage } from './common'
 import WebSocketClientEndpoint from './websocket-client-endpoint'
 

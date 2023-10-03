@@ -1,19 +1,21 @@
+/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 import clsx from 'clsx'
-import Image from 'next/image'
+
+export type DyoIconSize = 'sm' | 'md' | 'lg' | 'xl' | 'xxl'
 
 interface DyoIconProps {
   className?: string
   imageClassName?: string
   src: string
   alt: string
-  size?: 'sm' | 'md' | 'lg' | 'xl'
+  size?: DyoIconSize
   onClick?: VoidFunction
 }
 
 const DyoIcon = (props: DyoIconProps) => {
   const { className, imageClassName, src, alt, size: propsSize = 'sm', onClick } = props
 
-  const size = propsSize === 'sm' ? 16 : propsSize === 'md' ? 24 : propsSize === 'lg' ? 32 : 36
+  const size = propsSize === 'sm' ? 16 : propsSize === 'md' ? 24 : propsSize === 'lg' ? 32 : propsSize == 'xl' ? 36 : 46
 
   return (
     <span
@@ -23,7 +25,7 @@ const DyoIcon = (props: DyoIconProps) => {
         minHeight: size,
       }}
     >
-      <Image
+      <img
         className={clsx(
           'aspect-square object-contain object-center',
           imageClassName,

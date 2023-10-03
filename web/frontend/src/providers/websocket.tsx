@@ -1,9 +1,9 @@
-import { defaultWsErrorHandler } from '@app/errors'
-import { isServerSide } from '@app/utils'
-import WebSocketClient from '@app/websockets/websocket-client'
-import useTranslation from 'next-translate/useTranslation'
-import { useRouter } from 'next/router'
+import { defaultWsErrorHandler } from 'src/errors'
+import { isServerSide } from 'src/utils'
+import WebSocketClient from 'src/websockets/websocket-client'
 import React, { useState } from 'react'
+import { useTranslation } from 'react-i18next'
+// import { useNavigate } from 'react-router-dom'
 
 interface WebSocketContextInterface {
   client: WebSocketClient
@@ -15,7 +15,7 @@ export const WebSocketProvider = (props: React.PropsWithChildren<{}>) => {
   const { children } = props
 
   const { t } = useTranslation('common')
-  const router = useRouter()
+  // const nav = useNavigate()
 
   const [wsClient] = useState(() => {
     if (isServerSide()) {
@@ -24,7 +24,7 @@ export const WebSocketProvider = (props: React.PropsWithChildren<{}>) => {
 
     const client = new WebSocketClient()
 
-    const wsErrorHandler = defaultWsErrorHandler(t, router)
+    const wsErrorHandler = defaultWsErrorHandler(t, null as any)
     client.setErrorHandler(wsErrorHandler)
 
     return client

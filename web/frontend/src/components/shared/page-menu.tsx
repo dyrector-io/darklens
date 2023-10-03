@@ -1,9 +1,9 @@
-import DyoButton from '@app/elements/dyo-button'
-import { DyoConfirmationModal } from '@app/elements/dyo-modal'
-import useConfirmation from '@app/hooks/use-confirmation'
+import DyoButton from 'src/elements/dyo-button'
+import { DyoConfirmationModal } from 'src/elements/dyo-modal'
+import useConfirmation from 'src/hooks/use-confirmation'
 import clsx from 'clsx'
-import useTranslation from 'next-translate/useTranslation'
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 
 export type ListPageMenuTexts = {
   add?: string

@@ -1,4 +1,3 @@
-import assert from 'assert'
 import clsx from 'clsx'
 import React from 'react'
 
@@ -43,7 +42,8 @@ export const DyoList = <T,>(props: DyoListProps<T>) => {
     Array.isArray(it) &&
     (it.length === 0 || (it.length > 0 && Array.isArray(it[0]) && it[0].length > 0 && typeof it[0][0] === 'string'))
 
-  assert(
+  // eslint-disable-next-line no-console
+  console.assert(
     itemBuilder || isArrayOfStringArrays(propsData),
     'If the data type is not string, then you must define the itemBuilder',
   )

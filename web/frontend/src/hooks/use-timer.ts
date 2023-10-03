@@ -1,4 +1,4 @@
-import { SECOND_IN_MILLIS } from '@app/const'
+import { SECOND_IN_MILLIS } from 'src/const'
 import { useCallback, useRef, useState } from 'react'
 import useInterval from './use-interval'
 

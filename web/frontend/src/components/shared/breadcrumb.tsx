@@ -1,10 +1,12 @@
-import { DyoHeading } from '@app/elements/dyo-heading'
-import DyoIcon from '@app/elements/dyo-icon'
-import { DyoLabel } from '@app/elements/dyo-label'
-import { ROUTE_INDEX } from '@app/routes'
-import useTranslation from 'next-translate/useTranslation'
-import Link from 'next/link'
-import { sidebarSections } from '../main/sidebar'
+import { DyoHeading } from 'src/elements/dyo-heading'
+import DyoIcon from 'src/elements/dyo-icon'
+import { DyoLabel } from 'src/elements/dyo-label'
+import { ROUTE_INDEX } from 'src/routes'
+import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router-dom'
+import breadcrumbHome from 'src/assets/breadcrumb_home.svg'
+import breadcrumbNext from 'src/assets/breadcrumb_next.svg'
+import servers from 'src/assets/servers.svg'
 
 export type BreadcrumbLink = {
   name: string
@@ -17,12 +19,20 @@ export interface BreadcrumbProps {
   links?: BreadcrumbLink[]
 }
 
+export const sections = [
+  {
+    icon: servers,
+    text: 'nodes',
+    link: '/nodes',
+  },
+]
+
 const Breadcrumb = (props: BreadcrumbProps) => {
   const { page, pageUrl, links } = props
 
   const { t } = useTranslation('common')
 
-  const homeMenu = sidebarSections.find(it => it.link === pageUrl)
+  const homeMenu = sections.find(it => it.link === pageUrl)
 
   return (
     <div key="breadcrumb" className="flex flex-row items-center w-1/2 flex-grow">
@@ -32,10 +42,10 @@ const Breadcrumb = (props: BreadcrumbProps) => {
 
       <div className="bg-lens-bright w-px h-8 mx-6" />
 
-      <Link href={homeMenu?.link ?? ROUTE_INDEX} passHref>
+      <Link to={homeMenu?.link ?? ROUTE_INDEX}>
         <DyoIcon
           className="cursor-pointer"
-          src={homeMenu?.icon ?? '/breadcrumb_home.svg'}
+          src={homeMenu?.icon ?? breadcrumbHome}
           alt={t(homeMenu?.text ?? 'home')}
           size="sm"
         />
@@ -47,13 +57,13 @@ const Breadcrumb = (props: BreadcrumbProps) => {
         return (
           <div key={`breadcrumb-link-${index}`} className="flex flex-row max-w-lg">
             <div className="mx-4 mt-1">
-              <DyoIcon className="aspect-square" src="/breadcrumb_next.svg" alt="" size="sm" />
+              <DyoIcon className="aspect-square" src={breadcrumbNext} alt="" size="sm" />
             </div>
 
             {last ? (
               <DyoLabel className="my-auto truncate">{it.name}</DyoLabel>
             ) : (
-              <Link key={`breadcrumb-link-${index}-link`} href={it.url} passHref>
+              <Link key={`breadcrumb-link-${index}-link`} to={it.url}>
                 <DyoLabel className="cursor-pointer my-auto" textColor="text-lens-turquoise">
                   {it.name}
                 </DyoLabel>

@@ -1,68 +1,80 @@
 import clsx from 'clsx'
-import useTranslation from 'next-translate/useTranslation'
-import Head from 'next/head'
-import React from 'react'
+import React, { useEffect } from 'react'
 import Footer from './main/footer'
-import { Sidebar } from './main/sidebar'
-
-const sidebarWidth = 'w-[17rem]'
-const mainWidth = 'w-[calc(100vw-17rem)]' // ViewWidth - sidebar
-
-interface PageHeadProps {
-  title: string
-}
-
-const PageHead = (props: PageHeadProps) => {
-  const { title } = props
-
-  const { t } = useTranslation('head')
-
-  return (
-    <Head>
-      <title>{t('title', { page: title })}</title>
-    </Head>
-  )
-}
+import { useTranslation } from 'react-i18next'
+import { Link, Outlet } from 'react-router-dom'
+import { ROUTE_INDEX } from 'src/routes'
+import DyoIcon from 'src/elements/dyo-icon'
+import logo from 'src/assets/darklens_logo.svg'
+import user from 'src/assets/user.svg'
+import logout from 'src/assets/logout.svg'
+import cog from 'src/assets/cog.svg'
 
 export interface LayoutProps {
   title: string
-  // TODO(@m8vago): check after eslint update if this is still necessary
-  // eslint-disable-next-line react/no-unused-prop-types
-  children: React.ReactNode
+  className?: string
 }
 
-export const Layout = (props: LayoutProps) => {
+export const Page = (props: React.PropsWithChildren<LayoutProps>) => {
+  const { title, className, children } = props
+
+  const { t } = useTranslation('common')
+
+  useEffect(() => {
+    document.title = t('title', { page: title })
+  }, [title])
+
+  return <div className={className ?? "flex-1"}>
+    {children}
+  </div>
+}
+
+export const SingleFormLayout = (props: React.PropsWithChildren<LayoutProps>) => {
   const { title, children } = props
 
+  const { t } = useTranslation('common')
+
+  useEffect(() => {
+    document.title = t('title', { page: title })
+  }, [title])
+
   return (
-    <>
-      <PageHead title={title} />
+    <main className="flex flex-col w-screen h-screen bg-lens-dark">
+      <div className="flex flex-col h-full justify-center items-center">{children}</div>
 
-      <main className="flex flex-row h-full bg-lens-dark w-full">
-        <Sidebar className={clsx('flex flex-col bg-lens-medium h-screen sticky top-0', sidebarWidth)} />
-
-        <div className={clsx('flex flex-col px-7 pt-4', mainWidth)}>
-          <div className="flex flex-col h-full">{children}</div>
-
-          <Footer className="mt-auto" />
-        </div>
-      </main>
-    </>
+      <Footer className="mx-7" />
+    </main>
   )
 }
 
-export const SingleFormLayout = (props: LayoutProps) => {
-  const { title, children } = props
+export const MainLayout = () => {
+  const { t } = useTranslation()
 
   return (
-    <>
-      <PageHead title={title} />
+    <main className="w-full h-full">
+      <div className="bg-lens-medium h-18 shadow-topbar fixed left-0 top-0 right-0 flex flex-row pr-7 z-50">
+        <Link to={ROUTE_INDEX}>
+          <div className="px-12 bg-lens-medium-eased">
+            <img className="cursor-pointer" src={logo} alt={t('logoAlt')} width={120} height={20} />
+          </div>
+        </Link>
 
-      <main className="flex flex-col w-screen h-screen bg-lens-dark">
-        <div className="flex flex-col h-full justify-center items-center">{children}</div>
+        <div className="flex-1 flex flex-row justify-end items-center">
+          <DyoIcon src={cog} alt='' size='lg' className='mr-2 cursor-pointer' />
 
-        <Footer className="mx-7" />
-      </main>
-    </>
+          <DyoIcon src={user} alt='' size='lg' className='cursor-pointer' />
+
+          <div className="bg-lens-bright-muted w-px h-8 mx-3" />
+
+          <DyoIcon src={logout} alt='' size='lg' className='cursor-pointer' />
+        </div>
+      </div>
+
+      <div className="px-7 pt-20 h-full flex flex-col">
+        <Outlet />
+
+        <Footer className="flex-none mt-auto" />
+      </div>
+    </main>
   )
 }

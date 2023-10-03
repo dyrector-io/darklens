@@ -1,32 +1,42 @@
-import { Layout } from '@app/components/layout'
-import { BreadcrumbLink } from '@app/components/shared/breadcrumb'
-import EventsTerminal from '@app/components/shared/events-terminal'
-import PageHeading from '@app/components/shared/page-heading'
-import DyoButton from '@app/elements/dyo-button'
-import { DyoCard } from '@app/elements/dyo-card'
-import { DyoHeading } from '@app/elements/dyo-heading'
-import useWebSocket from '@app/hooks/use-websocket'
+import { Page } from 'src/components/layout'
+import { BreadcrumbLink } from 'src/components/shared/breadcrumb'
+import EventsTerminal from 'src/components/shared/events-terminal'
+import PageHeading from 'src/components/shared/page-heading'
+import DyoButton from 'src/elements/dyo-button'
+import { DyoCard } from 'src/elements/dyo-card'
+import { DyoHeading } from 'src/elements/dyo-heading'
+import useQuery from 'src/hooks/use-query'
+import useWebSocket from 'src/hooks/use-websocket'
 import {
   ContainerLogMessage,
   NodeDetails,
   WatchContainerLogMessage,
   WS_TYPE_CONTAINER_LOG,
   WS_TYPE_WATCH_CONTAINER_LOG,
-} from '@app/models'
-import { nodeApiDetailsUrl, nodeContainerLogUrl, nodeDetailsUrl, nodeWsDetailsUrl, ROUTE_NODES } from '@app/routes'
-import { withContextAuthorization } from '@app/utils'
-import { getBackendFromContext } from '@server/api'
-import { NextPageContext } from 'next'
-import useTranslation from 'next-translate/useTranslation'
-import { useState } from 'react'
+} from 'src/models'
+import { nodeApiDetailsUrl, nodeContainerLogUrl, nodeDetailsUrl, nodeWsDetailsUrl, ROUTE_NODES } from 'src/routes'
+import { fetcher } from 'src/utils'
+import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useParams } from 'react-router-dom'
+import LoadingIndicator from 'src/elements/loading-indicator'
 
-interface InstanceLogPageProps {
+type NodeContainerLogPageParams = {
+  nodeId: string
+}
+
+type NodeContainerLogPageQuery = {
+  prefix?: string
+  name?: string
+}
+
+interface NodeContainerLogPageProps {
   node: NodeDetails
   prefix: string
   name: string
 }
 
-const NodeContainerLogPage = (props: InstanceLogPageProps) => {
+const NodeContainerLogPage = (props: NodeContainerLogPageProps) => {
   const { node, prefix, name } = props
 
   const { t } = useTranslation('common')
@@ -67,7 +77,7 @@ const NodeContainerLogPage = (props: InstanceLogPageProps) => {
   ]
 
   return (
-    <Layout title={t('log')}>
+    <Page title={t('log')}>
       <PageHeading pageLink={pageLink} sublinks={sublinks}>
         <DyoButton className="ml-auto px-6 mr-2" secondary href={nodeDetailsUrl(node.id)}>
           {t('back')}
@@ -83,26 +93,22 @@ const NodeContainerLogPage = (props: InstanceLogPageProps) => {
 
         <EventsTerminal events={log} formatEvent={it => [it.log]} />
       </DyoCard>
-    </Layout>
+    </Page>
   )
 }
 
-export default NodeContainerLogPage
+export default () => {
+  const { nodeId } = useParams<NodeContainerLogPageParams>()
+  const { prefix, name } = useQuery<NodeContainerLogPageQuery>()
+  const [node, setNode] = useState<NodeDetails>(null)
 
-const getPageServerSideProps = async (context: NextPageContext) => {
-  const nodeId = context.query.nodeId as string
-  const prefix = context.query.prefix as string
-  const name = context.query.name as string
+  useEffect(() => {
+    const fetchData = async () => {
+      const node: NodeDetails = await fetcher(nodeApiDetailsUrl(nodeId))
+      setNode(node)
+    }
+    fetchData()
+  }, [])
 
-  const node = await getBackendFromContext<NodeDetails>(context, nodeApiDetailsUrl(nodeId))
-
-  return {
-    props: {
-      node,
-      prefix: prefix ?? null,
-      name: name ?? null,
-    },
-  }
+  return node ? <NodeContainerLogPage node={node} prefix={prefix} name={name} /> : <LoadingIndicator />
 }
-
-export const getServerSideProps = withContextAuthorization(getPageServerSideProps)

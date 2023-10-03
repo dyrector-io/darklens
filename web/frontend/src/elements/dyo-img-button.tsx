@@ -1,5 +1,4 @@
 import clsx from 'clsx'
-import Image from 'next/image'
 
 interface DyoImgButtonProps {
   className?: string
@@ -32,7 +31,7 @@ const DyoImgButton = (props: DyoImgButtonProps) => {
       disabled={disabled}
       onClick={onClick}
     >
-      <Image
+      <img
         className={imageClassName}
         src={src}
         width={width ?? 24}

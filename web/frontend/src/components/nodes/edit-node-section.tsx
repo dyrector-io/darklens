@@ -1,11 +1,11 @@
-import DyoButton from '@app/elements/dyo-button'
-import { DyoCard } from '@app/elements/dyo-card'
-import { DyoHeading } from '@app/elements/dyo-heading'
-import { DyoConfirmationModal } from '@app/elements/dyo-modal'
-import LoadingIndicator from '@app/elements/loading-indicator'
-import { defaultApiErrorHandler } from '@app/errors'
-import useConfirmation from '@app/hooks/use-confirmation'
-import useWebSocket from '@app/hooks/use-websocket'
+import DyoButton from 'src/elements/dyo-button'
+import { DyoCard } from 'src/elements/dyo-card'
+import { DyoHeading } from 'src/elements/dyo-heading'
+import { DyoConfirmationModal } from 'src/elements/dyo-modal'
+import LoadingIndicator from 'src/elements/loading-indicator'
+import { defaultApiErrorHandler } from 'src/errors'
+import useConfirmation from 'src/hooks/use-confirmation'
+import useWebSocket from 'src/hooks/use-websocket'
 import {
   NodeDetails,
   NodeEventMessage,
@@ -13,16 +13,16 @@ import {
   UpdateNodeAgentMessage,
   WS_TYPE_NODE_EVENT,
   WS_TYPE_UPDATE_AGENT,
-} from '@app/models'
+} from 'src/models'
 import clsx from 'clsx'
-import useTranslation from 'next-translate/useTranslation'
 import { MutableRefObject } from 'react'
 import toast from 'react-hot-toast'
 import DyoNodeSetup from './dyo-node-setup'
 import EditNodeCard from './edit-node-card'
 import NodeConnectionCard from './node-connection-card'
 import useNodeState from './use-node-state'
-import { WS_NODES, nodeApiTokenUrl } from '@app/routes'
+import { WS_NODES, nodeApiTokenUrl } from 'src/routes'
+import { useTranslation } from 'react-i18next'
 
 interface EditNodeSectionProps {
   className?: string
@@ -158,7 +158,7 @@ const EditNodeSection = (props: EditNodeSectionProps) => {
                   </DyoButton>
                 )}
 
-                <DyoButton
+                {/*<DyoButton
                   className="px-6"
                   secondary
                   danger={node.status === 'outdated'}
@@ -169,7 +169,7 @@ const EditNodeSection = (props: EditNodeSectionProps) => {
                     {t('update')}
                     {node.status === 'updating' && <LoadingIndicator className="inline-block ml-2" />}
                   </span>
-                </DyoButton>
+                </DyoButton>*/}
               </div>
             </DyoCard>
           ) : (

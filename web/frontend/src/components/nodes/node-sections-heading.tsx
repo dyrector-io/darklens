@@ -1,6 +1,6 @@
-import DyoButton from '@app/elements/dyo-button'
-import useTranslation from 'next-translate/useTranslation'
+import DyoButton from 'src/elements/dyo-button'
 import { NodeDetailsSection } from './use-node-details-state'
+import { useTranslation } from 'react-i18next'
 
 interface NodeSectionsHeadingProps {
   section: NodeDetailsSection

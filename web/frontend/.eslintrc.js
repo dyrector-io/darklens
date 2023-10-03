@@ -6,7 +6,7 @@ module.exports = {
   },
   plugins: ['@typescript-eslint'],
   extends: [
-    'next/core-web-vitals',
+    'react-app',
     'eslint:recommended',
     'plugin:@typescript-eslint/eslint-recommended',
     'airbnb',
@@ -54,8 +54,8 @@ module.exports = {
       {
         "patterns": [
           {
-            "group": ["@app/validations/*"],
-            "message": "Importing sub-paths from @app/validations results in yup localizations not working. Please import @app/validations instead."
+            "group": ["src/validations/*"],
+            "message": "Importing sub-paths from src/validations results in yup localizations not working. Please import src/validations instead."
           },
         ],
       },

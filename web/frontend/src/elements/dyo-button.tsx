@@ -1,6 +1,6 @@
 import clsx from 'clsx'
-import Link from 'next/link'
 import React from 'react'
+import { Link } from 'react-router-dom'
 
 export interface DyoButtonProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'ref'> {
   heightClassName?: string
@@ -83,7 +83,7 @@ const DyoButton = (props: DyoButtonProps) => {
   )
 
   return href ? (
-    <Link className="inline-block" href={href}>
+    <Link className="inline-block" to={href}>
       {button}
     </Link>
   ) : (

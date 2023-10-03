@@ -1,28 +1,30 @@
-import DyoButton from '@app/elements/dyo-button'
-import { DyoCard } from '@app/elements/dyo-card'
-import DyoChips from '@app/elements/dyo-chips'
-import DyoForm from '@app/elements/dyo-form'
-import { DyoHeading } from '@app/elements/dyo-heading'
-import DyoIcon from '@app/elements/dyo-icon'
-import { DyoInput } from '@app/elements/dyo-input'
-import { DyoLabel } from '@app/elements/dyo-label'
-import DyoToggle from '@app/elements/dyo-toggle'
-import TimeLabel from '@app/elements/time-label'
-import { defaultApiErrorHandler } from '@app/errors'
-import useDyoFormik from '@app/hooks/use-dyo-formik'
-import useTimer from '@app/hooks/use-timer'
+import DyoButton from 'src/elements/dyo-button'
+import { DyoCard } from 'src/elements/dyo-card'
+import DyoChips from 'src/elements/dyo-chips'
+import DyoForm from 'src/elements/dyo-form'
+import { DyoHeading } from 'src/elements/dyo-heading'
+import DyoIcon from 'src/elements/dyo-icon'
+import { DyoInput } from 'src/elements/dyo-input'
+import { DyoLabel } from 'src/elements/dyo-label'
+import DyoToggle from 'src/elements/dyo-toggle'
+import TimeLabel from 'src/elements/time-label'
+import { defaultApiErrorHandler } from 'src/errors'
+import useDyoFormik from 'src/hooks/use-dyo-formik'
+import useTimer from 'src/hooks/use-timer'
 import {
   NODE_INSTALL_SCRIPT_TYPE_VALUES,
   NodeDetails,
   NodeGenerateScript,
   NodeInstall,
   NodeInstallScriptType,
-} from '@app/models'
-import { sendForm, writeToClipboard } from '@app/utils'
-import { nodeGenerateScriptSchema } from '@app/validations'
-import useTranslation from 'next-translate/useTranslation'
+} from 'src/models'
+import { sendForm, writeToClipboard } from 'src/utils'
+import { nodeGenerateScriptSchema } from 'src/validations'
 import ShEditor from '../shared/sh-editor'
-import { nodeApiScriptUrl } from '@app/routes'
+import { nodeApiScriptUrl } from 'src/routes'
+import { useTranslation } from 'react-i18next'
+import copyAlt from 'src/assets/copy-alt.svg'
+import InfoBox from 'src/elements/lens-info-box'
 
 const expiresIn = (expireAt: Date): number => {
   const now = new Date().getTime()
@@ -99,38 +101,35 @@ const DyoNodeSetup = (props: DyoNodeSetupProps) => {
 
   return (
     <DyoCard>
-      <DyoHeading element="h4" className="text-lg text-lens-bright mb-4">
+      <DyoHeading element="h4" className="text-lg text-lens-bright mb-2">
         {t('agentInstall')}
       </DyoHeading>
 
-      <div className="text-lens-bright mb-4">
-        <DyoHeading element="h4" className="text-md">
-          {t('whatScriptDoesHeader')}
-        </DyoHeading>
-
-        <p className="text-lens-light-eased ml-4">{t('scriptExplanation')}</p>
-      </div>
+      <InfoBox className="mb-2" type="info" title={t('whatScriptDoesHeader')}>
+        <p className="text-lens-light-eased">{t('scriptExplanation')}</p>
+      </InfoBox>
 
       <DyoForm className="flex flex-col" onSubmit={formik.handleSubmit} onReset={formik.handleReset}>
         {!node.install ? (
-          <div className="mb-4">
+          <>
             <div className="flex flex-col">
-              <DyoHeading element="h4" className="text-lg text-lens-bright">
+              <DyoHeading element="h4" className="text-lg text-lens-bright flex flex-row items-center">
+                <DyoToggle
+                  className="mr-2 my-2"
+                  labelClassName="text-lens-light-eased mr-4"
+                  name="traefik"
+                  checked={!!formik.values.dagentTraefik}
+                  onCheckedChange={onTraefikChanged}
+                />
+
                 {t('traefik')}
               </DyoHeading>
 
-              <DyoToggle
-                className="mx-4 my-2"
-                labelClassName="text-lens-light-eased mr-4"
-                name="traefik"
-                checked={!!formik.values.dagentTraefik}
-                onCheckedChange={onTraefikChanged}
-                label={t('installTraefik')}
-              />
+              <p className="text-sm text-lens-bright-muted mb-2.5">{t('traefikExplanation')}</p>
 
               {formik.values.dagentTraefik && (
-                <div className="ml-2 mb-2">
-                  <DyoLabel className="text-lg mb-2.5" textColor="text-lens-bright">
+                <div className="mb-2">
+                  <DyoLabel className="text-md mb-2" textColor="text-lens-bright">
                     {t('traefikAcmeEmail')}
                   </DyoLabel>
 
@@ -145,14 +144,6 @@ const DyoNodeSetup = (props: DyoNodeSetupProps) => {
                 </div>
               )}
 
-              <div className="text-lens-bright mb-4">
-                <DyoHeading element="h4" className="text-md">
-                  {t('whatIsTraefik')}
-                </DyoHeading>
-
-                <p className="text-lens-light-eased ml-4">{t('traefikExplanation')}</p>
-              </div>
-
               <DyoLabel className="text-lg mb-2.5" textColor="text-lens-bright">
                 {t('persistentDataPath')}
               </DyoLabel>
@@ -160,13 +151,13 @@ const DyoNodeSetup = (props: DyoNodeSetupProps) => {
               <DyoInput
                 name="rootPath"
                 placeholder={t('optionalLeaveEmptyForDefaults')}
-                className="max-w-lg ml-2 mb-2.5"
+                className="max-w-lg mb-2.5"
                 grow
                 value={formik.values.rootPath}
                 onChange={formik.handleChange}
                 message={formik.errors.rootPath}
               />
-              <p className="text-sm text-lens-light-eased ml-4 mb-2.5">{t('persistentDataExplanation')}</p>
+              <p className="text-sm text-lens-bright-muted mb-2.5">{t('persistentDataExplanation')}</p>
 
               <DyoHeading element="h4" className="text-lg text-lens-bright mb-2">
                 {t('type')}
@@ -184,7 +175,7 @@ const DyoNodeSetup = (props: DyoNodeSetupProps) => {
             <DyoButton className="px-4 py-2 mt-4 mr-auto" type="submit">
               {t('generateScript')}
             </DyoButton>
-          </div>
+          </>
         ) : (
           <>
             <div className="flex flex-col">
@@ -201,7 +192,7 @@ const DyoNodeSetup = (props: DyoNodeSetupProps) => {
                 />
 
                 <div onClick={onCopyScript} className="cursor-pointer ml-2 h-11 w-11 flex items-center justify-center">
-                  <DyoIcon size="md" src="/copy-alt.svg" alt={t('common:copy')} />
+                  <DyoIcon size="md" src={copyAlt} alt={t('common:copy')} />
                 </div>
               </div>
 

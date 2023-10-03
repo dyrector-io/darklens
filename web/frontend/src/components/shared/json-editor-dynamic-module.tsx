@@ -1,7 +1,5 @@
-import dynamic from 'next/dynamic'
+import { lazy } from 'react'
 
-const JsonEditor = dynamic(() => import('./json-editor'), {
-  ssr: false,
-})
+const JsonEditor = lazy(() => import('./json-editor'))
 
 export default JsonEditor

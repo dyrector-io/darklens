@@ -1,15 +1,15 @@
-import { SingleFormLayout } from '@app/components/layout'
-import DyoButton from '@app/elements/dyo-button'
-import { DyoHeading } from '@app/elements/dyo-heading'
-import { ROUTE_INDEX, ROUTE_STATUS } from '@app/routes'
-import useTranslation from 'next-translate/useTranslation'
-import { useRouter } from 'next/router'
+import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
+import { SingleFormLayout } from 'src/components/layout'
+import DyoButton from 'src/elements/dyo-button'
+import { DyoHeading } from 'src/elements/dyo-heading'
+import { ROUTE_INDEX, ROUTE_STATUS } from 'src/routes'
 
 const Page500 = () => {
   const { t } = useTranslation('status')
-  const router = useRouter()
+  const nav = useNavigate()
 
-  const navigateToIndex = async () => await router.push(ROUTE_INDEX)
+  const navigateToIndex = async () => await nav(ROUTE_INDEX)
 
   return (
     <SingleFormLayout title={t('errors:internalError')}>

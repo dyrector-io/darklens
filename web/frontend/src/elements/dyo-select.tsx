@@ -1,8 +1,9 @@
 import clsx from 'clsx'
-import useTranslation from 'next-translate/useTranslation'
 import React, { ForwardedRef, forwardRef } from 'react'
 import DyoIcon from './dyo-icon'
 import DyoMessage from './dyo-message'
+import { useTranslation } from 'react-i18next'
+import chevronDown from 'src/assets/chevron_down.svg'
 
 export interface DyoSelectProps extends React.InputHTMLAttributes<HTMLSelectElement> {
   children: React.ReactNode
@@ -32,7 +33,7 @@ export const DyoSelect = forwardRef((props: DyoSelectProps, ref: ForwardedRef<HT
           )}
         />
         <div className="pointer-events-none pr-2 absolute h-[24px] right-0 top-1/2 transform -translate-y-1/2">
-          <DyoIcon src="/chevron_down.svg" alt={t('common:down')} aria-hidden size="md" />
+          <DyoIcon src={chevronDown} alt={t('common:down')} aria-hidden size="md" />
         </div>
       </div>
 

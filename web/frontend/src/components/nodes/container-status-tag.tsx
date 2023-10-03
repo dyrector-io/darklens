@@ -1,6 +1,6 @@
-import DyoTag from '@app/elements/dyo-tag'
-import { ContainerState } from '@app/models'
-import useTranslation from 'next-translate/useTranslation'
+import DyoTag from 'src/elements/dyo-tag'
+import { ContainerState } from 'src/models'
+import { useTranslation } from 'react-i18next'
 
 interface ContainerStatusTagProps {
   className?: string

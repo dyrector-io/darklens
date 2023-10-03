@@ -1,10 +1,10 @@
-import { Translate } from 'next-translate'
 import toast, { ToastOptions } from 'react-hot-toast'
 import { fromApiError } from './error-responses'
 import { DyoErrorDto, WsErrorMessage } from './models'
 import WebSocketClient from './websockets/websocket-client'
-import { NextRouter } from 'next/router'
 import { ROUTE_INDEX } from './routes'
+import { TFunction } from 'i18next'
+import { NavigateFunction } from 'react-router-dom'
 
 export type DyoApiErrorHandler = (res: Response, setErrorValue?: FormikSetErrorValue) => Promise<void>
 
@@ -25,12 +25,10 @@ type ApiError = {
   error: string
 }
 
-export const defaultTranslator: (t: Translate) => Translator = t => (stringId, status, dto) => {
+export const defaultTranslator: (t: TFunction) => Translator = t => (stringId, status, dto) => {
   if (status < 500) {
-    const translation = t(`errors.${stringId}`, dto, {
-      fallback: `errors:${stringId}`,
-      default: dto.description,
-    })
+    t(`errors.${stringId}`)
+    const translation = t(`errors.${stringId}`, dto.description, dto)
     return {
       input: translation,
       toast: translation,
@@ -65,7 +63,7 @@ export const apiErrorHandler =
     toaster(translation.toast, translation.toastOptions)
   }
 
-export const defaultApiErrorHandler = (t: Translate) => apiErrorHandler(defaultTranslator(t))
+export const defaultApiErrorHandler = (t: TFunction) => apiErrorHandler(defaultTranslator(t))
 
 export const wsErrorHandler = (translator: Translator) => (message: WsErrorMessage) => {
   const toaster = text => toast.error(text)
@@ -80,10 +78,10 @@ export const wsErrorHandler = (translator: Translator) => (message: WsErrorMessa
   toaster(translation.toast)
 }
 
-export const defaultWsErrorHandler = (t: Translate, router: NextRouter) => (msg: WsErrorMessage) => {
+export const defaultWsErrorHandler = (t: TFunction, router: NavigateFunction) => (msg: WsErrorMessage) => {
   const defaultErrorHandler = wsErrorHandler(defaultTranslator(t))
   if (msg.status === WebSocketClient.ERROR_UNAUTHORIZE) {
-    router.push(ROUTE_INDEX)
+    router(ROUTE_INDEX)
     return
   }
   defaultErrorHandler(msg)

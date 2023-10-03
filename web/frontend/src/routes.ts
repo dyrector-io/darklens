@@ -13,7 +13,6 @@ export const ROUTE_NODES = '/nodes'
 export const API_ROOT = '/api'
 export const API_NODES = `${API_ROOT}/nodes`
 export const API_HEALTH = `${API_ROOT}/health`
-export const API_STATUS = '/api/status'
 
 export const WS_NODES = '/nodes'
 

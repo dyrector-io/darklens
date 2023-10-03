@@ -1,26 +1,24 @@
 import clsx from 'clsx'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
+import { Link, useLocation } from 'react-router-dom'
 
 interface NavButtonProps {
   children: React.ReactNode
   href: string
   target?: string
-  passHref?: boolean
   icon?: JSX.Element
 }
 
 const NavButton = (props: NavButtonProps) => {
-  const { children, href, target, passHref, icon } = props
+  const { children, href, target, icon } = props
 
-  const router = useRouter()
+  const location = useLocation()
 
-  const active = router.pathname.startsWith(href)
+  const active = location.pathname.startsWith(href)
 
   return (
     <>
       <div className={clsx('pl-8 py-2', active ? 'bg-lens-dark w-full' : null)}>
-        <Link href={href} passHref={passHref} target={target}>
+        <Link to={href} target={target}>
           <div className="flex flex-row">
             <div className="flex items-center mr-2 text-lens-bright text-sm font-semibold">{icon}</div>
             {children}

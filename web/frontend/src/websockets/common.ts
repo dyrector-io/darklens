@@ -1,4 +1,4 @@
-import { WsErrorMessage } from '@app/models'
+import { WsErrorMessage } from 'src/models'
 
 export type WsMessage<T = any> = {
   type: string

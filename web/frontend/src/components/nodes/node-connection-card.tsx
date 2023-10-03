@@ -1,13 +1,13 @@
-import DyoBadge from '@app/elements/dyo-badge'
-import { DyoCard } from '@app/elements/dyo-card'
-import { DyoHeading } from '@app/elements/dyo-heading'
-import { DyoLabel } from '@app/elements/dyo-label'
-import TimeLabel from '@app/elements/time-label'
-import { DyoNode } from '@app/models'
+import DyoBadge from 'src/elements/dyo-badge'
+import { DyoCard } from 'src/elements/dyo-card'
+import { DyoHeading } from 'src/elements/dyo-heading'
+import { DyoLabel } from 'src/elements/dyo-label'
+import TimeLabel from 'src/elements/time-label'
+import { DyoNode } from 'src/models'
 import clsx from 'clsx'
-import useTranslation from 'next-translate/useTranslation'
 import NodeStatusIndicator from './node-status-indicator'
 import useNodeUptime from './use-node-uptime'
+import { useTranslation } from 'react-i18next'
 
 interface NodeConnectionCardProps {
   className?: string

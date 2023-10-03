@@ -1,4 +1,3 @@
-import assert from 'assert'
 import clsx from 'clsx'
 
 export interface DyoChipsProps<T> {
@@ -14,7 +13,8 @@ export interface DyoChipsProps<T> {
 const DyoChips = <T,>(props: DyoChipsProps<T>) => {
   const { choices, converter, onSelectionChange, key: propsKey, className, selection, disabled } = props
 
-  assert(
+  // eslint-disable-next-line no-console
+  console.assert(
     converter || choices.length < 1 || typeof choices[0] === 'string',
     'When choices are not string, you must define a converter.',
   )

@@ -1,4 +1,4 @@
-import { NodeInstallScriptType, NODE_INSTALL_SCRIPT_TYPE_VALUES } from '@app/models'
+import { NodeInstallScriptType, NODE_INSTALL_SCRIPT_TYPE_VALUES } from 'src/models'
 import yup from './yup'
 import { descriptionRule, iconRule, nameRule } from './common'
 

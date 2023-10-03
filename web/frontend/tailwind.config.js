@@ -40,6 +40,7 @@ module.exports = {
       },
       boxShadow: {
         modal: '0 0 20px 5px rgb(0 0 0 / 0.25)',
+        topbar: '0px 3px 8px rgba(0, 0, 0, 0.24)',
       },
       fontFamily: {
         poppins: 'Poppins, sans-serif',

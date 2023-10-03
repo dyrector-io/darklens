@@ -1,10 +1,10 @@
-import { DyoCard } from '@app/elements/dyo-card'
-import { DyoHeading } from '@app/elements/dyo-heading'
-import { ServiceInfo } from '@app/models'
+import { DyoCard } from 'src/elements/dyo-card'
+import { DyoHeading } from 'src/elements/dyo-heading'
+import { ServiceInfo } from 'src/models'
 import clsx from 'clsx'
-import useTranslation from 'next-translate/useTranslation'
 import ServiceStatusIndicator from './service-status-indicator'
 import ServiceStatusTag from './service-status-tag'
+import { useTranslation } from 'react-i18next'
 
 interface ServiceStatusCardProps {
   className?: string

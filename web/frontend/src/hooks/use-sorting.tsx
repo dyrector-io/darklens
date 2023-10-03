@@ -1,6 +1,7 @@
-import { Audit } from '@app/models'
-import Image from 'next/image'
+import { Audit } from 'src/models'
 import { useEffect, useState } from 'react'
+import arrowUp from 'src/assets/arrow_up.svg'
+import arrowDown from 'src/assets/arrow_down.svg'
 
 export type SortDirection = 'asc' | 'desc'
 
@@ -115,9 +116,9 @@ export const sortHeaderBuilder =
           onClick={() => sort.toggleSorting(mapping[header])}
         >
           <span>{translate(header)}</span>
-          <Image
+          <img
             className="cursor-pointer ml-1"
-            src={sort.sortDirection === 'asc' ? '/arrow_up.svg' : '/arrow_down.svg'}
+            src={sort.sortDirection === 'asc' ? arrowUp : arrowDown}
             alt="order"
             width={16}
             height={16}

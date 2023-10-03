@@ -1,9 +1,9 @@
-import useOverflowDetection from '@app/hooks/use-overflow-detection'
+import useOverflowDetection from 'src/hooks/use-overflow-detection'
 import clsx from 'clsx'
-import useTranslation from 'next-translate/useTranslation'
 import { useState } from 'react'
 import DyoButton from './dyo-button'
 import DyoModal from './dyo-modal'
+import { useTranslation } from 'react-i18next'
 
 interface DyoExpandableTextProps {
   text: string

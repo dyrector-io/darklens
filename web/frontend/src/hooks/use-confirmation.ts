@@ -1,4 +1,4 @@
-import { DyoConfirmationModalConfig } from '@app/elements/dyo-modal'
+import { DyoConfirmationModalConfig } from 'src/elements/dyo-modal'
 import { useState } from 'react'
 
 export type DyoConfirmationModalConfigOverride = Omit<DyoConfirmationModalConfig, 'onClose'>

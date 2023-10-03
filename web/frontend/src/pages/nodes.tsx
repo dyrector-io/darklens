@@ -1,46 +1,41 @@
-import { Layout } from '@app/components/layout'
-import DyoNodeCard from '@app/components/nodes/dyo-node-card'
-import EditNodeSection from '@app/components/nodes/edit-node-section'
-import { BreadcrumbLink } from '@app/components/shared/breadcrumb'
-import Filters from '@app/components/shared/filters'
-import PageHeading from '@app/components/shared/page-heading'
-import { ListPageMenu } from '@app/components/shared/page-menu'
-import DyoFilterChips from '@app/elements/dyo-filter-chips'
-import { DyoHeading } from '@app/elements/dyo-heading'
-import DyoWrap from '@app/elements/dyo-wrap'
-import { EnumFilter, enumFilterFor, TextFilter, textFilterFor, useFilters } from '@app/hooks/use-filters'
-import useWebSocket from '@app/hooks/use-websocket'
-import { DyoNode, NODE_STATUS_VALUES, NodeEventMessage, NodeStatus, WS_TYPE_NODE_EVENT } from '@app/models'
-import { API_NODES, nodeDetailsUrl, ROUTE_DOCS, ROUTE_NODES, WS_NODES } from '@app/routes'
-import { withContextAuthorization } from '@app/utils'
-import { getBackendFromContext } from '@server/api'
-import clsx from 'clsx'
-import { NextPageContext } from 'next'
-import useTranslation from 'next-translate/useTranslation'
-import Link from 'next/link'
-import { useRef, useState } from 'react'
+import { Page } from 'src/components/layout'
+import DyoNodeCard from 'src/components/nodes/dyo-node-card'
+import EditNodeSection from 'src/components/nodes/edit-node-section'
+import { BreadcrumbLink } from 'src/components/shared/breadcrumb'
+import Filters from 'src/components/shared/filters'
+import PageHeading from 'src/components/shared/page-heading'
+import DyoFilterChips from 'src/elements/dyo-filter-chips'
+import { DyoHeading } from 'src/elements/dyo-heading'
+import { EnumFilter, enumFilterFor, TextFilter, textFilterFor, useFilters } from 'src/hooks/use-filters'
+import useWebSocket from 'src/hooks/use-websocket'
+import { DyoNode, NODE_STATUS_VALUES, NodeEventMessage, NodeStatus, WS_TYPE_NODE_EVENT } from 'src/models'
+import { API_NODES, nodeDetailsUrl, ROUTE_DOCS, ROUTE_NODES, WS_NODES } from 'src/routes'
+import { fetcher } from 'src/utils'
+import { useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
-import { useSWRConfig } from 'swr'
-
-interface NodesPageProps {
-  nodes: DyoNode[]
-}
+import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router-dom'
+import LoadingIndicator from 'src/elements/loading-indicator'
+import plusIcon from 'src/assets/plus.svg'
+import DyoIcon from 'src/elements/dyo-icon'
+import DyoButton from 'src/elements/dyo-button'
+import clsx from 'clsx'
+import { DyoSelect } from 'src/elements/dyo-select'
+import { DyoInput } from 'src/elements/dyo-input'
+import { DyoLabel } from 'src/elements/dyo-label'
 
 type NodeFilter = TextFilter & EnumFilter<NodeStatus>
 
-const NodesPage = (props: NodesPageProps) => {
-  const { nodes } = props
-
+const NodesPage = () => {
   const { t } = useTranslation('nodes')
 
-  const { mutate } = useSWRConfig()
-
+  const [loading, setLoading] = useState<boolean>(true)
   const filters = useFilters<DyoNode, NodeFilter>({
     filters: [
       textFilterFor<DyoNode>(it => [it.address, it.name, it.description, it.status, it.icon]),
       enumFilterFor<DyoNode, NodeStatus>(it => [it.status]),
     ],
-    initialData: nodes,
+    initialData: [],
   })
 
   const [creating, setCreating] = useState(false)
@@ -51,6 +46,15 @@ const NodesPage = (props: NodesPageProps) => {
       toast(t('errors:connectionLost'))
     },
   })
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const nodes: DyoNode[] = await fetcher(API_NODES)
+      filters.setItems(nodes)
+      setLoading(false)
+    }
+    fetchData()
+  }, [])
 
   socket.on(WS_TYPE_NODE_EVENT, (message: NodeEventMessage) => {
     const index = filters.items.findIndex(it => it.id === message.id)
@@ -86,75 +90,82 @@ const NodesPage = (props: NodesPageProps) => {
     }
 
     filters.setItems(newNodes)
-    await mutate(API_NODES, null)
   }
+
+  const cardClass = (index: number) => {
+    const modulo3Class = index % 4 === 1 ? 'xl:mx-4' : null
+    const modulo2Class = clsx(index % 2 > 0 ? 'lg:ml-2' : 'lg:mr-2', modulo3Class ?? 'xl:mx-0')
+
+    return clsx(modulo2Class, modulo3Class)
+  }
+
   const pageLink: BreadcrumbLink = {
     name: t('common:nodes'),
     url: ROUTE_NODES,
   }
 
   return (
-    <Layout title={t('common:nodes')}>
+    <Page title={t('common:nodes')} className="flex-1 flex flex-col">
       <PageHeading pageLink={pageLink}>
-        <ListPageMenu creating={creating} setCreating={setCreating} submitRef={submitRef} />
+        {creating ? (
+          <>
+            <DyoButton className="ml-auto px-4" secondary onClick={() => setCreating(false)}>
+              {t('common:discard')}
+            </DyoButton>
+
+            <DyoButton className="px-4 ml-4" onClick={() => submitRef.current()}>
+              {t('common:save')}
+            </DyoButton>
+          </>
+        ) : (
+          <>
+            <DyoSelect
+              className="mr-4"
+              value={filters.filter?.enum}
+              onChange={it =>
+                filters.setFilter({
+                  enum: it.target.value as NodeStatus,
+                })
+              }
+            >
+              {['all', ...NODE_STATUS_VALUES].map(it => (
+                <option key={it} value={it}>
+                  {it == 'all' ? t('common:all') : t(`common:nodeStatuses.${it}`)}
+                </option>
+              ))}
+            </DyoSelect>
+
+            <DyoInput
+              className={t('grow')}
+              placeholder={t('common:search')}
+              onChange={e => filters.setFilter({ text: e.target.value })}
+            />
+          </>
+        )}
       </PageHeading>
 
-      {!creating ? null : <EditNodeSection className="mb-4" submitRef={submitRef} onNodeEdited={onNodeEdited} />}
-      {filters.items.length ? (
-        <>
-          <Filters setTextFilter={it => filters.setFilter({ text: it })}>
-            <DyoFilterChips
-              className="pl-6"
-              choices={NODE_STATUS_VALUES}
-              converter={it => t(`common:nodeStatuses.${it}`)}
-              selection={filters.filter?.enum}
-              onSelectionChange={type => {
-                filters.setFilter({
-                  enum: type,
-                })
-              }}
-            />
-          </Filters>
-
-          <DyoWrap itemClassName="lg:w-1/2 xl:w-1/3">
-            {filters.filtered.map((it, index) => {
-              const modulo3Class = index % 3 === 1 ? 'xl:mx-4' : null
-              const modulo2Class = clsx(index % 2 > 0 ? 'lg:ml-2' : 'lg:mr-2', modulo3Class ?? 'xl:mx-0')
-
-              return (
-                <DyoNodeCard
-                  className={clsx('max-h-72 w-full p-8 my-2', modulo3Class, modulo2Class)}
-                  key={`node-${index}`}
-                  node={it}
-                  titleHref={nodeDetailsUrl(it.id)}
-                />
-              )
-            })}
-          </DyoWrap>
-        </>
+      {creating ? (
+        <EditNodeSection submitRef={submitRef} onNodeEdited={onNodeEdited} />
+      ) : loading ? (
+        <div className="flex-1 flex items-center justify-center">
+          <LoadingIndicator size="xl" />
+        </div>
       ) : (
-        <DyoHeading element="h3" className="text-md text-center text-lens-light-eased w-8/12 m-auto">
-          <p className="pb-8">{t('noItems')}</p>
-
-          <Link className="pt-32" href={`${ROUTE_DOCS}/tutorials/register-your-node`} target="_blank">
-            {t('description')}
-          </Link>
-        </DyoHeading>
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4 mt-2">
+          {filters.filtered.map((it, index) => (
+            <DyoNodeCard className="p-6 h-40" key={`node-${index}`} node={it} titleHref={nodeDetailsUrl(it.id)} />
+          ))}
+          <div
+            className="h-40 rounded-lg ring-2 ring-lens-light-grey flex flex-col items-center justify-center cursor-pointer"
+            onClick={() => setCreating(true)}
+          >
+            <DyoIcon src={plusIcon} size="xxl" alt="" />
+            <DyoLabel>{t('add')}</DyoLabel>
+          </div>
+        </div>
       )}
-    </Layout>
+    </Page>
   )
 }
 
 export default NodesPage
-
-const getPageServerSideProps = async (context: NextPageContext) => {
-  const nodes = await getBackendFromContext<DyoNode[]>(context, API_NODES)
-
-  return {
-    props: {
-      nodes,
-    },
-  }
-}
-
-export const getServerSideProps = withContextAuthorization(getPageServerSideProps)

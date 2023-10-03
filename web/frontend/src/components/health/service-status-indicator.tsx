@@ -1,6 +1,6 @@
-import DyoIndicator from '@app/elements/dyo-indicator'
-import { ServiceStatus } from '@app/models'
-import useTranslation from 'next-translate/useTranslation'
+import DyoIndicator from 'src/elements/dyo-indicator'
+import { ServiceStatus } from 'src/models'
+import { useTranslation } from 'react-i18next'
 
 const statusToColor = (status: ServiceStatus) => {
   switch (status) {

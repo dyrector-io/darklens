@@ -1,18 +1,19 @@
-import Paginator, { PaginationSettings } from '@app/components/shared/paginator'
-import { DyoCard } from '@app/elements/dyo-card'
-import DyoIcon from '@app/elements/dyo-icon'
-import { DyoList } from '@app/elements/dyo-list'
-import DyoModal from '@app/elements/dyo-modal'
-import { useThrottling } from '@app/hooks/use-throttleing'
-import { NodeAuditLog, NodeAuditLogList, NodeAuditLogQuery } from '@app/models'
-import { getEndOfToday, utcDateToLocale } from '@app/utils'
+import Paginator, { PaginationSettings } from 'src/components/shared/paginator'
+import { DyoCard } from 'src/elements/dyo-card'
+import DyoIcon from 'src/elements/dyo-icon'
+import { DyoList } from 'src/elements/dyo-list'
+import DyoModal from 'src/elements/dyo-modal'
+import { useThrottling } from 'src/hooks/use-throttleing'
+import { NodeAuditLog, NodeAuditLogList, NodeAuditLogQuery } from 'src/models'
+import { getEndOfToday, utcDateToLocale } from 'src/utils'
 import clsx from 'clsx'
-import useTranslation from 'next-translate/useTranslation'
 import { useEffect, useState } from 'react'
 import JsonEditor from '../shared/json-editor'
-import { dateSort, sortHeaderBuilder, stringSort, useSorting } from '@app/hooks/use-sorting'
-import { nodeApiAuditUrl } from '@app/routes'
+import { dateSort, sortHeaderBuilder, stringSort, useSorting } from 'src/hooks/use-sorting'
+import { nodeApiAuditUrl } from 'src/routes'
 import { NodeDetailsState } from './use-node-details-state'
+import { useTranslation } from 'react-i18next'
+import eye from 'src/assets/eye.svg'
 
 interface NodeAuditListProps {
   state: NodeDetailsState
@@ -101,7 +102,7 @@ const NodeAuditList = (props: NodeAuditListProps) => {
       {log.data && (
         <DyoIcon
           className="aspect-square cursor-pointer ml-auto mr-auto"
-          src="/eye.svg"
+          src={eye}
           alt={t('common:view')}
           size="md"
           onClick={() => onShowInfoClick(log)}
@@ -121,6 +122,7 @@ const NodeAuditList = (props: NodeAuditListProps) => {
           columnWidths={columnWidths}
           data={sorting.items}
           headers={listHeaders}
+          footerClassName="py-1"
           footer={<Paginator onChanged={setPagination} length={total} defaultPagination={defaultPagination} />}
           itemBuilder={itemTemplate}
           headerBuilder={sortHeaderBuilder<NodeAuditLog, NodeAuditLogSorting>(

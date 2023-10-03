@@ -1,9 +1,9 @@
-import DyoButton from '@app/elements/dyo-button'
+import DyoButton from 'src/elements/dyo-button'
 import clsx from 'clsx'
-import useTranslation from 'next-translate/useTranslation'
 import React, { useCallback, useEffect, useRef } from 'react'
 import { DyoCard } from './dyo-card'
 import { DyoHeading } from './dyo-heading'
+import { useTranslation } from 'react-i18next'
 
 export interface DyoModalProps {
   className?: string

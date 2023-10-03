@@ -1,4 +1,4 @@
-import { FormikSetFieldValue } from '@app/utils'
+import { FormikSetFieldValue } from 'src/utils'
 import clsx from 'clsx'
 import { useState } from 'react'
 import DyoBadge from './dyo-badge'

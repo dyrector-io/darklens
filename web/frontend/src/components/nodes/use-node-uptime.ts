@@ -1,6 +1,6 @@
-import { SECOND_IN_MILLIS } from '@app/const'
-import useInterval from '@app/hooks/use-interval'
-import { DyoNode } from '@app/models'
+import { SECOND_IN_MILLIS } from 'src/const'
+import useInterval from 'src/hooks/use-interval'
+import { DyoNode } from 'src/models'
 import { useState } from 'react'
 
 const useNodeUptime = (node: DyoNode): number | null => {

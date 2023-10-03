@@ -1,13 +1,13 @@
-import DyoBadge from '@app/elements/dyo-badge'
-import { DyoCard, DyoCardProps } from '@app/elements/dyo-card'
-import DyoExpandableText from '@app/elements/dyo-expandable-text'
-import { DyoHeading } from '@app/elements/dyo-heading'
-import { DyoLabel } from '@app/elements/dyo-label'
-import { DyoNode } from '@app/models'
+import DyoBadge from 'src/elements/dyo-badge'
+import { DyoCard, DyoCardProps } from 'src/elements/dyo-card'
+import DyoExpandableText from 'src/elements/dyo-expandable-text'
+import { DyoHeading } from 'src/elements/dyo-heading'
+import { DyoLabel } from 'src/elements/dyo-label'
+import { DyoNode } from 'src/models'
 import clsx from 'clsx'
-import useTranslation from 'next-translate/useTranslation'
-import Link from 'next/link'
 import NodeStatusIndicator from './node-status-indicator'
+import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router-dom'
 
 interface DyoNodeCardProps extends Omit<DyoCardProps, 'children'> {
   node: DyoNode
@@ -37,7 +37,7 @@ const DyoNodeCard = (props: DyoNodeCardProps) => {
 
   return (
     <DyoCard className={clsx(className ?? 'p-6', 'flex flex-col')}>
-      {titleHref ? <Link href={titleHref}>{title}</Link> : title}
+      {titleHref ? <Link to={titleHref}>{title}</Link> : title}
 
       {!hideConnectionInfo && node.address && (
         <DyoLabel className="mr-auto mt-6">

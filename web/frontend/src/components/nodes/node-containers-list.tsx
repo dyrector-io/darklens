@@ -1,12 +1,12 @@
-import ContainerStatusTag from '@app/components/nodes/container-status-tag'
-import { NodeDetailsActions, NodeDetailsState } from '@app/components/nodes/use-node-details-state'
-import Paginator from '@app/components/shared/paginator'
-import { DyoCard } from '@app/elements/dyo-card'
-import DyoIcon from '@app/elements/dyo-icon'
-import DyoImgButton from '@app/elements/dyo-img-button'
-import { DyoList } from '@app/elements/dyo-list'
-import LoadingIndicator from '@app/elements/loading-indicator'
-import { dateSort, enumSort, sortHeaderBuilder, stringSort, useSorting } from '@app/hooks/use-sorting'
+import ContainerStatusTag from 'src/components/nodes/container-status-tag'
+import { NodeDetailsActions, NodeDetailsState } from 'src/components/nodes/use-node-details-state'
+import Paginator from 'src/components/shared/paginator'
+import { DyoCard } from 'src/elements/dyo-card'
+import DyoIcon from 'src/elements/dyo-icon'
+import DyoImgButton from 'src/elements/dyo-img-button'
+import { DyoList } from 'src/elements/dyo-list'
+import LoadingIndicator from 'src/elements/loading-indicator'
+import { dateSort, enumSort, sortHeaderBuilder, stringSort, useSorting } from 'src/hooks/use-sorting'
 import {
   CONTAINER_STATE_VALUES,
   Container,
@@ -17,12 +17,17 @@ import {
   containerPortsToString,
   containerPrefixNameOf,
   imageName,
-} from '@app/models'
-import { nodeContainerLogUrl } from '@app/routes'
-import { utcDateToLocale } from '@app/utils'
+} from 'src/models'
+import { nodeContainerLogUrl } from 'src/routes'
+import { utcDateToLocale } from 'src/utils'
 import clsx from 'clsx'
-import useTranslation from 'next-translate/useTranslation'
-import Link from 'next/link'
+import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router-dom'
+import restart from 'src/assets/restart.svg'
+import start from 'src/assets/start.svg'
+import stop from 'src/assets/stop.svg'
+import trashCan from 'src/assets/trash-can.svg'
+import note from 'src/assets/note.svg'
 
 interface NodeContainersListProps {
   state: NodeDetailsState
@@ -86,7 +91,7 @@ const NodeContainersList = (props: NodeContainersListProps) => {
           <>
             {containerIsRestartable(container.state) ? (
               <DyoImgButton
-                src="/restart.svg"
+                src={restart}
                 alt={t('restart')}
                 height={24}
                 onClick={() => actions.onRestartContainer(container)}
@@ -94,7 +99,7 @@ const NodeContainersList = (props: NodeContainersListProps) => {
             ) : (
               <DyoImgButton
                 disabled={!containerIsStartable(container.state)}
-                src="/start.svg"
+                src={start}
                 alt={t('start')}
                 height={24}
                 onClick={() => actions.onStartContainer(container)}
@@ -103,20 +108,20 @@ const NodeContainersList = (props: NodeContainersListProps) => {
 
             <DyoImgButton
               disabled={!containerIsStopable(container.state)}
-              src="/stop.svg"
+              src={stop}
               alt={t('stop')}
               height={24}
               onClick={() => actions.onStopContainer(container)}
             />
 
             {container.state && (
-              <Link href={nodeContainerLogUrl(state.node.id, container.id)} passHref>
-                <DyoIcon className="align-bottom" src="/note.svg" alt={t('logs')} size="md" />
+              <Link to={nodeContainerLogUrl(state.node.id, container.id)}>
+                <DyoIcon className="align-bottom" src={note} alt={t('logs')} size="md" />
               </Link>
             )}
 
             <DyoImgButton
-              src="/trash-can.svg"
+              src={trashCan}
               alt={t('common:delete')}
               height={24}
               onClick={() => actions.onDeleteContainer(container)}
@@ -161,6 +166,7 @@ const NodeContainersList = (props: NodeContainersListProps) => {
           },
           text => t(text),
         )}
+        footerClassName="py-1"
         footer={
           <Paginator
             onChanged={actions.setContainerPagination}

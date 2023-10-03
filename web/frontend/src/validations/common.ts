@@ -1,7 +1,7 @@
-import { DYO_ICONS } from '@app/elements/dyo-icon-picker'
+import { DYO_ICONS } from 'src/elements/dyo-icon-picker'
 import yup from './yup'
-import { Translate } from 'next-translate'
 import { ValidationError } from 'yup'
+import { TFunction } from 'i18next'
 
 export type ErrorWithPath = {
   path: string
@@ -14,7 +14,7 @@ type ErrorMessage =
       regex: string
     }
 
-export const yupErrorTranslate = (error: yup.ValidationError, t: Translate): yup.ValidationError => {
+export const yupErrorTranslate = (error: yup.ValidationError, t: TFunction): yup.ValidationError => {
   const tMessage = (message: ErrorMessage, values: ValidationError) => {
     const { label, path } = values.params as any
     const params = {
@@ -55,7 +55,7 @@ export const getValidationError = (
   schema: yup.Schema,
   candidate: any,
   options?: yup.ValidateOptions,
-  t?: Translate,
+  t?: TFunction,
 ): yup.ValidationError => {
   try {
     schema.validateSync(candidate, options)

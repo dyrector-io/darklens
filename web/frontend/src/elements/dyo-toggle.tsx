@@ -1,4 +1,4 @@
-import { FormikSetFieldValue } from '@app/utils'
+import { FormikSetFieldValue } from 'src/utils'
 import clsx from 'clsx'
 import React from 'react'
 
@@ -41,7 +41,7 @@ const DyoToggle = (props: DyoToggleProps) => {
         name={name}
         disabled={disabled}
         className={`${
-          checked ? 'bg-lens-turquoise' : 'bg-light'
+          checked ? 'bg-lens-turquoise' : 'bg-lens-light'
         } relative inline-flex items-center h-6 rounded-full w-11 outline-none`}
         onClick={onToggle}
       >

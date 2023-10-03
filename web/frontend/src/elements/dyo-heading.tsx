@@ -1,6 +1,6 @@
 import clsx from 'clsx'
-import Link from 'next/link'
 import React from 'react'
+import { Link } from 'react-router-dom'
 
 export interface DyoHeadingProps {
   element?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
@@ -19,6 +19,6 @@ export const DyoHeading = (props: DyoHeadingProps) => {
       className: clsx(className ?? 'text-lens-bright font-extrabold text-4xl', onClick ? 'cursor-pointer' : null),
       onClick,
     },
-    href ? <Link href={href}>{children}</Link> : children,
+    href ? <Link to={href}>{children}</Link> : children,
   )
 }

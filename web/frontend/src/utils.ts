@@ -1,16 +1,7 @@
 import { FormikErrors, FormikHandlers, FormikState } from 'formik'
-import {
-  GetServerSideProps,
-  GetServerSidePropsContext,
-  GetServerSidePropsResult,
-  NextApiRequest,
-  NextPageContext,
-} from 'next'
-import { Translate } from 'next-translate'
-import { NextRouter } from 'next/router'
 import toast, { ToastOptions } from 'react-hot-toast'
 import { Audit, DyoApiError, DyoErrorDto } from './models'
-import { ROUTE_404, ROUTE_INDEX, ROUTE_STATUS } from './routes'
+import { TFunction } from 'i18next'
 
 export type AsyncVoidFunction = () => Promise<void>
 
@@ -31,7 +22,7 @@ export const dateToUtcTime = (date: Date): number =>
 export const utcNow = (): number => dateToUtcTime(new Date())
 
 // TODO: singular time formats
-export const timeAgo = (t: Translate, seconds: number): string => {
+export const timeAgo = (t: TFunction, seconds: number): string => {
   const minutes = Math.floor(seconds / 60)
   if (minutes < 1) {
     return t('common:secondsAgo', { seconds })
@@ -157,12 +148,6 @@ export const configuredFetcher = (init?: RequestInit) => {
 export const fetcher = configuredFetcher()
 
 // forms
-export const paginationParams = (req: NextApiRequest, defaultTake: 100): [number, number] => {
-  const skip = (req.query.skip ?? 0) as number
-  const take = (req.query.take ?? defaultTake) as number
-  return [skip, take]
-}
-
 export type FormikSetFieldValue = (
   field: string,
   value: any,
@@ -194,76 +179,6 @@ export const sendForm = async <Dto>(
     body: body ? JSON.stringify(body) : null,
   })
 
-// routing
-export const anchorLinkOf = (router: NextRouter): string => {
-  const url = router.asPath ?? ''
-  const parts = url.split('#')
-  if (parts.length < 2) {
-    return null
-  }
-
-  return `#${parts[1]}`
-}
-
-export const searchParamsOf = (context: NextPageContext): string => {
-  const url = context.req?.url ?? ''
-  const parts = url.split('?')
-  if (parts.length < 2) {
-    return ''
-  }
-
-  return `?${parts[1]}`
-}
-
-// page ssr
-export const redirectTo = (destination: string, permanent = false): GetServerSidePropsResult<any> => ({
-  redirect: {
-    destination,
-    permanent,
-  },
-})
-
-export type GetServerSidePropsWithType<T> = (context: NextPageContext) => Promise<GetServerSidePropsResult<T>>
-
-const dyoApiErrorStatusToRedirectUrl = (status: number): string => {
-  switch (status) {
-    case 401:
-      return ROUTE_INDEX
-    case 404:
-      return ROUTE_404
-    case 403:
-      return ROUTE_404
-    default:
-      return ROUTE_STATUS
-  }
-}
-
-export const withContextErrorHandling =
-  <T>(getServerSideProps: GetServerSidePropsWithType<T>): GetServerSideProps<T> =>
-  async (context: GetServerSidePropsContext) => {
-    try {
-      const props = await getServerSideProps(context as any as NextPageContext)
-      return props
-    } catch (err) {
-      if (isDyoApiError(err)) {
-        console.error(`[ERROR]: ${err.status} - prop: ${err.property}: ${err.value} - ${err.description}`)
-
-        if (err.status === 404 && err.property === 'team') {
-          return redirectTo(ROUTE_INDEX)
-        }
-
-        const url = dyoApiErrorStatusToRedirectUrl(err.status)
-        return redirectTo(url)
-      }
-      throw err
-    }
-  }
-
-export const withContextAuthorization =
-  <T>(getServerSideProps: GetServerSidePropsWithType<T>): GetServerSideProps<T> =>
-  async (context: GetServerSidePropsContext) =>
-    await withContextErrorHandling(getServerSideProps)(context)
-
 export const parseStringUnionType = <T>(value: string, fallback: T, validValues: ReadonlyArray<T>): T => {
   if (value) {
     const index = (validValues as unknown as ReadonlyArray<string>).indexOf(value)
@@ -273,7 +188,7 @@ export const parseStringUnionType = <T>(value: string, fallback: T, validValues:
   return fallback
 }
 
-export const writeToClipboard = async (t: Translate, content: string) => {
+export const writeToClipboard = async (t: TFunction, content: string) => {
   if (window.isSecureContext) {
     await navigator.clipboard.writeText(content)
     toast(t('common:copiedToClipboard'))

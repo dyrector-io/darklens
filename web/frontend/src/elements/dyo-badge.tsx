@@ -1,4 +1,4 @@
-import useTranslation from 'next-translate/useTranslation'
+import { useTranslation } from 'react-i18next'
 import DyoIcon from './dyo-icon'
 
 interface DyoBadgeProps {

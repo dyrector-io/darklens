@@ -7,8 +7,6 @@
   "add": "Add node",
   "new": "New node",
   "tips": "Nodes are the environments where you plan to run your applications.",
-  "description": "Nodes are the deployment targets. You can add a new node by installing dyrector.io’s agents on your environment using a one-liner generated.",
-  "noItems": "You haven't added any nodes yet. To add a new node click 'Add' on the top right.\n\n",
 
   "nodeAlreadyInUse": "This node is already in use in some deployments.",
 
@@ -19,7 +17,7 @@
   "status": "Status",
   "lastConnected": "Last connected",
   "whatScriptDoesHeader": "What does this script do?",
-  "scriptExplanation": "The following 'Generate script' button will create a one-liner and script that will install our agent to the target host with the selected technology.",
+  "scriptExplanation": "The following 'Generate script' button will create a one-liner and script that will install our agent to the target host with the selected parameters.",
   "requirements": "Requirements",
   "agentSettings": "Agent settings",
   "installReq": {

@@ -1,6 +1,6 @@
-import { WebSocketContext } from '@app/providers/websocket'
-import { WebSocketClientOptions } from '@app/websockets/common'
-import WebSocketClientEndpoint from '@app/websockets/websocket-client-endpoint'
+import { WebSocketContext } from 'src/providers/websocket'
+import { WebSocketClientOptions } from 'src/websockets/common'
+import WebSocketClientEndpoint from 'src/websockets/websocket-client-endpoint'
 import { useContext, useEffect, useRef, useState } from 'react'
 
 const useWebSocket = (route: string, options?: WebSocketClientOptions): WebSocketClientEndpoint => {

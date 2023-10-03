@@ -10,3 +10,6 @@ docker-compose.ci.yaml
 
 # Ignore dev sqlite db
 *.db
+
+# Ignore react build
+build

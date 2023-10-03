@@ -1,5 +1,5 @@
-import DyoTag from '@app/elements/dyo-tag'
-import { ServiceStatus } from '@app/models'
+import DyoTag from 'src/elements/dyo-tag'
+import { ServiceStatus } from 'src/models'
 
 interface ServiceStatusTagProps {
   className?: string

@@ -1,25 +1,10 @@
-import { fromApiError } from '@app/error-responses'
-import http from 'http'
-import { NextPageContext } from 'next'
+import { fromApiError } from 'src/error-responses'
 
-export const fetchBackend = async (
-  requestOrCookie: http.IncomingMessage | string | null,
-  url: string,
-  init?: RequestInit,
-) => {
-  const uiUrl = process.env.UI_URL
-
-  const cookie: string = requestOrCookie
-    ? typeof requestOrCookie === 'string'
-      ? requestOrCookie
-      : requestOrCookie.headers.cookie
-    : null
-
-  const res = await fetch(`${uiUrl}${url}`, {
+export const fetchBackend = async (url: string, init?: RequestInit) => {
+  const res = await fetch(`${url}`, {
     ...(init ?? {}),
     headers: {
       ...(init?.headers ?? {}),
-      cookie,
     },
   })
 
@@ -38,17 +23,17 @@ export const fetchBackend = async (
   return res
 }
 
-export const getBackend = async <Res>(req: http.IncomingMessage, url: string): Promise<Res> => {
-  const res = await fetchBackend(req, url)
+export const getBackend = async <Res>(url: string): Promise<Res> => {
+  const res = await fetchBackend(url)
   const body = await res.json()
 
   return body
 }
 
-export const getBackendFromContext = <Res>(context: NextPageContext, url: string) => getBackend<Res>(context.req, url)
+export const getBackendFromContext = <Res>(url: string) => getBackend<Res>(url)
 
-export const postBackendFromContext = async <Res>(context: NextPageContext, url: string): Promise<Res> => {
-  const res = await fetchBackend(context.req, url, {
+export const postBackendFromContext = async <Res>(url: string): Promise<Res> => {
+  const res = await fetchBackend(url, {
     method: 'POST',
   })
 

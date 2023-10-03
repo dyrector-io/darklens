@@ -1,11 +1,11 @@
-import { yupErrorTranslate } from '@app/validations'
+import { yupErrorTranslate } from 'src/validations'
 import { FormikConfig, FormikValues, useFormik } from 'formik'
-import { Translate } from 'next-translate'
+import { TFunction } from 'i18next'
 import { MutableRefObject, useEffect } from 'react'
 
 export type DyoFormikOptions<Values> = FormikConfig<Values> & {
   submitRef?: MutableRefObject<() => Promise<any>>
-  t?: Translate
+  t?: TFunction
 }
 
 const useDyoFormik = <Values extends FormikValues>(options: DyoFormikOptions<Values>) => {

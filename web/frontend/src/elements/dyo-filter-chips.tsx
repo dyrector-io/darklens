@@ -1,4 +1,4 @@
-import useTranslation from 'next-translate/useTranslation'
+import { useTranslation } from 'react-i18next'
 import DyoChips, { DyoChipsProps } from './dyo-chips'
 
 const DyoFilterChips = <T,>(props: DyoChipsProps<T | 'all'>) => {

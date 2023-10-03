@@ -1,7 +1,7 @@
-import { DyoConfirmationModalConfig } from '@app/elements/dyo-modal'
-import useConfirmation from '@app/hooks/use-confirmation'
-import { FilterConfig, TextFilter, textFilterFor, useFilters } from '@app/hooks/use-filters'
-import useWebSocket from '@app/hooks/use-websocket'
+import { DyoConfirmationModalConfig } from 'src/elements/dyo-modal'
+import useConfirmation from 'src/hooks/use-confirmation'
+import { FilterConfig, TextFilter, textFilterFor, useFilters } from 'src/hooks/use-filters'
+import useWebSocket from 'src/hooks/use-websocket'
 import {
   Container,
   ContainerCommandMessage,
@@ -17,13 +17,13 @@ import {
   WS_TYPE_DELETE_CONTAINER,
   WS_TYPE_WATCH_CONTAINERS_STATE,
   NodeEventType,
-} from '@app/models'
-import { getEndOfToday, utcDateToLocale } from '@app/utils'
-import useTranslation from 'next-translate/useTranslation'
+} from 'src/models'
+import { getEndOfToday, utcDateToLocale } from 'src/utils'
 import { useEffect, useState } from 'react'
 import { PaginationSettings } from '../shared/paginator'
 import useNodeState from './use-node-state'
-import { nodeWsDetailsUrl } from '@app/routes'
+import { nodeWsDetailsUrl } from 'src/routes'
+import { useTranslation } from 'react-i18next'
 
 const sixDays = 1000 * 60 * 60 * 24 * 6 // ms * minutes * hours * day * six
 

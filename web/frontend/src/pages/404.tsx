@@ -1,23 +1,22 @@
-import { SingleFormLayout } from '@app/components/layout'
-import DyoButton from '@app/elements/dyo-button'
-import { DyoHeading } from '@app/elements/dyo-heading'
-import { ROUTE_INDEX } from '@app/routes'
-import useTranslation from 'next-translate/useTranslation'
-import Image from 'next/image'
-import { useRouter } from 'next/router'
+import { SingleFormLayout } from 'src/components/layout'
+import DyoButton from 'src/elements/dyo-button'
+import { DyoHeading } from 'src/elements/dyo-heading'
+import { ROUTE_INDEX } from 'src/routes'
+import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 
 const Page404 = () => {
   const { t } = useTranslation('404')
-  const router = useRouter()
+  const nav = useNavigate()
 
-  const navigateToIndex = async () => await router.push(ROUTE_INDEX)
+  const navigateToIndex = async () => await nav(ROUTE_INDEX)
 
   return (
     <SingleFormLayout title={t('oops')}>
       <div className="flex flex-row bg-lens-dark">
         <div className="flex flex-col items-center w-full my-auto">
           <div>
-            <Image src="/404.svg" alt={t('errors:notFound')} width={500} height={346.833} />
+            <img src="/404.svg" alt={t('errors:notFound')} width={500} height={346.833} />
           </div>
 
           <DyoHeading element="h2" className="text-4xl text-white font-extrabold mt-16">

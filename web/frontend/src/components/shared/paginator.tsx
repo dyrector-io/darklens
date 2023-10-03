@@ -1,8 +1,12 @@
-import DyoButton from '@app/elements/dyo-button'
-import DyoIcon from '@app/elements/dyo-icon'
-import { DyoInput } from '@app/elements/dyo-input'
-import useTranslation from 'next-translate/useTranslation'
+import DyoButton from 'src/elements/dyo-button'
+import DyoIcon from 'src/elements/dyo-icon'
+import { DyoInput } from 'src/elements/dyo-input'
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import caretLeft from 'src/assets/caret_left.svg'
+import caretsLeft from 'src/assets/carets_left.svg'
+import caretRight from 'src/assets/caret_right.svg'
+import caretsRight from 'src/assets/carets_right.svg'
 
 type PaginationType = 'first' | 'last' | 'next' | 'previous'
 export const pageSizes = [5, 10, 20, 50, 100, 250] as const
@@ -98,7 +102,7 @@ const Paginator = (props: PaginatorProps) => {
           thin
           disabled={disabled}
         >
-          <DyoIcon className="aspect-square h-6 m-auto pt-0.5" src="/carets_left.svg" size="md" alt={t('first')} />
+          <DyoIcon className="aspect-square h-6 m-auto pt-0.5" src={caretsLeft} size="md" alt={t('first')} />
         </DyoButton>
         <DyoButton
           className="w-8 text-xl"
@@ -107,7 +111,7 @@ const Paginator = (props: PaginatorProps) => {
           thin
           disabled={disabled}
         >
-          <DyoIcon className="aspect-square h-6 m-auto pt-0.5" src="/caret_left.svg" size="md" alt={t('previous')} />
+          <DyoIcon className="aspect-square h-6 m-auto pt-0.5" src={caretLeft} size="md" alt={t('previous')} />
         </DyoButton>
         {pagination.pageNumber - 2 >= 0 && (
           <DyoButton
@@ -167,7 +171,7 @@ const Paginator = (props: PaginatorProps) => {
           thin
           disabled={disabled}
         >
-          <DyoIcon className="aspect-square h-6 m-auto pt-0.5" src="/caret_right.svg" size="md" alt={t('next')} />
+          <DyoIcon className="aspect-square h-6 m-auto pt-0.5" src={caretRight} size="md" alt={t('next')} />
         </DyoButton>
         <DyoButton
           className="w-8 text-xl"
@@ -176,7 +180,7 @@ const Paginator = (props: PaginatorProps) => {
           thin
           disabled={disabled}
         >
-          <DyoIcon className="aspect-square h-6 m-auto pt-0.5" src="/carets_right.svg" size="md" alt={t('last')} />
+          <DyoIcon className="aspect-square h-6 m-auto pt-0.5" src={caretsRight} size="md" alt={t('last')} />
         </DyoButton>
       </div>
     </div>

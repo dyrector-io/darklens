@@ -1,4 +1,4 @@
-import useWebSocket from '@app/hooks/use-websocket'
+import useWebSocket from 'src/hooks/use-websocket'
 import {
   DyoNode,
   NodeConnection,
@@ -6,9 +6,9 @@ import {
   NodeDetails,
   NodeEventMessage,
   WS_TYPE_NODE_EVENT,
-} from '@app/models'
-import { WS_NODES } from '@app/routes'
-import { WsMessage } from '@app/websockets/common'
+} from 'src/models'
+import { WS_NODES } from 'src/routes'
+import { WsMessage } from 'src/websockets/common'
 import { useState } from 'react'
 
 const filterWsNodeId = (nodeId: string) => (message: WsMessage<Pick<NodeEventMessage, 'id'>>) => {
@@ -23,7 +23,7 @@ const filterWsNodeId = (nodeId: string) => (message: WsMessage<Pick<NodeEventMes
 
 const useNodeState = <T extends DyoNode | NodeDetails>(initialState: T): [T, (node: T) => void] => {
   const [node, setNode] = useState<T>(initialState)
-  const [connection, setConnection] = useState<NodeConnection>(nodeConnectionOf(node))
+  const [connection, setConnection] = useState<NodeConnection>(nodeConnectionOf(initialState))
 
   const sock = useWebSocket(WS_NODES, {
     transformReceive: filterWsNodeId(node.id),

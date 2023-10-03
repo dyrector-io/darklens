@@ -1,9 +1,9 @@
-import { DyoCard } from '@app/elements/dyo-card'
-import { DyoHeading } from '@app/elements/dyo-heading'
-import { DyoInput } from '@app/elements/dyo-input'
+import { DyoCard } from 'src/elements/dyo-card'
+import { DyoHeading } from 'src/elements/dyo-heading'
+import { DyoInput } from 'src/elements/dyo-input'
 import clsx from 'clsx'
-import useTranslation from 'next-translate/useTranslation'
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 
 export interface FiltersProps {
   setTextFilter: (filter: string) => void

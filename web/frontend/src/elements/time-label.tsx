@@ -1,6 +1,6 @@
-import { HOUR_IN_SECONDS } from '@app/const'
-import useTranslation from 'next-translate/useTranslation'
+import { HOUR_IN_SECONDS } from 'src/const'
 import { DyoLabel, DyoLabelProps } from './dyo-label'
+import { useTranslation } from 'react-i18next'
 
 interface TimeLabelProps extends DyoLabelProps {
   seconds: number
