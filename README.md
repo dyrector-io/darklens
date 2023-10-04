@@ -6,7 +6,7 @@
     </picture>
 </p>
 
-Lightweight container manager.
+<p align="center">Lightweight container manager.</p>
 
 ## Getting started
 
@@ -37,4 +37,4 @@ TODO: One liner `docker run`
     2. Goto `web/frontend` and run `npm start`
     3. The app will be available on `localhost:8000`
 
-    > Make sure the `dev-traefik` container is running as it routes the traffic between the frontand and the backend
+    > Make sure the `dev-traefik` container is running as it routes the traffic between the frontend and the backend
