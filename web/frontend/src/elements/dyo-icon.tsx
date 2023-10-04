@@ -15,7 +15,8 @@ interface DyoIconProps {
 const DyoIcon = (props: DyoIconProps) => {
   const { className, imageClassName, src, alt, size: propsSize = 'sm', onClick } = props
 
-  const size = propsSize === 'sm' ? 16 : propsSize === 'md' ? 24 : propsSize === 'lg' ? 32 : propsSize == 'xl' ? 36 : 46
+  const size =
+    propsSize === 'sm' ? 16 : propsSize === 'md' ? 24 : propsSize === 'lg' ? 32 : propsSize === 'xl' ? 36 : 46
 
   return (
     <span

@@ -1,4 +1,3 @@
-import clsx from 'clsx'
 import React, { useEffect } from 'react'
 import Footer from './main/footer'
 import { useTranslation } from 'react-i18next'
@@ -10,12 +9,14 @@ import user from 'src/assets/user.svg'
 import logout from 'src/assets/logout.svg'
 import cog from 'src/assets/cog.svg'
 
-export interface LayoutProps {
+interface PageProps {
   title: string
+  // TODO(@robot9706): figure out false positive lint error
+  // eslint-disable-next-line react/no-unused-prop-types
   className?: string
 }
 
-export const Page = (props: React.PropsWithChildren<LayoutProps>) => {
+export const Page = (props: React.PropsWithChildren<PageProps>) => {
   const { title, className, children } = props
 
   const { t } = useTranslation('common')
@@ -27,7 +28,7 @@ export const Page = (props: React.PropsWithChildren<LayoutProps>) => {
   return <div className={className ?? 'flex-1'}>{children}</div>
 }
 
-export const SingleFormLayout = (props: React.PropsWithChildren<LayoutProps>) => {
+export const SingleFormLayout = (props: React.PropsWithChildren<PageProps>) => {
   const { title, children } = props
 
   const { t } = useTranslation('common')

@@ -2,18 +2,10 @@ import DyoButton from 'src/elements/dyo-button'
 import { DyoCard } from 'src/elements/dyo-card'
 import { DyoHeading } from 'src/elements/dyo-heading'
 import { DyoConfirmationModal } from 'src/elements/dyo-modal'
-import LoadingIndicator from 'src/elements/loading-indicator'
 import { defaultApiErrorHandler } from 'src/errors'
 import useConfirmation from 'src/hooks/use-confirmation'
 import useWebSocket from 'src/hooks/use-websocket'
-import {
-  NodeDetails,
-  NodeEventMessage,
-  NodeInstall,
-  UpdateNodeAgentMessage,
-  WS_TYPE_NODE_EVENT,
-  WS_TYPE_UPDATE_AGENT,
-} from 'src/models'
+import { NodeDetails, NodeEventMessage, NodeInstall, WS_TYPE_NODE_EVENT } from 'src/models'
 import clsx from 'clsx'
 import { MutableRefObject } from 'react'
 import toast from 'react-hot-toast'
@@ -120,17 +112,6 @@ const EditNodeSection = (props: EditNodeSectionProps) => {
     onNodeEdited(newNode)
   }
 
-  const onUpdateNode = () => {
-    socket.send(WS_TYPE_UPDATE_AGENT, {
-      id: node.id,
-    } as UpdateNodeAgentMessage)
-
-    setNode({
-      ...node,
-      status: 'updating',
-    })
-  }
-
   return (
     <>
       <div className={clsx(className, 'flex flex-row gap-4')}>
@@ -157,19 +138,6 @@ const EditNodeSection = (props: EditNodeSectionProps) => {
                     {t('tokens:revoke')}
                   </DyoButton>
                 )}
-
-                {/*<DyoButton
-                  className="px-6"
-                  secondary
-                  danger={node.status === 'outdated'}
-                  onClick={onUpdateNode}
-                  disabled={!node.updatable}
-                >
-                  <span className="flex">
-                    {t('update')}
-                    {node.status === 'updating' && <LoadingIndicator className="inline-block ml-2" />}
-                  </span>
-                </DyoButton>*/}
               </div>
             </DyoCard>
           ) : (

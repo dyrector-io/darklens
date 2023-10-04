@@ -172,8 +172,8 @@ export default () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const node: NodeDetails = await fetcher(nodeApiDetailsUrl(nodeId))
-      setNode(node)
+      const details: NodeDetails = await fetcher(nodeApiDetailsUrl(nodeId))
+      setNode(details)
     }
     fetchData()
   }, [])

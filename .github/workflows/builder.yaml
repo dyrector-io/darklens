@@ -17,7 +17,7 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 jobs:
-  crux_build:
+  build:
     runs-on: ubuntu-22.04
     permissions:
       packages: write

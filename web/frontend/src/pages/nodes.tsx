@@ -2,24 +2,19 @@ import { Page } from 'src/components/layout'
 import DyoNodeCard from 'src/components/nodes/dyo-node-card'
 import EditNodeSection from 'src/components/nodes/edit-node-section'
 import { BreadcrumbLink } from 'src/components/shared/breadcrumb'
-import Filters from 'src/components/shared/filters'
 import PageHeading from 'src/components/shared/page-heading'
-import DyoFilterChips from 'src/elements/dyo-filter-chips'
-import { DyoHeading } from 'src/elements/dyo-heading'
 import { EnumFilter, enumFilterFor, TextFilter, textFilterFor, useFilters } from 'src/hooks/use-filters'
 import useWebSocket from 'src/hooks/use-websocket'
 import { DyoNode, NODE_STATUS_VALUES, NodeEventMessage, NodeStatus, WS_TYPE_NODE_EVENT } from 'src/models'
-import { API_NODES, nodeDetailsUrl, ROUTE_DOCS, ROUTE_NODES, WS_NODES } from 'src/routes'
+import { API_NODES, nodeDetailsUrl, ROUTE_NODES, WS_NODES } from 'src/routes'
 import { fetcher } from 'src/utils'
 import { useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
 import LoadingIndicator from 'src/elements/loading-indicator'
 import plusIcon from 'src/assets/plus.svg'
 import DyoIcon from 'src/elements/dyo-icon'
 import DyoButton from 'src/elements/dyo-button'
-import clsx from 'clsx'
 import { DyoSelect } from 'src/elements/dyo-select'
 import { DyoInput } from 'src/elements/dyo-input'
 import { DyoLabel } from 'src/elements/dyo-label'
@@ -92,13 +87,6 @@ const NodesPage = () => {
     filters.setItems(newNodes)
   }
 
-  const cardClass = (index: number) => {
-    const modulo3Class = index % 4 === 1 ? 'xl:mx-4' : null
-    const modulo2Class = clsx(index % 2 > 0 ? 'lg:ml-2' : 'lg:mr-2', modulo3Class ?? 'xl:mx-0')
-
-    return clsx(modulo2Class, modulo3Class)
-  }
-
   const pageLink: BreadcrumbLink = {
     name: t('common:nodes'),
     url: ROUTE_NODES,
@@ -130,7 +118,7 @@ const NodesPage = () => {
             >
               {['all', ...NODE_STATUS_VALUES].map(it => (
                 <option key={it} value={it}>
-                  {it == 'all' ? t('common:all') : t(`common:nodeStatuses.${it}`)}
+                  {it === 'all' ? t('common:all') : t(`common:nodeStatuses.${it}`)}
                 </option>
               ))}
             </DyoSelect>
