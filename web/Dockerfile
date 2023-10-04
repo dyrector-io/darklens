@@ -41,11 +41,13 @@ COPY --from=APIBUILDER /build/dist ./dist
 COPY --from=APIBUILDER /build/package.json ./
 COPY --from=APIBUILDER /build/node_modules ./node_modules
 COPY --from=APIBUILDER /build/prisma ./prisma
-COPY ./backend/lens-entrypoint.sh ./
+COPY ./backend/entrypoint.sh ./
 COPY ./backend/assets/ ./assets/
 COPY ./backend/proto ./proto
 
 COPY --from=UIBUILDER /build/build ./assets/frontend
+
+RUN chmod +x ./entrypoint.sh
 
 EXPOSE 5000
 EXPOSE 8000
@@ -54,4 +56,4 @@ HEALTHCHECK --interval=30s --timeout=5s \
     CMD wget -nv -t1 --spider http://localhost:1848/api/health || exit 1
 
 # Start
-ENTRYPOINT ["./lens-entrypoint.sh"]
+ENTRYPOINT ["./entrypoint.sh"]
