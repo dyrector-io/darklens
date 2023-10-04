@@ -12,7 +12,9 @@ const LoadingIndicator = (props: LoadingIndicatorProps) => {
 
   const { t } = useTranslation('common')
 
-  return <DyoIcon className={className} imageClassName="animate-spin" src={loading} alt={t('loading')} size={size ?? "md"} />
+  return (
+    <DyoIcon className={className} imageClassName="animate-spin" src={loading} alt={t('loading')} size={size ?? 'md'} />
+  )
 }
 
 export default LoadingIndicator

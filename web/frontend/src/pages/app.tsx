@@ -2,7 +2,14 @@ import { WebSocketProvider } from 'src/providers/websocket'
 import { ROUTE_NODES } from 'src/routes'
 import 'src/styles/global.css'
 import { Toaster } from 'react-hot-toast'
-import { Navigate, Outlet, Route, RouterProvider, createBrowserRouter, createRoutesFromElements } from 'react-router-dom'
+import {
+  Navigate,
+  Outlet,
+  Route,
+  RouterProvider,
+  createBrowserRouter,
+  createRoutesFromElements,
+} from 'react-router-dom'
 import NodesPage from './nodes'
 import NodeDetailsPage from './nodes/[nodeId]'
 import NodeContainerLogPage from './nodes/[nodeId]/log'

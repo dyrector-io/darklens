@@ -56,7 +56,7 @@ const bootstrap = async () => {
   SwaggerModule.setup('/api/swagger', app, document)
 
   const agentOptions = loadGrpcOptions(configService.get<string>('GRPC_AGENT_PORT'))
-  const httpOptions = configService.get<string>('HTTP_API_PORT', '1848')
+  const httpOptions = configService.get<string>('HTTP_API_PORT', '8000')
 
   app.useGlobalFilters(new HttpExceptionFilter())
   app.useGlobalGuards(app.get(UuidValidationGuard))

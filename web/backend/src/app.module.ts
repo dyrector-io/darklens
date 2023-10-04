@@ -9,8 +9,15 @@ import pinoLoggerConfig from './config/pino.logger.config'
 import UuidValidationGuard from './guards/uuid-params.validation.guard'
 import ShutdownService from './services/application.shutdown.service'
 import PrismaService from './services/prisma.service'
+import { ServeStaticModule } from '@nestjs/serve-static'
+import { join } from 'path';
 
-const imports = [NodeModule, AgentModule, HealthModule, ConfigModule.forRoot(appConfig)]
+const staticFileHost = ServeStaticModule.forRoot({
+  rootPath: join(__dirname, '..', 'assets', 'frontend'),
+  exclude: ['/api/(.*)'],
+})
+
+const imports = [NodeModule, AgentModule, HealthModule, ConfigModule.forRoot(appConfig), staticFileHost]
 
 if (process.env.NODE_ENV === 'production') {
   imports.push(LoggerModule.forRoot(pinoLoggerConfig))

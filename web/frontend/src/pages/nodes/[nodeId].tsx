@@ -89,10 +89,7 @@ const NodeDetailsPage = (props: NodeDetailsPageProps) => {
 
   return (
     <Page title={t('nodesName', node)}>
-      <PageHeading
-        pageLink={pageLink}
-        sublinks={subLinks}
-      >
+      <PageHeading pageLink={pageLink} sublinks={subLinks}>
         <DetailsPageMenu
           onDelete={onDelete}
           editing={state.section === 'editing'}

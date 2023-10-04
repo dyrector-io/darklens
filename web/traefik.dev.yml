@@ -20,4 +20,4 @@ http:
     local-backend:
       loadBalancer:
         servers:
-          - url: http://host.docker.internal:1848/
+          - url: http://host.docker.internal:3100/

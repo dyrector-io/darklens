@@ -24,9 +24,7 @@ export const Page = (props: React.PropsWithChildren<LayoutProps>) => {
     document.title = t('title', { page: title })
   }, [title])
 
-  return <div className={className ?? "flex-1"}>
-    {children}
-  </div>
+  return <div className={className ?? 'flex-1'}>{children}</div>
 }
 
 export const SingleFormLayout = (props: React.PropsWithChildren<LayoutProps>) => {
@@ -60,13 +58,13 @@ export const MainLayout = () => {
         </Link>
 
         <div className="flex-1 flex flex-row justify-end items-center">
-          <DyoIcon src={cog} alt='' size='lg' className='mr-2 cursor-pointer' />
+          <DyoIcon src={cog} alt="" size="lg" className="mr-2 cursor-pointer" />
 
-          <DyoIcon src={user} alt='' size='lg' className='cursor-pointer' />
+          <DyoIcon src={user} alt="" size="lg" className="cursor-pointer" />
 
           <div className="bg-lens-bright-muted w-px h-8 mx-3" />
 
-          <DyoIcon src={logout} alt='' size='lg' className='cursor-pointer' />
+          <DyoIcon src={logout} alt="" size="lg" className="cursor-pointer" />
         </div>
       </div>
 
