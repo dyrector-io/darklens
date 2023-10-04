@@ -31,6 +31,7 @@ FROM docker.io/library/node:20.5.0-alpine3.17 AS RUNNER
 
 ENV NODE_ENV production
 ENV TZ UTC
+ENV DATABASE file:/var/lib/darklens/data.db
 
 RUN apk --update add tzdata openssl1.1-compat
 
@@ -40,12 +41,11 @@ COPY --from=APIBUILDER /build/dist ./dist
 COPY --from=APIBUILDER /build/package.json ./
 COPY --from=APIBUILDER /build/node_modules ./node_modules
 COPY --from=APIBUILDER /build/prisma ./prisma
+COPY ./backend/entrypoint.sh ./
 COPY ./backend/assets/ ./assets/
 COPY ./backend/proto ./proto
 
 COPY --from=UIBUILDER /build/build ./assets/frontend
-
-USER node
 
 EXPOSE 5000
 EXPOSE 8000
@@ -54,4 +54,4 @@ HEALTHCHECK --interval=30s --timeout=5s \
     CMD wget -nv -t1 --spider http://localhost:1848/api/health || exit 1
 
 # Start
-ENTRYPOINT [ "npm", "run", "start:prod"]
+ENTRYPOINT ["./entrypoint.sh"]
