@@ -43,4 +43,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: darklens
-          path: darklens.zstd
+          path: ${{ env.BUILD_WORKING_DIRECTORY }}/darklens.zstd
