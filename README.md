@@ -34,7 +34,7 @@ TODO: One liner `docker run`
 4. Develop
 
     1. Goto `web/backend` and run `npm start`
-    2. Goto `web/frontend` and run `npm start`
+    2. Goto `web/frontend` and run `npx prisma migrate dev` to apply migrations then start using `npm start`
     3. The app will be available on `localhost:8000`
 
     > Make sure the `dev-traefik` container is running as it routes the traffic between the frontend and the backend
