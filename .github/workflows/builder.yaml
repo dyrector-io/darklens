@@ -31,7 +31,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          token: ${{ secrets.GHCR_PAT }}
+          token: ${{ secrets.GITHUB_TOKEN }}
       # fixes: fatal: unsafe repository
       - name: Adding workspace
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
@@ -43,6 +43,6 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GHCR_PAT }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Push
         run: docker push -a ${GITHUB_REGISTRY}/${IMAGE_NAME}
