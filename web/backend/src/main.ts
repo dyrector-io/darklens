@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config'
 import { NestFactory } from '@nestjs/core'
 import { MicroserviceOptions, Transport } from '@nestjs/microservices'
 import { SwaggerModule } from '@nestjs/swagger'
+import * as cookieParser from 'cookie-parser'
 import { Logger as PinoLogger } from 'nestjs-pino'
 import { join } from 'path'
 import AppModule from './app.module'
@@ -57,6 +58,8 @@ const bootstrap = async () => {
 
   const agentOptions = loadGrpcOptions(configService.get<string>('GRPC_AGENT_PORT'))
   const httpOptions = configService.get<string>('HTTP_API_PORT', '8000')
+
+  app.use(cookieParser())
 
   app.useGlobalFilters(new HttpExceptionFilter())
   app.useGlobalGuards(app.get(UuidValidationGuard))

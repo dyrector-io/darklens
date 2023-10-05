@@ -5,17 +5,17 @@ import { DyoHeading } from 'src/elements/dyo-heading'
 import LoadingIndicator from 'src/elements/loading-indicator'
 import { BackendHealth, DEFAULT_SERVICE_INFO, DyoServiceInfo } from 'src/models'
 import { API_HEALTH, ROUTE_INDEX } from 'src/routes'
-import { fetcher } from 'src/utils'
-import packageInfo from 'src/server/package'
+import packageInfo from 'src/package'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import useSWR from 'swr'
+import { configuredFetcher } from 'src/utils'
 
 const StatusPage = () => {
   const { t } = useTranslation('status')
   const nav = useNavigate()
 
-  const { data: backend, error, isLoading } = useSWR<BackendHealth, any>(API_HEALTH, fetcher)
+  const { data: backend, error, isLoading } = useSWR<BackendHealth, any>(API_HEALTH, configuredFetcher)
 
   const navigateToIndex = async () => await nav(ROUTE_INDEX)
 

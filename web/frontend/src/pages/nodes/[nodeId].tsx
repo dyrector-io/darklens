@@ -13,14 +13,13 @@ import DyoDatePicker from 'src/elements/dyo-date-picker'
 import { DyoInput } from 'src/elements/dyo-input'
 import { DyoConfirmationModal } from 'src/elements/dyo-modal'
 import { DyoSelect } from 'src/elements/dyo-select'
-import { defaultApiErrorHandler } from 'src/errors'
 import { NODE_EVENT_TYPE_VALUES, NodeDetails, NodeEventType } from 'src/models'
 import { ROUTE_NODES, nodeApiDetailsUrl, nodeDetailsUrl } from 'src/routes'
-import { fetcher } from 'src/utils'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useParams } from 'react-router-dom'
 import LoadingIndicator from 'src/elements/loading-indicator'
+import { useBackendDelete, useBackendGet } from 'src/hooks/use-backend'
 
 type NodeDetailsPageParams = {
   nodeId: string
@@ -36,6 +35,8 @@ const NodeDetailsPage = (props: NodeDetailsPageProps) => {
   const { t } = useTranslation('nodes')
   const nav = useNavigate()
 
+  const backendDelete = useBackendDelete()
+
   const [state, actions] = useNodeDetailsState({
     node: propsNode,
   })
@@ -43,15 +44,9 @@ const NodeDetailsPage = (props: NodeDetailsPageProps) => {
 
   const { node, auditFilter } = state
 
-  const handleApiError = defaultApiErrorHandler(t)
-
   const onDelete = async () => {
-    const res = await fetch(nodeApiDetailsUrl(node.id), {
-      method: 'DELETE',
-    })
-
-    if (!res.ok) {
-      handleApiError(res)
+    const res = await backendDelete(nodeApiDetailsUrl(node.id))
+    if (!res) {
       return
     }
 
@@ -170,10 +165,15 @@ export default () => {
   const { nodeId } = useParams<NodeDetailsPageParams>()
   const [node, setNode] = useState<NodeDetails>(null)
 
+  const backendGet = useBackendGet()
+
   useEffect(() => {
     const fetchData = async () => {
-      const details: NodeDetails = await fetcher(nodeApiDetailsUrl(nodeId))
-      setNode(details)
+      const res = await backendGet<NodeDetails>(nodeApiDetailsUrl(nodeId))
+      if (!res.ok) {
+        return
+      }
+      setNode(res.data)
     }
     fetchData()
   }, [])

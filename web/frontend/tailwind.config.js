@@ -27,7 +27,7 @@ module.exports = {
         'lens-medium-eased': '#343d55',
         'lens-dark': '#161d31',
         'lens-error-red': '#ea5455',
-        'lens-warning-orange': '#ff9f43',
+        'lens-warning-orange': '#ff9f43'
       },
       width: {
         128: '32rem',

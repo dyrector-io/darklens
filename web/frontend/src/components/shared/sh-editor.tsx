@@ -23,7 +23,7 @@ const ShEditor = (props: ShEditorProps) => {
   return (
     <div
       className={clsx(
-        'bg-gray-900 rounded-md ring-2 ring-lens-light-grey border-lens-dark caret-white text-blue-300',
+        'bg-lens-medium-muted rounded-md ring-2 ring-lens-light-grey border-lens-dark caret-white text-blue-300',
         className,
       )}
     >

@@ -1,5 +1,6 @@
 import { Controller, Get } from '@nestjs/common'
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger'
+import { Public } from '../auth/auth.guard'
 import { HealthDto } from './health.dto'
 import HealthService from './health.service'
 
@@ -10,6 +11,7 @@ const ROUTE_HEALTH = 'health'
 export default class HealthHttpController {
   constructor(private service: HealthService) {}
 
+  @Public()
   @Get()
   @ApiOperation({
     description: 'Response should include `status`, `version` of the platform and `lastMigration` of database.',

@@ -1,0 +1,9 @@
+{
+  "name": "Name",
+  "password": "Password",
+  "logIn": "Login",
+  "register": "Register",
+  "registerHint": "Hello! 👋 Please register a default user below by entering a username and a password.",
+
+  "invalidCredentials": "Invalid credentials"
+}

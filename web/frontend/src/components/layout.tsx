@@ -1,13 +1,15 @@
-import React, { useEffect } from 'react'
+import React, { useContext, useEffect } from 'react'
 import Footer from './main/footer'
 import { useTranslation } from 'react-i18next'
-import { Link, Outlet } from 'react-router-dom'
-import { ROUTE_INDEX } from 'src/routes'
+import { Link, Outlet, useNavigate } from 'react-router-dom'
+import { API_AUTH_LOGOUT, ROUTE_INDEX } from 'src/routes'
 import DyoIcon from 'src/elements/dyo-icon'
 import logo from 'src/assets/darklens_logo.svg'
 import user from 'src/assets/user.svg'
 import logout from 'src/assets/logout.svg'
 import cog from 'src/assets/cog.svg'
+import toast from 'react-hot-toast'
+import { AuthContext } from './auth'
 
 interface PageProps {
   title: string
@@ -47,25 +49,41 @@ export const SingleFormLayout = (props: React.PropsWithChildren<PageProps>) => {
 }
 
 export const MainLayout = () => {
-  const { t } = useTranslation()
+  const { t } = useTranslation('errors')
+  const nav = useNavigate()
+  const auth = useContext(AuthContext)
+
+  const onLogout = async () => {
+    const res = await fetch(API_AUTH_LOGOUT, { method: 'POST' })
+
+    if (res.ok) {
+      nav(ROUTE_INDEX)
+    } else {
+      toast(t('oops'))
+    }
+  }
 
   return (
     <main className="w-full h-full">
       <div className="bg-lens-medium h-18 shadow-topbar fixed left-0 top-0 right-0 flex flex-row pr-7 z-50">
         <Link to={ROUTE_INDEX}>
           <div className="px-12 bg-lens-medium-eased">
-            <img className="cursor-pointer" src={logo} alt={t('logoAlt')} width={120} height={20} />
+            <img className="cursor-pointer" src={logo} alt={t('common:logoAlt')} width={120} height={20} />
           </div>
         </Link>
 
         <div className="flex-1 flex flex-row justify-end items-center">
           <DyoIcon src={cog} alt="" size="lg" className="mr-2 cursor-pointer" />
 
-          <DyoIcon src={user} alt="" size="lg" className="cursor-pointer" />
+          {auth.hasAuth && (
+            <>
+              <DyoIcon src={user} alt="" size="lg" className="cursor-pointer" />
 
-          <div className="bg-lens-bright-muted w-px h-8 mx-3" />
+              <div className="bg-lens-bright-muted w-px h-8 mx-3" />
 
-          <DyoIcon src={logout} alt="" size="lg" className="cursor-pointer" />
+              <DyoIcon src={logout} alt="" size="lg" className="cursor-pointer" onClick={onLogout} />
+            </>
+          )}
         </div>
       </div>
 

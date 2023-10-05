@@ -48,7 +48,7 @@ export default class AgentInstaller {
   }
 
   getCommand(): string {
-    const scriptUrl = `${this.configService.get<string>('UI_URL')}/api/nodes/${this.node.id}/script`
+    const scriptUrl = `${this.configService.get<string>('PUBLIC_URL')}/api/nodes/${this.node.id}/script`
 
     switch (this.options.scriptType) {
       case 'shell':

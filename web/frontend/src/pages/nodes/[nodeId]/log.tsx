@@ -15,11 +15,11 @@ import {
   WS_TYPE_WATCH_CONTAINER_LOG,
 } from 'src/models'
 import { nodeApiDetailsUrl, nodeContainerLogUrl, nodeDetailsUrl, nodeWsDetailsUrl, ROUTE_NODES } from 'src/routes'
-import { fetcher } from 'src/utils'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useParams } from 'react-router-dom'
 import LoadingIndicator from 'src/elements/loading-indicator'
+import { useBackendGet } from 'src/hooks/use-backend'
 
 type NodeContainerLogPageParams = {
   nodeId: string
@@ -102,11 +102,16 @@ export default () => {
   const { prefix, name } = useQuery<NodeContainerLogPageQuery>()
   const [node, setNode] = useState<NodeDetails>(null)
 
+  const backendGet = useBackendGet()
+
   useEffect(() => {
     const fetchData = async () => {
-      const details: NodeDetails = await fetcher(nodeApiDetailsUrl(nodeId))
+      const res = await backendGet<NodeDetails>(nodeApiDetailsUrl(nodeId))
+      if (!res.ok) {
+        return
+      }
 
-      setNode(details)
+      setNode(res.data)
     }
     fetchData()
   }, [])

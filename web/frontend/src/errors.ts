@@ -14,7 +14,7 @@ type Translation = {
   toast: string
 }
 
-type FormikSetErrorValue = (field: string, message: string | undefined) => void
+export type FormikSetErrorValue = (field: string, message: string | undefined) => void
 
 type Translator = (stringId: string, status: number, dto: DyoErrorDto) => Translation
 
@@ -44,6 +44,7 @@ export const apiErrorHandler =
     const toaster = (message, options) => toast.error(message, options)
 
     const { status } = res
+
     let translation = null
 
     try {

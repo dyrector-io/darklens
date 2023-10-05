@@ -6,15 +6,14 @@ import DyoIconPicker from 'src/elements/dyo-icon-picker'
 import { DyoInput } from 'src/elements/dyo-input'
 import { DyoLabel } from 'src/elements/dyo-label'
 import DyoTextArea from 'src/elements/dyo-text-area'
-import { defaultApiErrorHandler } from 'src/errors'
 import useDyoFormik from 'src/hooks/use-dyo-formik'
 import { CreateNode, NodeDetails, UpdateNode } from 'src/models'
 import { API_NODES, nodeApiDetailsUrl } from 'src/routes'
-import { sendForm } from 'src/utils'
 import { nodeSchema } from 'src/validations'
 import clsx from 'clsx'
 import { MutableRefObject } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useBackendFetch } from 'src/hooks/use-backend'
 
 type EditNodeCardProps = {
   className?: string
@@ -27,8 +26,7 @@ const EditNodeCard = (props: EditNodeCardProps) => {
   const { className, node, onNodeEdited, submitRef } = props
 
   const { t } = useTranslation('nodes')
-
-  const handleApiError = defaultApiErrorHandler(t)
+  const backendFetch = useBackendFetch()
 
   const editing = !!node.id
 
@@ -45,15 +43,14 @@ const EditNodeCard = (props: EditNodeCardProps) => {
       }
 
       const res = await (!editing
-        ? sendForm('POST', API_NODES, body as CreateNode)
-        : sendForm('PUT', nodeApiDetailsUrl(node.id), body as UpdateNode))
+        ? backendFetch<CreateNode, NodeDetails>('POST', API_NODES, body as CreateNode, setFieldError)
+        : backendFetch<UpdateNode, NodeDetails>('PUT', nodeApiDetailsUrl(node.id), body as UpdateNode, setFieldError))
 
       if (res.ok) {
         let result: NodeDetails
-        if (res.status !== 204) {
-          const json = await res.json()
+        if (res.data) {
           result = {
-            ...json,
+            ...res.data,
             status: node.status,
           } as NodeDetails
         } else {
@@ -68,7 +65,6 @@ const EditNodeCard = (props: EditNodeCardProps) => {
         onNodeEdited(result, editing)
       } else {
         setSubmitting(false)
-        handleApiError(res, setFieldError)
       }
     },
   })

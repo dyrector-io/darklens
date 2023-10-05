@@ -2,7 +2,6 @@ import DyoButton from 'src/elements/dyo-button'
 import { DyoCard } from 'src/elements/dyo-card'
 import { DyoHeading } from 'src/elements/dyo-heading'
 import { DyoConfirmationModal } from 'src/elements/dyo-modal'
-import { defaultApiErrorHandler } from 'src/errors'
 import useConfirmation from 'src/hooks/use-confirmation'
 import useWebSocket from 'src/hooks/use-websocket'
 import { NodeDetails, NodeEventMessage, NodeInstall, WS_TYPE_NODE_EVENT } from 'src/models'
@@ -15,6 +14,7 @@ import NodeConnectionCard from './node-connection-card'
 import useNodeState from './use-node-state'
 import { WS_NODES, nodeApiTokenUrl } from 'src/routes'
 import { useTranslation } from 'react-i18next'
+import { useBackendDelete } from 'src/hooks/use-backend'
 
 interface EditNodeSectionProps {
   className?: string
@@ -28,6 +28,8 @@ const EditNodeSection = (props: EditNodeSectionProps) => {
 
   const { t } = useTranslation('nodes')
 
+  const backendDelete = useBackendDelete()
+
   const [revokeModalConfig, confirmTokenRevoke] = useConfirmation()
 
   const [node, setNode] = useNodeState(
@@ -40,8 +42,6 @@ const EditNodeSection = (props: EditNodeSectionProps) => {
   )
 
   const editing = !!node.id
-
-  const handleApiError = defaultApiErrorHandler(t)
 
   const onNodeEdited = (newNode: NodeDetails, shouldClose?: boolean) => {
     setNode(newNode)
@@ -91,12 +91,9 @@ const EditNodeSection = (props: EditNodeSectionProps) => {
       return
     }
 
-    const res = await fetch(nodeApiTokenUrl(node.id), {
-      method: 'DELETE',
-    })
+    const res = await backendDelete(nodeApiTokenUrl(node.id))
 
-    if (!res.ok) {
-      handleApiError(res)
+    if (!res) {
       return
     }
 

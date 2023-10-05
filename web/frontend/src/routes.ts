@@ -9,10 +9,15 @@ export const ROUTE_INDEX = '/'
 export const ROUTE_STATUS = '/status'
 export const ROUTE_404 = '/404'
 export const ROUTE_NODES = '/nodes'
+export const ROUTE_LOGIN = '/login'
 
 export const API_ROOT = '/api'
 export const API_NODES = `${API_ROOT}/nodes`
 export const API_HEALTH = `${API_ROOT}/health`
+
+export const API_AUTH = `${API_ROOT}/auth`
+export const API_AUTH_LOGIN = `${API_AUTH}/login`
+export const API_AUTH_LOGOUT = `${API_AUTH}/logout`
 
 export const WS_NODES = '/nodes'
 

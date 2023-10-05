@@ -54,3 +54,9 @@ export class CruxInternalServerErrorException extends CruxException {
     super(HttpStatus.INTERNAL_SERVER_ERROR, options)
   }
 }
+
+export class CruxGoneException extends CruxException {
+  constructor(options: CruxExceptionOptions) {
+    super(HttpStatus.GONE, options)
+  }
+}

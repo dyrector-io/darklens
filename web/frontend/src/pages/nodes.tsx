@@ -7,7 +7,6 @@ import { EnumFilter, enumFilterFor, TextFilter, textFilterFor, useFilters } from
 import useWebSocket from 'src/hooks/use-websocket'
 import { DyoNode, NODE_STATUS_VALUES, NodeEventMessage, NodeStatus, WS_TYPE_NODE_EVENT } from 'src/models'
 import { API_NODES, nodeDetailsUrl, ROUTE_NODES, WS_NODES } from 'src/routes'
-import { fetcher } from 'src/utils'
 import { useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
@@ -18,11 +17,14 @@ import DyoButton from 'src/elements/dyo-button'
 import { DyoSelect } from 'src/elements/dyo-select'
 import { DyoInput } from 'src/elements/dyo-input'
 import { DyoLabel } from 'src/elements/dyo-label'
+import { useBackendGet } from 'src/hooks/use-backend'
 
 type NodeFilter = TextFilter & EnumFilter<NodeStatus>
 
 const NodesPage = () => {
   const { t } = useTranslation('nodes')
+
+  const backendGet = useBackendGet()
 
   const [loading, setLoading] = useState<boolean>(true)
   const filters = useFilters<DyoNode, NodeFilter>({
@@ -44,8 +46,11 @@ const NodesPage = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const nodes: DyoNode[] = await fetcher(API_NODES)
-      filters.setItems(nodes)
+      const res = await backendGet<DyoNode[]>(API_NODES)
+      if (!res.ok) {
+        return
+      }
+      filters.setItems(res.data)
       setLoading(false)
     }
     fetchData()

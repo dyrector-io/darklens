@@ -14,7 +14,7 @@ export interface InfoBoxProps {
 const types = {
   info: {
     icon: infoIcon,
-    color: 'blue-500',
+    color: 'border-blue-400',
   },
 }
 
@@ -24,8 +24,8 @@ const InfoBox = (props: React.PropsWithChildren<InfoBoxProps>) => {
   return (
     <div
       className={clsx(
+        `${types[type].color}`,
         'bg-lens-medium-eased text-lens-bright p-4 border-l-4 rounded-r-lg',
-        `border-${types[type].color}`,
         className,
       )}
     >

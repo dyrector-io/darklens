@@ -10,7 +10,7 @@ datasource db {
 }
 
 model Node {
-  id             String        @id @default(uuid())
+  id             String    @id @default(uuid())
   name           String
   description    String?
   icon           String?
@@ -18,27 +18,35 @@ model Node {
   connectedAt    DateTime?
   disconnectedAt DateTime?
 
-  events      NodeEvent[]
-  token       NodeToken?
+  events NodeEvent[]
+  token  NodeToken?
 
   @@unique([name])
 }
 
 model NodeToken {
-  nodeId    String @id @unique
-  nonce     String
+  nodeId String @id @unique
+  nonce  String
 
   node Node @relation(fields: [nodeId], references: [id], onDelete: Cascade)
 }
 
 model NodeEvent {
-  id        String            @id @default(uuid())
+  id        String   @id @default(uuid())
   nodeId    String
-  createdAt DateTime          @default(now())
+  createdAt DateTime @default(now())
   event     String
   data      String?
 
   node Node @relation(fields: [nodeId], references: [id], onDelete: Cascade)
 
   @@map("NodeEvent")
+}
+
+model User {
+  id       String @id @default(uuid())
+  name     String
+  password String
+
+  @@unique([name])
 }

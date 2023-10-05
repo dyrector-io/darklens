@@ -1,5 +1,5 @@
 import { FormikErrors, FormikHandlers, FormikState } from 'formik'
-import toast, { ToastOptions } from 'react-hot-toast'
+import toast from 'react-hot-toast'
 import { Audit, DyoApiError, DyoErrorDto } from './models'
 import { TFunction } from 'i18next'
 
@@ -84,70 +84,6 @@ export const getUserDateFormat = (fallback: string) => {
   return dateFormat?.indexOf('yyyy') > -1 ? dateFormat : fallback // if the format is invalid, use fallback
 }
 
-// errors
-export const isDyoError = (instance: any) => 'error' in instance && 'description' in instance
-export const isDyoApiError = (instance: any): instance is DyoApiError => isDyoError(instance) && 'status' in instance
-
-export const findError = (errors: DyoErrorDto[], name: string, converter?: (error: DyoErrorDto) => string): string => {
-  const error = errors.find(it => it.property === name)
-  if (error && converter) {
-    return converter(error)
-  }
-
-  return error?.error
-}
-
-export const upsertDyoError = (errors: DyoErrorDto[], error: DyoErrorDto): DyoErrorDto[] => {
-  const index = errors.findIndex(it => it.property === error.property)
-  if (index > -1) {
-    const result = [...errors]
-    result[index] = error
-    return result
-  }
-
-  return [...errors, error]
-}
-
-export const upsertError = (errors: DyoErrorDto[], name: string, error: string, description?: string): DyoErrorDto[] =>
-  upsertDyoError(errors, {
-    description: description ?? 'Ui error.',
-    error,
-    property: name,
-  })
-
-export const removeError = (errors: DyoErrorDto[], name: string): DyoErrorDto[] =>
-  errors.filter(it => it.property !== name)
-
-// fetch
-export const configuredFetcher = (init?: RequestInit) => {
-  if (init && init.method in ['POST', 'PUT'] && !init.headers['Content-Type']) {
-    init.headers['Content-Type'] = 'application/json'
-  }
-
-  return async url => {
-    const res = await fetch(url, init)
-
-    if (!res.ok) {
-      const dto: DyoErrorDto = (await res.json()) ?? {
-        error: 'UNKNOWN',
-        description: 'Unknown error',
-      }
-
-      const error: DyoApiError = {
-        ...dto,
-        status: res.status,
-      }
-
-      throw error
-    }
-
-    return res.json()
-  }
-}
-
-export const fetcher = configuredFetcher()
-
-// forms
 export type FormikSetFieldValue = (
   field: string,
   value: any,
@@ -159,35 +95,6 @@ export type FormikProps<T> = FormikState<T> &
     setFieldValue: FormikSetFieldValue
   }
 
-export const formikFieldValueConverter =
-  <T>(formik: { setFieldValue: FormikSetFieldValue }, converter: (value: boolean) => T): FormikSetFieldValue =>
-  (field, value, shouldValidate) =>
-    formik.setFieldValue(field, converter(value), shouldValidate)
-
-export const sendForm = async <Dto>(
-  method: 'POST' | 'PUT' | 'PATCH' | 'DELETE',
-  url: string,
-  body?: Dto,
-): Promise<Response> =>
-  await fetch(url, {
-    method,
-    headers: body
-      ? {
-          'Content-Type': 'application/json',
-        }
-      : undefined,
-    body: body ? JSON.stringify(body) : null,
-  })
-
-export const parseStringUnionType = <T>(value: string, fallback: T, validValues: ReadonlyArray<T>): T => {
-  if (value) {
-    const index = (validValues as unknown as ReadonlyArray<string>).indexOf(value)
-    return validValues[index]
-  }
-
-  return fallback
-}
-
 export const writeToClipboard = async (t: TFunction, content: string) => {
   if (window.isSecureContext) {
     await navigator.clipboard.writeText(content)
@@ -197,62 +104,46 @@ export const writeToClipboard = async (t: TFunction, content: string) => {
   }
 }
 
-export const snakeToCamel = str =>
-  str.toLowerCase().replace(/([-_][a-z])/g, group => group.toUpperCase().replace('-', '').replace('_', ''))
-
-export const toastWarning = (message: string, opts?: ToastOptions) => {
-  toast(message, {
-    ...opts,
-    className: '!bg-lens-warning-orange',
-    style: {
-      color: 'white',
-    },
-  })
-}
-
-export const nullify = <T>(target: T): T => {
-  const values = Object.values(target)
-
-  const notEmpty = values.some(it => {
-    if (!it) {
-      return typeof it === 'number' && it === 0
-    }
-
-    if (Array.isArray(it)) {
-      return it.length > 0
-    }
-
-    if (typeof it === 'object') {
-      return nullify(it)
-    }
-
-    return true
-  })
-
-  return notEmpty ? target : null
-}
-
-export const toNumber = (value: string): number => {
-  if (!value) {
-    return null
-  }
-
-  const parsedValue = Number(value)
-
-  if (Number.isNaN(parsedValue)) {
-    return NaN
-  }
-
-  return parsedValue
-}
-
 export const getEndOfToday = () => {
   const endOfToday = new Date()
   endOfToday.setHours(23, 59, 59, 999)
   return endOfToday
 }
 
-export const delay = (ms: number): Promise<boolean> =>
-  new Promise(resolve => {
-    setTimeout(() => resolve(null), ms)
+export const getCookie = (name: string): string => {
+  const cookieString = document.cookie
+  const cookies = cookieString.split('; ')
+  const keyValuePairs = cookies.map(it => {
+    const split = it.split('=')
+    if (split.length === 1) {
+      return [split[0], '']
+    }
+    return split
   })
+
+  const findCookie = keyValuePairs.find(([cookieName, _]) => cookieName === name)
+  return findCookie?.[1] ?? null
+}
+
+export const fetcher = (init?: RequestInit) => {
+  if (init && init.method in ['POST', 'PUT'] && !init.headers['Content-Type']) {
+    init.headers['Content-Type'] = 'application/json'
+  }
+  return async url => {
+    const res = await fetch(url, init)
+    if (!res.ok) {
+      const dto: DyoErrorDto = (await res.json()) ?? {
+        error: 'UNKNOWN',
+        description: 'Unknown error',
+      }
+      const error: DyoApiError = {
+        ...dto,
+        status: res.status,
+      }
+      throw error
+    }
+    return res.json()
+  }
+}
+
+export const configuredFetcher = fetcher()

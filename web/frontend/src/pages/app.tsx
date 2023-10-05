@@ -10,18 +10,63 @@ import StatusPage from './status'
 import Page404 from './404'
 import Page500 from './500'
 import { MainLayout } from 'src/components/layout'
+import LoginPage from './login'
+import React from 'react'
+import { AuthOnlyRoute, AuthWrapper, ProtectedRoute } from 'src/components/auth'
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route errorElement={<Page500 />}>
-      <Route element={<MainLayout />}>
-        <Route path="/" element={<Navigate to={ROUTE_NODES} />} />
-        <Route path="nodes" element={<NodesPage />} />
-        <Route path="nodes/:nodeId" element={<NodeDetailsPage />} />
-        <Route path="nodes/:nodeId/log" element={<NodeContainerLogPage />} />
-        <Route path="status" element={<StatusPage />} />
+      <Route
+        element={
+          <ProtectedRoute>
+            <MainLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Navigate to={ROUTE_NODES} />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="nodes"
+          element={
+            <ProtectedRoute>
+              <NodesPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="nodes/:nodeId"
+          element={
+            <ProtectedRoute>
+              <NodeDetailsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="nodes/:nodeId/log"
+          element={
+            <ProtectedRoute>
+              <NodeContainerLogPage />
+            </ProtectedRoute>
+          }
+        />
       </Route>
 
+      <Route path="status" element={<StatusPage />} />
+      <Route
+        path="login"
+        element={
+          <AuthOnlyRoute>
+            <LoginPage />
+          </AuthOnlyRoute>
+        }
+      />
       <Route path="*" element={<Page404 />} />
     </Route>,
   ),
@@ -42,7 +87,9 @@ const LensApp = () => (
       }}
     />
 
-    <RouterProvider router={router} />
+    <AuthWrapper>
+      <RouterProvider router={router} />
+    </AuthWrapper>
   </WebSocketProvider>
 )
 

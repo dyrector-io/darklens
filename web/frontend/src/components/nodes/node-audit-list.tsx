@@ -14,6 +14,7 @@ import { nodeApiAuditUrl } from 'src/routes'
 import { NodeDetailsState } from './use-node-details-state'
 import { useTranslation } from 'react-i18next'
 import eye from 'src/assets/eye.svg'
+import { useBackendGet } from 'src/hooks/use-backend'
 
 interface NodeAuditListProps {
   state: NodeDetailsState
@@ -34,6 +35,8 @@ const NodeAuditList = (props: NodeAuditListProps) => {
   const { t } = useTranslation('nodes')
   const throttle = useThrottling(1000)
 
+  const backendGet = useBackendGet()
+
   const endOfToday = getEndOfToday()
 
   const [total, setTotal] = useState(0)
@@ -51,10 +54,10 @@ const NodeAuditList = (props: NodeAuditListProps) => {
       to: (to ?? endOfToday).toISOString(),
       filterEventType: auditFilter.eventType,
     }
-    const res = await fetch(nodeApiAuditUrl(node.id, query))
+    const res = await backendGet<NodeAuditLogList>(nodeApiAuditUrl(node.id, query))
 
     if (res.ok) {
-      const list = (await res.json()) as NodeAuditLogList
+      const list = res.data
       setData(list.items)
       setTotal(list.total)
     } else {

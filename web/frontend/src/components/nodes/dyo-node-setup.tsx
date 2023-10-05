@@ -8,7 +8,6 @@ import { DyoInput } from 'src/elements/dyo-input'
 import { DyoLabel } from 'src/elements/dyo-label'
 import DyoToggle from 'src/elements/dyo-toggle'
 import TimeLabel from 'src/elements/time-label'
-import { defaultApiErrorHandler } from 'src/errors'
 import useDyoFormik from 'src/hooks/use-dyo-formik'
 import useTimer from 'src/hooks/use-timer'
 import {
@@ -18,13 +17,14 @@ import {
   NodeInstall,
   NodeInstallScriptType,
 } from 'src/models'
-import { sendForm, writeToClipboard } from 'src/utils'
+import { writeToClipboard } from 'src/utils'
 import { nodeGenerateScriptSchema } from 'src/validations'
 import ShEditor from '../shared/sh-editor'
 import { nodeApiScriptUrl } from 'src/routes'
 import { useTranslation } from 'react-i18next'
 import copyAlt from 'src/assets/copy-alt.svg'
 import InfoBox from 'src/elements/lens-info-box'
+import { useBackendDelete, useBackendFetch } from 'src/hooks/use-backend'
 
 const expiresIn = (expireAt: Date): number => {
   const now = new Date().getTime()
@@ -41,20 +41,17 @@ const DyoNodeSetup = (props: DyoNodeSetupProps) => {
 
   const { t } = useTranslation('nodes')
 
+  const backendFetch = useBackendFetch(t)
+  const backendDelete = useBackendDelete(t)
+
   const [remaining, startCountdown, cancelCountdown] = useTimer(
     node.install ? expiresIn(new Date(node.install.expireAt)) : null,
     () => onNodeInstallChanged(null),
   )
 
-  const handleApiError = defaultApiErrorHandler(t)
-
   const onDiscard = async () => {
-    const res = await fetch(nodeApiScriptUrl(node.id), {
-      method: 'DELETE',
-    })
-
-    if (!res.ok) {
-      await handleApiError(res)
+    const res = await backendDelete(nodeApiScriptUrl(node.id))
+    if (!res) {
       return
     }
 
@@ -79,15 +76,14 @@ const DyoNodeSetup = (props: DyoNodeSetupProps) => {
         cancelCountdown()
       }
 
-      const res = await sendForm('POST', nodeApiScriptUrl(node.id), values)
+      const res = await backendFetch<NodeGenerateScript, NodeInstall>('POST', nodeApiScriptUrl(node.id), values)
 
       if (!res.ok) {
         setSubmitting(false)
-        await handleApiError(res)
         return
       }
 
-      const install = (await res.json()) as NodeInstall
+      const install = res.data
 
       startCountdown(expiresIn(new Date(install.expireAt)))
 

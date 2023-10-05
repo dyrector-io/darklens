@@ -4,6 +4,7 @@ import { ServeStaticModule } from '@nestjs/serve-static'
 import { LoggerModule } from 'nestjs-pino'
 import { join } from 'path'
 import AgentModule from './app/agent/agent.module'
+import { AuthModule } from './app/auth/auth.module'
 import HealthModule from './app/health/health.module'
 import NodeModule from './app/node/node.module'
 import appConfig from './config/app.config'
@@ -17,7 +18,7 @@ const staticFileHost = ServeStaticModule.forRoot({
   exclude: ['/api/(.*)'],
 })
 
-const imports = [NodeModule, AgentModule, HealthModule, ConfigModule.forRoot(appConfig), staticFileHost]
+const imports = [AuthModule, NodeModule, AgentModule, HealthModule, ConfigModule.forRoot(appConfig), staticFileHost]
 
 if (process.env.NODE_ENV === 'production') {
   imports.push(LoggerModule.forRoot(pinoLoggerConfig))

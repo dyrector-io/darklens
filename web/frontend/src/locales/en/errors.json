@@ -1,29 +1,8 @@
 {
   "oops": "Opps, something went wrong.",
   "connectionLost": "Connection lost.",
-  "invalid": "There are some errors. Please fix them.",
-  "fetchFailed": "Failed to fetch {{type}}",
-  "deletionFailed": "Failed to delete {{type}}",
-  "insecure": "Insecure connection. Some browser features are not available.",
-
-  "missingParameter": "Missing parameter",
-  "invalidArgument": "Invalid argument",
   "notFound": "Not found",
-  "alreadyExists": "Already exists",
-  "unauthorized": "Unauthenticated",
-  "forbidden": "Forbidden",
   "internalError": "Something went wrong. Please try again later.",
-
-  "invalidCredentials": "Invalid credentials",
-  "confirmPassMismatch": "Passwords must match",
-
-  "validationFailedForDeployment": "Validation failed for deployment. Please open the deployment details and check for any instance configuration errors.",
-  "validationFailedForInstance": "Validation failed for instance '{{path}}'",
-  "validationFailedForInstanceMessage": "Validation failed for instance '{{path}}': {{message}}",
-
-  "registryRateLimit": "Rate limit reached, please try again later",
-  "registryUnauthorized": "Unauthorized",
-  "deployRequiredSecrets": "The following instances have missing required secrets: {{instances}}",
 
   "yup": {
     "mixed": {

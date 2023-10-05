@@ -54,7 +54,7 @@ const EventsTerminal = <T,>(props: EventsTerminalProps<T>) => {
       <div
         ref={containerRef}
         onScroll={onScroll}
-        className="flex flex-col h-full overflow-y-auto bg-gray-900 rounded-md ring-2 ring-lens-light-grey border-lens-dark px-2 py-1 mt-4 h-128 font-roboto"
+        className="flex flex-col h-full overflow-y-auto bg-lens-medium-muted rounded-md ring-2 ring-lens-light-grey border-lens-dark px-2 py-1 mt-4 h-128 font-roboto"
       >
         {eventStrings.map((it, index) => (
           <span className="text-lens-bright tracking-widest py-2 text-sm" key={`event-${index}`}>
