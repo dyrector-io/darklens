@@ -6,11 +6,17 @@
     </picture>
 </p>
 
-<p align="center">Lightweight container manager.</p>
+<p align="center"><b>Lightweight container manager.</b></p>
+
+## Use cases
+
+- **SSH-less Container Monitoring:** You can add as many components of your infrastructure as you like, and check up on the services running in one place without SSH access.
+- **Centralized View for Container Management:** One user-friendly interface to analyze logs and container configs, and interact with them.
+- **Goodbye JSON (Hello UI):** Quickly interpretable UI to spare you from untangling data in JSON about your containers.
 
 ## Getting started
 
-TODO: One liner `docker run`
+Enter `docker run -p 8000:8000 -d ghcr.io/dyrector-io/darklens:latest` in terminal
 
 ## Development
 
@@ -36,5 +42,5 @@ TODO: One liner `docker run`
     1. Goto `web/backend` and run `npm start`
     2. Goto `web/frontend` and run `npx prisma migrate dev` to apply migrations then start using `npm start`
     3. The app will be available on `localhost:8000`
-
+</br>
     > Make sure the `dev-traefik` container is running as it routes the traffic between the frontend and the backend
