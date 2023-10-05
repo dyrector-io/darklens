@@ -26,6 +26,7 @@ import {
 } from '@nestjs/swagger'
 import UuidParams from 'src/decorators/api-params.decorator'
 import { CreatedResponse, CreatedWithLocation } from '../../interceptors/created-with-location.decorator'
+import { Public } from '../auth/auth.guard'
 import NodeTeamAccessGuard from './guards/node.team-access.http.guard'
 import { NodeId, PARAM_NODE_ID, ROUTE_NODES, ROUTE_NODE_ID } from './node.const'
 import {
@@ -52,7 +53,7 @@ export default class NodeHttpController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     description:
-      "Fetch data of deployment targets. Request must include `teamSlug` in URL. Response should include an array with the node's `type`, `status`, `description`, `icon`, `address`, `connectedAt` date, `version`, `id`, and `name`.",
+      "Fetch data of deployment targets. Response should include an array with the node's `type`, `status`, `description`, `icon`, `address`, `connectedAt` date, `version`, `id`, and `name`.",
     summary: 'Get data of nodes that belong to your team.',
   })
   @ApiOkResponse({
@@ -69,7 +70,7 @@ export default class NodeHttpController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     description:
-      "Fetch data of a specific node. Request must include `teamSlug` in URL, and `nodeId` in body. Response should include an array with the node's `type`, `status`, `description`, `icon`, `address`, `connectedAt` date, `version`, `updatable`, `id`, `name`, `hasToken`, and agent installation details.",
+      "Fetch data of a specific node. Request must include `nodeId` in body. Response should include an array with the node's `type`, `status`, `description`, `icon`, `address`, `connectedAt` date, `version`, `updatable`, `id`, `name`, `hasToken`, and agent installation details.",
     summary: 'Get data of nodes that belong to your team.',
   })
   @ApiOkResponse({ type: NodeDetailsDto, description: 'Data of the node.' })
@@ -85,7 +86,7 @@ export default class NodeHttpController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     description:
-      "Request must include the `teamSlug` in URL, and node's `name` in body. Response should include an array with the node's `type`, `status`, `description`, `icon`, `address`, `connectedAt` date, `version`, `id`, and `name`.",
+      "Request must include the node's `name` in body. Response should include an array with the node's `type`, `status`, `description`, `icon`, `address`, `connectedAt` date, `version`, `id`, and `name`.",
     summary: 'Create new node.',
   })
   @CreatedWithLocation()
@@ -106,8 +107,7 @@ export default class NodeHttpController {
   @Put(ROUTE_NODE_ID)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({
-    description:
-      "Request must include the `teamSlug` in URL, and node's `name` in body, body can include `description` and `icon`.",
+    description: "Request must include the node's `name` in body, body can include `description` and `icon`.",
     summary: 'Update details of a node.',
   })
   @ApiNoContentResponse({ description: 'Node details modified.' })
@@ -123,7 +123,7 @@ export default class NodeHttpController {
   @Delete(ROUTE_NODE_ID)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({
-    description: "Request must include the `teamSlug` in URL, and node's `name` in body.",
+    description: "Request must include the node's `name` in body.",
     summary: 'Delete node.',
   })
   @ApiNoContentResponse({ description: 'Node deleted.' })
@@ -137,7 +137,7 @@ export default class NodeHttpController {
   @Post(`${ROUTE_NODE_ID}/script`)
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
-    description: 'Request must include `teamSlug` in URL and `nodeId`, `type`, and `scriptType`.',
+    description: 'Request must include `nodeId`, `type`, and `scriptType` in URL.',
     summary: 'Create agent install script.',
   })
   @ApiOkResponse({ type: NodeInstallDto, description: 'Install script generated.' })
@@ -154,7 +154,7 @@ export default class NodeHttpController {
   @Delete(`${ROUTE_NODE_ID}/script`)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({
-    description: "Request must include the `teamSlug` in URL, and node's `name` in body.",
+    description: "Request must include the node's `name` in body.",
     summary: 'Delete node set up install script.',
   })
   @ApiNoContentResponse({ description: 'Agent install script deleted.' })
@@ -164,12 +164,13 @@ export default class NodeHttpController {
     return await this.service.discardScript(nodeId)
   }
 
+  @Public()
   @Get(`${ROUTE_NODE_ID}/script`)
   @ApiOkResponse({ type: String })
   @ApiProduces('text/plain')
   @ApiOperation({
     description:
-      "Request must include the `teamSlug` in URL, and node's `name` in body. Response should include `type`, `status`, `description`, `icon`, `address`, `connectedAt` date, `version`, `updatable`, `id`, `name`, `hasToken`, and `install` details.",
+      "Request must include the node's `name` in body. Response should include `type`, `status`, `description`, `icon`, `address`, `connectedAt` date, `version`, `updatable`, `id`, `name`, `hasToken`, and `install` details.",
     summary: 'Fetch install script.',
   })
   @ApiOkResponse({ type: NodeDetailsDto, description: 'Install script.' })
@@ -185,7 +186,7 @@ export default class NodeHttpController {
   @Delete(`${ROUTE_NODE_ID}/token`)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({
-    description: "Request must include the `teamSlug` in URL, and node's `name` in body.",
+    description: "Request must include the node's `name` in body.",
     summary: "Revoke the node's access token.",
   })
   @ApiNoContentResponse({ description: 'Token revoked.' })
@@ -199,7 +200,7 @@ export default class NodeHttpController {
   @Post(`${ROUTE_NODE_ID}/update`)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({
-    description: "Request must include the `teamSlug` in URL, and node's `name` in body.",
+    description: "Request must include the node's `name` in body.",
     summary: 'Update the agent.',
   })
   @ApiNoContentResponse({ description: 'Node details modified.' })
@@ -214,7 +215,7 @@ export default class NodeHttpController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     description:
-      'Request must include `teamSlug` in URL, and its body must include `skip`, `take`, and dates of `from` and `to`. Response should include an array of `items`: `createdAt` date, `event`, and `data`.',
+      'Request must include `skip`, `take`, and dates of `from` and `to` in the body. Response should include an array of `items`: `createdAt` date, `event`, and `data`.',
     summary: 'Fetch audit log.',
   })
   @ApiOkResponse({ type: NodeAuditLogListDto, description: 'Paginated list of the audit log.' })

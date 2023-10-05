@@ -31,7 +31,12 @@ FROM docker.io/library/node:20.5.0-alpine3.17 AS RUNNER
 
 ENV NODE_ENV production
 ENV TZ UTC
+
+# Defaults
 ENV DATABASE file:/var/lib/darklens/data.db
+ENV JWT_SECRET super-secret
+ENV AGENT_ADDRESS host.docker.internal:5000
+ENV PUBLIC_URL http://localhost:8000
 
 RUN apk --update add tzdata openssl1.1-compat
 
