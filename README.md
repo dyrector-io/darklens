@@ -11,7 +11,7 @@
 ## Use cases
 
 - **SSH-less Container Monitoring:** You can add as many components of your infrastructure as you like, and check up on the services running in one place without SSH access.
-- **Centralized View for Container Management:** One user-friendly interface to analyze logs and container configs, and interact with them.
+- **Centralized View for Container Management:** One user-friendly interface to analyze logs and container configs.
 - **Goodbye JSON (Hello UI):** Quickly interpretable UI to spare you from untangling data in JSON about your containers.
 
 ## Getting started
