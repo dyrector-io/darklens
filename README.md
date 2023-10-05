@@ -6,7 +6,7 @@
     </picture>
 </p>
 
-<p align="center"><b>Lightweight container manager.</b></p>
+<p align="center"><b>Lightweight container viewer.</b></p>
 
 ## Use cases
 
@@ -27,6 +27,15 @@
 * Run on a public domain: `docker run -p 8000:8000 -p 5000:5000 -e PUBLIC_URL=example.com AGENT_ADDRESS=example.com:5000 -d ghcr.io/dyrector-io/darklens:latest`
     * Note: Agents require gRPC port 5000 to connect to the service
 * Persist data: `docker run -p 8000:8000 -p 5000:5000 -v darklens-data:/var/lib/darklens -d ghcr.io/dyrector-io/darklens:latest`
+
+## Agent install
+
+1. Click on the empty card with a plus icon to add a new node
+2. Enter a name for your node and click Save
+    -  This'll be the name of the agent running as a container on your node
+3. On the right side of the screen, select whether you'd like to install the agent with a Shell (UNIX) or a PowerShell (Windows) script
+4. Generate the script and copy & paste it into Shell or PowerShell. Press enter to install the agent
+5. When node status turns green, you're ready to use darklens
 
 ## Development
 
