@@ -31,7 +31,7 @@ If you're worried or don’t know where to start, check out our next section exp
 
 4. Develop
 
-    1. Goto `web/backend` and run `npm start`
+    1. Goto `web/backend` and run `npx prisma migrate dev` to apply migrations then start using `npm start`
     2. Goto `web/frontend` and run `npm start`
     3. The app will be available on `localhost:8000`
 
