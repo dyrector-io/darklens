@@ -16,7 +16,9 @@
 
 ## Getting started
 
-Enter `docker run -p 8000:8000 -d ghcr.io/dyrector-io/darklens:latest` in terminal
+1. Enter `docker run -p 8000:8000 -d ghcr.io/dyrector-io/darklens:latest` in terminal
+2. Open `localhost:8000` in browser
+3. Enjoy!
 
 ## Development
 
