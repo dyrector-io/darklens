@@ -61,7 +61,7 @@ const LoginPage = () => {
       <img src={logo} alt="" className="w-80" />
 
       <DyoCard className="text-bright p-8 mt-4 max-w-sm">
-        <DyoHeading className="text-lens-bright font-extrabold text-3xl text-center mb-4">
+        <DyoHeading className="text-lens-text-0 font-extrabold text-3xl text-center mb-4">
           {t(auth.regRequired ? 'register' : 'logIn')}
         </DyoHeading>
         {auth.regRequired && (

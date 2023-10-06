@@ -25,7 +25,7 @@ const DyoNodeCard = (props: DyoNodeCardProps) => {
       {node.icon ? <DyoBadge large icon={node.icon} /> : null}
 
       <DyoHeading
-        className={clsx('text-xl text-lens-bright font-semibold my-auto mr-auto', node.icon ? 'ml-4' : null)}
+        className={clsx('text-xl text-lens-text-0 font-semibold my-auto mr-auto', node.icon ? 'ml-4' : null)}
         element="h3"
       >
         {node.name}
@@ -48,7 +48,7 @@ const DyoNodeCard = (props: DyoNodeCardProps) => {
       <DyoExpandableText
         text={node.description}
         lineClamp={node.address ? 4 : 6}
-        className="text-md text-lens-light mt-2 max-h-44"
+        className="text-md text-lens-text-2 mt-2 max-h-44"
         buttonClassName="w-fit"
         modalTitle={node.name}
       />

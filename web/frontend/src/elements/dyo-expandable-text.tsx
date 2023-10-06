@@ -58,7 +58,7 @@ const DyoExpandableText = (props: DyoExpandableTextProps) => {
           open={show}
           onClose={() => setShow(false)}
         >
-          <p className="text-lens-bright mt-8 break-words whitespace-pre-line overflow-y-auto">{text}</p>
+          <p className="text-lens-text-0 mt-8 break-words whitespace-pre-line overflow-y-auto">{text}</p>
         </DyoModal>
       )}
     </>

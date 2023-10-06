@@ -34,10 +34,8 @@ export class AuthController {
 
     let token = null
     if (await this.userService.hasUsers()) {
-      console.log('A')
       token = await this.authService.signIn(signInDto.name, signInDto.password)
     } else {
-      console.log('B')
       token = await this.authService.register(signInDto.name, signInDto.password)
     }
 

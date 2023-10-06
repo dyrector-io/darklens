@@ -44,8 +44,8 @@ const ContainerStatusTag = (props: ContainerStatusTagProps) => {
 
   return (
     <DyoTag
-      color={state ? statusToBgColor() : 'bg-lens-bright'}
-      textColor={state ? statusToTextColor() : 'text-lens-bright'}
+      color={state ? statusToBgColor() : 'lens-surface-0'}
+      textColor={state ? statusToTextColor() : 'text-lens-text-0'}
       className={className}
       solid={state === 'removing'}
     >

@@ -16,7 +16,7 @@ export const DyoHeading = (props: DyoHeadingProps) => {
   return React.createElement(
     element ?? 'h1',
     {
-      className: clsx(className ?? 'text-lens-bright font-extrabold text-4xl', onClick ? 'cursor-pointer' : null),
+      className: clsx(className ?? 'text-lens-text-0 font-extrabold text-4xl', onClick ? 'cursor-pointer' : null),
       onClick,
     },
     href ? <Link to={href}>{children}</Link> : children,

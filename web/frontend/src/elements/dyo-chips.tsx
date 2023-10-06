@@ -34,7 +34,7 @@ const DyoChips = <T,>(props: DyoChipsProps<T>) => {
               'rounded-md border-2 px-2 py-1 my-1 mr-2',
               selection === it
                 ? 'text-white font-lens-medium border-lens-turquoise bg-lens-turquoise bg-opacity-30'
-                : 'text-lens-light-eased border-lens-light-eased',
+                : 'text-lens-text-1 border-lens-light-eased',
               disabled ? 'cursor-not-allowed' : null,
             )}
             onClick={() => onSelectionChange(it)}

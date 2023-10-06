@@ -86,7 +86,7 @@ const NodeContainerLogPage = (props: NodeContainerLogPageProps) => {
 
       <DyoCard className="p-4">
         <div className="flex mb-4 justify-between items-start">
-          <DyoHeading element="h4" className="text-xl text-lens-bright">
+          <DyoHeading element="h4" className="text-xl text-lens-text-0">
             {t('logOf', { name: prefix ? `${prefix}-${name}` : name })}
           </DyoHeading>
         </div>

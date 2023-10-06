@@ -97,22 +97,22 @@ const DyoNodeSetup = (props: DyoNodeSetupProps) => {
 
   return (
     <DyoCard>
-      <DyoHeading element="h4" className="text-lg text-lens-bright mb-2">
+      <DyoHeading element="h4" className="text-lg text-lens-text-0 mb-2">
         {t('agentInstall')}
       </DyoHeading>
 
       <InfoBox className="mb-2" type="info" title={t('whatScriptDoesHeader')}>
-        <p className="text-lens-light-eased">{t('scriptExplanation')}</p>
+        <p className="text-lens-text-1">{t('scriptExplanation')}</p>
       </InfoBox>
 
       <DyoForm className="flex flex-col" onSubmit={formik.handleSubmit} onReset={formik.handleReset}>
         {!node.install ? (
           <>
             <div className="flex flex-col">
-              <DyoHeading element="h4" className="text-lg text-lens-bright flex flex-row items-center">
+              <DyoHeading element="h4" className="text-lg text-lens-text-0 flex flex-row items-center">
                 <DyoToggle
                   className="mr-2 my-2"
-                  labelClassName="text-lens-light-eased mr-4"
+                  labelClassName="text-lens-text-1 mr-4"
                   name="traefik"
                   checked={!!formik.values.dagentTraefik}
                   onCheckedChange={onTraefikChanged}
@@ -121,11 +121,11 @@ const DyoNodeSetup = (props: DyoNodeSetupProps) => {
                 {t('traefik')}
               </DyoHeading>
 
-              <p className="text-sm text-lens-bright-muted mb-2.5">{t('traefikExplanation')}</p>
+              <p className="text-sm text-lens-text-3 mb-2.5">{t('traefikExplanation')}</p>
 
               {formik.values.dagentTraefik && (
                 <div className="mb-2">
-                  <DyoLabel className="text-md mb-2" textColor="text-lens-bright">
+                  <DyoLabel className="text-md mb-2" textColor="text-lens-text-0">
                     {t('traefikAcmeEmail')}
                   </DyoLabel>
 
@@ -140,7 +140,7 @@ const DyoNodeSetup = (props: DyoNodeSetupProps) => {
                 </div>
               )}
 
-              <DyoLabel className="text-lg mb-2.5" textColor="text-lens-bright">
+              <DyoLabel className="text-lg mb-2.5" textColor="text-lens-text-0">
                 {t('persistentDataPath')}
               </DyoLabel>
 
@@ -153,9 +153,9 @@ const DyoNodeSetup = (props: DyoNodeSetupProps) => {
                 onChange={formik.handleChange}
                 message={formik.errors.rootPath}
               />
-              <p className="text-sm text-lens-bright-muted mb-2.5">{t('persistentDataExplanation')}</p>
+              <p className="text-sm text-lens-text-3 mb-2.5">{t('persistentDataExplanation')}</p>
 
-              <DyoHeading element="h4" className="text-lg text-lens-bright mb-2">
+              <DyoHeading element="h4" className="text-lg text-lens-text-0 mb-2">
                 {t('type')}
               </DyoHeading>
 

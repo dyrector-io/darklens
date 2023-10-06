@@ -42,7 +42,7 @@ interface JsonEditorProps<T> {
   style?: CSSProperties
 }
 
-const JsonEditorInternal = <T,>(props: JsonEditorProps<T>) => {
+const JsonEditor = <T,>(props: JsonEditorProps<T>) => {
   const { id, className, disabled, value, onChange: propOnChange, onParseError, onFocus, onBlur, style } = props
 
   const [state, dispatch] = useReducer(reducer, JSON.stringify(value, undefined, '  '))
@@ -72,7 +72,7 @@ const JsonEditorInternal = <T,>(props: JsonEditorProps<T>) => {
   return (
     <div
       className={clsx(
-        'text-lens-bright bg-lens-dark rounded-md ring-2 ring-lens-light-grey border-lens-dark caret-white',
+        'text-lens-text-0 bg-lens-surface-6 rounded-md ring-2 ring-lens-surface-4 border-lens-dark caret-white',
         className,
       )}
       style={style}
@@ -94,7 +94,7 @@ const JsonEditorInternal = <T,>(props: JsonEditorProps<T>) => {
   )
 }
 
-export default JsonEditorInternal
+export default JsonEditor
 
 type JsonEditorActionType = 'update' | 'text-changed'
 

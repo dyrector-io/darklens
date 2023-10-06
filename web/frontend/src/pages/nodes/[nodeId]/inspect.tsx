@@ -34,9 +34,11 @@ const NodeContainerInspectPage = (props: ContainerInspectPageProps) => {
   const { inspect, node, prefix, name } = props
 
   const { t } = useTranslation('common')
+  const { t } = useTranslation('nodes')
 
   const pageLink: BreadcrumbLink = {
     name: t('nodes'),
+    name: t('common:nodes'),
     url: ROUTE_NODES,
   }
 
@@ -47,15 +49,18 @@ const NodeContainerInspectPage = (props: ContainerInspectPageProps) => {
     },
     {
       name: t('log'),
+      name: t('common:log'),
       url: `${nodeContainerInspectUrl(node.id, { prefix, name })}`,
     },
   ]
 
   return (
     <Page title={t('image')}>
+    <Page title={t('common:inspect')}>
       <PageHeading pageLink={pageLink} sublinks={sublinks}>
         <DyoButton className="ml-auto px-6" secondary href={nodeDetailsUrl(node.id)}>
           {t('back')}
+          {t('common:back')}
         </DyoButton>
       </PageHeading>
 
@@ -63,6 +68,8 @@ const NodeContainerInspectPage = (props: ContainerInspectPageProps) => {
         <div className="flex mb-4 justify-between items-start">
           <DyoHeading element="h4" className="text-xl text-lens-bright">
             {t('inspectOf', { name: prefix ? `${prefix}-${name}` : name })}
+          <DyoHeading element="h4" className="text-xl text-lens-text-0">
+            {t('common:inspectOf', { name: prefix ? `${prefix}-${name}` : name })}
           </DyoHeading>
         </div>
 

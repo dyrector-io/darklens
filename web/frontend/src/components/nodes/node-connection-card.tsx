@@ -29,12 +29,12 @@ const NodeConnectionCard = (props: NodeConnectionCardProps) => {
           {node.icon ? (
             <DyoBadge icon={node.icon} />
           ) : (
-            <span className="text-lens-bright text-xl">{`${t('common:node')}:`}</span>
+            <span className="text-lens-text-0 text-xl">{`${t('common:node')}:`}</span>
           )}
 
           <DyoHeading
             className={clsx(
-              'text-xl text-lens-bright font-semibold truncate my-auto mr-auto',
+              'text-xl text-lens-text-0 font-semibold truncate my-auto mr-auto',
               node.icon ? 'ml-4' : null,
             )}
             element="h3"
@@ -46,16 +46,16 @@ const NodeConnectionCard = (props: NodeConnectionCardProps) => {
 
       <div className="grid grid-cols-2 justify-between items-center">
         <DyoLabel>{t('address')}</DyoLabel>
-        <span className="text-lens-light-eased">{node.address}</span>
+        <span className="text-lens-text-1">{node.address}</span>
 
         <DyoLabel className="self-start"> {t('version')}</DyoLabel>
-        <span className="text-lens-light-eased">{node.version}</span>
+        <span className="text-lens-text-1">{node.version}</span>
 
         <DyoLabel>{t('status')}</DyoLabel>
         <div className="flex flex-row">
           <NodeStatusIndicator className="my-auto mr-2" status={node.status} />
 
-          <span className="text-lens-light-eased">{t(`common:nodeStatuses.${node.status}`)}</span>
+          <span className="text-lens-text-1">{t(`common:nodeStatuses.${node.status}`)}</span>
         </div>
 
         <DyoLabel>{t('uptime')}</DyoLabel>
@@ -64,7 +64,7 @@ const NodeConnectionCard = (props: NodeConnectionCardProps) => {
         {node.status === 'updating' && (
           <>
             <DyoLabel>{t('update')}</DyoLabel>
-            <span className="text-lens-light-eased">{t('in-progress')}</span>
+            <span className="text-lens-text-1">{t('in-progress')}</span>
           </>
         )}
       </div>

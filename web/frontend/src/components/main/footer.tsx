@@ -10,11 +10,11 @@ const Footer = (props: React.HTMLProps<HTMLDivElement>) => {
   return (
     <footer className={clsx('font-poppins items-center flex py-6 justify-between', className)} {...forwardProps}>
       <div className="flex items-stretch text-sm">
-        <span className="text-lens-light pr-2">Copyright © {new Date().getFullYear()}</span>
+        <span className="text-lens-text-4 pr-2">Copyright © {new Date().getFullYear()}</span>
       </div>
 
       <div className="flex items-stretch text-sm">
-        <span className="text-lens-light pr-2">
+        <span className="text-lens-text-4 pr-2">
           <Link to="https://github.com/dyrector-io/darklens" target="_blank">
             <span className="text-lens-turquoise font-bold">Darklens</span>
           </Link>{' '}

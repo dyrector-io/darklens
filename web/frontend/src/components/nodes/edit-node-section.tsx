@@ -118,10 +118,10 @@ const EditNodeSection = (props: EditNodeSectionProps) => {
           {node.hasToken && <NodeConnectionCard className="mb-4 p-6" node={node} />}
 
           {!editing ? (
-            <DyoCard className="h-full text-lens-bright p-8">{t('youCanInstall')}</DyoCard>
+            <DyoCard className="h-full text-lens-text-0 p-8">{t('youCanInstall')}</DyoCard>
           ) : node.hasToken ? (
-            <DyoCard className="flex flex-col h-full p-8 text-lens-bright">
-              <DyoHeading element="h4" className="text-lg text-lens-bright">
+            <DyoCard className="flex flex-col h-full p-8 text-lens-text-0">
+              <DyoHeading element="h4" className="text-lg text-lens-text-0">
                 {t('agentSettings')}
               </DyoHeading>
 

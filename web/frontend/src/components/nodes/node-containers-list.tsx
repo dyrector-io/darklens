@@ -142,13 +142,13 @@ const NodeContainersList = (props: NodeContainersListProps) => {
   }
 
   const columnWidths = ['w-2/12', 'w-3/12', 'w-1/12', 'w-1/12', '', '', 'w-48']
-  const defaultHeaderClass = 'uppercase text-lens-bright text-sm font-semibold bg-lens-medium-eased px-2 py-3 h-11'
+  const defaultHeaderClass = 'uppercase text-lens-text-0 text-sm font-semibold bg-lens-surface-4 px-2 py-3 h-11'
   const headerClasses = [
     clsx('rounded-tl-lg pl-6', defaultHeaderClass),
     ...Array.from({ length: headers.length - 2 }).map(() => defaultHeaderClass),
     clsx('rounded-tr-lg pr-6 text-center', defaultHeaderClass),
   ]
-  const defaultItemClass = 'h-12 min-h-min text-lens-light-eased p-2'
+  const defaultItemClass = 'h-12 min-h-min text-lens-text-1 p-2'
   const itemClasses = [
     clsx('pl-6', defaultItemClass),
     ...Array.from({ length: headers.length - 2 }).map(() => defaultItemClass),

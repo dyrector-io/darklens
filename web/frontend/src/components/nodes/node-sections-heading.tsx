@@ -18,7 +18,7 @@ const NodeSectionsHeading = (props: React.PropsWithChildren<NodeSectionsHeadingP
         text
         thin
         underlined={section === 'containers'}
-        textColor="text-lens-bright"
+        textColor="text-lens-text-0"
         className="mx-6"
         onClick={() => setSection('containers')}
       >
@@ -29,7 +29,7 @@ const NodeSectionsHeading = (props: React.PropsWithChildren<NodeSectionsHeadingP
         text
         thin
         underlined={section === 'logs'}
-        textColor="text-lens-bright"
+        textColor="text-lens-text-0"
         className="mx-6"
         onClick={() => setSection('logs')}
       >

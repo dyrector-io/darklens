@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useRouteError } from 'react-router-dom'
 import { SingleFormLayout } from 'src/components/layout'
 import DyoButton from 'src/elements/dyo-button'
 import { DyoHeading } from 'src/elements/dyo-heading'
@@ -8,6 +8,8 @@ import { ROUTE_INDEX, ROUTE_STATUS } from 'src/routes'
 const Page500 = () => {
   const { t } = useTranslation('status')
   const nav = useNavigate()
+  const error = useRouteError()
+  console.error(error)
 
   const navigateToIndex = async () => await nav(ROUTE_INDEX)
 

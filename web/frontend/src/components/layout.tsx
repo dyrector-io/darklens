@@ -65,9 +65,9 @@ export const MainLayout = () => {
 
   return (
     <main className="w-full h-full">
-      <div className="bg-lens-medium h-18 shadow-topbar fixed left-0 top-0 right-0 flex flex-row pr-7 z-50">
+      <div className="bg-lens-surface-5 h-18 shadow-topbar fixed left-0 top-0 right-0 flex flex-row pr-7 z-50">
         <Link to={ROUTE_INDEX}>
-          <div className="px-12 bg-lens-medium-eased">
+          <div className="px-12 bg-lens-surface-4">
             <img className="cursor-pointer" src={logo} alt={t('common:logoAlt')} width={120} height={20} />
           </div>
         </Link>
@@ -79,7 +79,7 @@ export const MainLayout = () => {
             <>
               <DyoIcon src={user} alt="" size="lg" className="cursor-pointer" />
 
-              <div className="bg-lens-bright-muted w-px h-8 mx-3" />
+              <div className="bg-lens-surface-3 w-px h-8 mx-3" />
 
               <DyoIcon src={logout} alt="" size="lg" className="cursor-pointer" onClick={onLogout} />
             </>
