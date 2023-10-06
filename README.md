@@ -6,7 +6,7 @@
     </picture>
 </p>
 
-<p align="center"><b>Lightweight container viewer.</b></p>
+<p align="center"><b>docker logs and docker inspect in an easy to use GUI</b></p>
 
 ## Use cases
 
