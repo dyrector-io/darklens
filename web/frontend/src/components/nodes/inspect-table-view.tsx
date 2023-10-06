@@ -178,11 +178,11 @@ const InspectTableView = (props: InspectTableViewProps) => {
     },
   ]
 
-  const networkTableData = Object.entries(networks).map(([name, network]) => {
+  const networkTableData = Object.entries(networks).map(([networkName, network]) => {
     const { IPAddress: ip, Gateway: gateway } = network as any
 
     return {
-      key: name,
+      key: networkName,
       value: t('networkInfo', {
         ip: ip === '' ? '-' : ip,
         gateway: gateway === '' ? '-' : gateway,
