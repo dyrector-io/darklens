@@ -5,6 +5,7 @@ import AgentInstaller from 'src/domain/agent-installer'
 import { NodeWithToken } from 'src/domain/node'
 import { fromTimestamp } from 'src/domain/utils'
 import {
+  ContainerInspectMessage,
   ContainerOperation,
   ContainerStateItem,
   ContainerStateListMessage,
@@ -17,6 +18,7 @@ import {
   BasicNodeDto,
   BasicNodeWithStatus,
   ContainerDto,
+  ContainerInspectionDto,
   ContainerOperationDto,
   ContainerState,
   NodeConnectionStatus,
@@ -127,6 +129,12 @@ export default class NodeMapper {
         return ContainerOperation.RESTART_CONTAINER
       default:
         return ContainerOperation.UNRECOGNIZED
+    }
+  }
+
+  containerInspectionMessageToDto(it: ContainerInspectMessage): ContainerInspectionDto {
+    return {
+      inspection: it.inspection,
     }
   }
 }

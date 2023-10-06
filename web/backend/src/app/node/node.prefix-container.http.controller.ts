@@ -1,4 +1,4 @@
-import { Controller, Delete, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common'
+import { Controller, Delete, Get, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common'
 import {
   ApiBadRequestResponse,
   ApiForbiddenResponse,
@@ -21,6 +21,7 @@ import {
   ROUTE_NODE_ID,
   ROUTE_PREFIX,
 } from './node.const'
+import { ContainerInspectionDto } from './node.dto'
 import NodeService from './node.service'
 
 @Controller(`${ROUTE_NODES}/${ROUTE_NODE_ID}/${ROUTE_PREFIX}/${ROUTE_CONTAINERS}`)
@@ -28,6 +29,23 @@ import NodeService from './node.service'
 @UseGuards(NodeTeamAccessGuard)
 export default class NodePrefixContainerHttpController {
   constructor(private service: NodeService) {}
+
+  @Get(`${ROUTE_NAME}/inspect`)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    description: 'Request must include `nodeId`, and the `name` of the container.',
+    summary: 'Inspect a specific container on a node.',
+  })
+  @ApiBadRequestResponse({ description: 'Bad request for container inspect.' })
+  @ApiForbiddenResponse({ description: 'Unauthorized request for container inspect.' })
+  @UuidParams(PARAM_NODE_ID)
+  async inspectContainer(
+    @NodeId() nodeId: string,
+    @Prefix() prefix: string,
+    @Name() name: string,
+  ): Promise<ContainerInspectionDto> {
+    return await this.service.inspectContainer(nodeId, prefix, name)
+  }
 
   @Post(`${ROUTE_NAME}/start`)
   @HttpCode(HttpStatus.NO_CONTENT)

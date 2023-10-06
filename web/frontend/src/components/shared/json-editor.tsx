@@ -72,7 +72,7 @@ const JsonEditorInternal = <T,>(props: JsonEditorProps<T>) => {
   return (
     <div
       className={clsx(
-        'text-lens-bright bg-lens-medium-muted rounded-md ring-2 ring-lens-light-grey border-lens-dark caret-white',
+        'text-lens-bright bg-lens-dark rounded-md ring-2 ring-lens-light-grey border-lens-dark caret-white',
         className,
       )}
       style={style}

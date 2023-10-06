@@ -79,7 +79,7 @@ const NodeContainerLogPage = (props: NodeContainerLogPageProps) => {
   return (
     <Page title={t('log')}>
       <PageHeading pageLink={pageLink} sublinks={sublinks}>
-        <DyoButton className="ml-auto px-6 mr-2" secondary href={nodeDetailsUrl(node.id)}>
+        <DyoButton className="ml-auto px-6" secondary href={nodeDetailsUrl(node.id)}>
           {t('back')}
         </DyoButton>
       </PageHeading>

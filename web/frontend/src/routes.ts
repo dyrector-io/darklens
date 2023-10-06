@@ -105,6 +105,12 @@ export const nodeContainerLogUrl = (id: string, params: ContainerLogParams) =>
     anchor: null,
   })
 
+export const nodeContainerInspectUrl = (id: string, params: ContainerLogParams) =>
+  appendUrlParams(`/nodes/${id}/inspect`, {
+    ...params,
+    anchor: null,
+  })
+
 export const nodeDetailsUrl = (id: string) => `/nodes/${id}`
 
 export const nodeApiDetailsUrl = (id: string) => `${API_NODES}/${id}`
@@ -114,5 +120,10 @@ export const nodeApiScriptUrl = (id: string) => `${nodeApiDetailsUrl(id)}/script
 export const nodeApiAuditUrl = (id: string, query: AuditLogQuery) => urlQuery(`${nodeApiDetailsUrl(id)}/audit`, query)
 
 export const nodeApiTokenUrl = (id: string) => `${nodeApiDetailsUrl(id)}/token`
+
+export const nodeApiInspectUrl = (id: string, prefix?: string, name?: string) =>
+  prefix
+    ? `${nodeApiDetailsUrl(id)}/${prefix}/containers/${name}/inspect`
+    : `${nodeApiDetailsUrl(id)}/containers/${name}/inspect`
 
 export const nodeWsDetailsUrl = (id: string) => `${WS_NODES}/${id}`

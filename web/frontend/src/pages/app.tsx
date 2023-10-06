@@ -6,6 +6,7 @@ import { Navigate, Route, RouterProvider, createBrowserRouter, createRoutesFromE
 import NodesPage from './nodes'
 import NodeDetailsPage from './nodes/[nodeId]'
 import NodeContainerLogPage from './nodes/[nodeId]/log'
+import NodeContainerInspectPage from './nodes/[nodeId]/inspect'
 import StatusPage from './status'
 import Page404 from './404'
 import Page500 from './500'
@@ -53,6 +54,14 @@ const router = createBrowserRouter(
           element={
             <ProtectedRoute>
               <NodeContainerLogPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="nodes/:nodeId/inspect"
+          element={
+            <ProtectedRoute>
+              <NodeContainerInspectPage />
             </ProtectedRoute>
           }
         />
