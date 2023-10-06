@@ -64,6 +64,14 @@ const handleFetch = <TRes>(opts: HandleFetchOptions) => {
           ok: false,
         })
       })
+      .catch(() => {
+        toast(t('oops'))
+        nav(ROUTE_STATUS)
+
+        resolve({
+          ok: false,
+        })
+      })
     } catch (err) {
       if (err.status === 401) {
         nav(ROUTE_LOGIN)
