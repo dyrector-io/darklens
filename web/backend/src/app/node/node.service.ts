@@ -1,6 +1,17 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { Prisma } from '@prisma/client'
-import { EmptyError, Observable, filter, firstValueFrom, map, mergeAll, mergeWith, of, timeout } from 'rxjs'
+import {
+  EmptyError,
+  Observable,
+  filter,
+  firstValueFrom,
+  lastValueFrom,
+  map,
+  mergeAll,
+  mergeWith,
+  of,
+  timeout,
+} from 'rxjs'
 import { Agent, AgentConnectionMessage } from 'src/domain/agent'
 import {
   ContainerCommandRequest,
@@ -14,6 +25,7 @@ import PrismaService from 'src/services/prisma.service'
 import AgentService from '../agent/agent.service'
 import {
   ContainerDto,
+  ContainerInspectionDto,
   CreateNodeDto,
   NodeAuditLogListDto,
   NodeAuditLogQueryDto,
@@ -348,6 +360,14 @@ export default class NodeService {
       })),
       total,
     }
+  }
+
+  async inspectContainer(nodeId: string, prefix: string, name: string): Promise<ContainerInspectionDto> {
+    const agent = this.agentService.getByIdOrThrow(nodeId)
+    const watcher = agent.getContainerInspection(prefix, name)
+    const inspectionMessage = await lastValueFrom(watcher)
+
+    return this.mapper.containerInspectionMessageToDto(inspectionMessage)
   }
 
   private static snakeCaseToCamelCase(snake: string): string {

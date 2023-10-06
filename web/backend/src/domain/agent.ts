@@ -1,11 +1,16 @@
 import { Logger } from '@nestjs/common'
-import { catchError, Observable, of, Subject, Subscription, timeout, TimeoutError } from 'rxjs'
+import { catchError, finalize, Observable, of, Subject, Subscription, throwError, timeout, TimeoutError } from 'rxjs'
 import { NodeConnectionStatus } from 'src/app/node/node.dto'
-import { CruxConflictException, CruxPreconditionFailedException } from 'src/exception/crux-exception'
+import {
+  CruxConflictException,
+  CruxInternalServerErrorException,
+  CruxPreconditionFailedException,
+} from 'src/exception/crux-exception'
 import { AgentCommand, AgentInfo, CloseReason } from 'src/grpc/protobuf/proto/agent'
 import {
   ContainerCommandRequest,
   ContainerIdentifier,
+  ContainerInspectMessage,
   DeleteContainersRequest,
   Empty,
 } from 'src/grpc/protobuf/proto/common'
@@ -30,11 +35,13 @@ export type AgentTokenReplacement = {
 }
 
 export class Agent {
-  public static SECRET_TIMEOUT = 5000
+  public static INSPECT_TIMEOUT = 5000
 
   private readonly commandChannel = new BufferedSubject<AgentCommand>()
 
   private statusWatchers: Map<string, ContainerStatusWatcher> = new Map()
+
+  private inspectionWatchers: Map<string, Subject<ContainerInspectMessage>> = new Map()
 
   private deleteContainersRequests: Map<string, Subject<Empty>> = new Map()
 
@@ -269,6 +276,63 @@ export class Agent {
 
     this.logStreams.delete(key)
     watcher.onNodeStreamFinished()
+  }
+
+  getContainerInspection(prefix: string, name: string): Observable<ContainerInspectMessage> {
+    this.throwIfCommandsAreDisabled()
+
+    const key = Agent.containerPrefixNameOf({
+      prefix,
+      name,
+    })
+
+    let watcher = this.inspectionWatchers.get(key)
+    if (!watcher) {
+      watcher = new Subject<ContainerInspectMessage>()
+      this.inspectionWatchers.set(key, watcher)
+
+      this.commandChannel.next({
+        containerInspect: {
+          container: {
+            prefix,
+            name,
+          },
+        },
+      } as AgentCommand)
+    }
+
+    return watcher.pipe(
+      finalize(() => {
+        this.inspectionWatchers.delete(key)
+      }),
+      timeout({
+        each: Agent.INSPECT_TIMEOUT,
+        with: () => {
+          this.inspectionWatchers.delete(key)
+
+          return throwError(
+            () =>
+              new CruxInternalServerErrorException({
+                message: 'Agent container inspection timed out.',
+              }),
+          )
+        },
+      }),
+    )
+  }
+
+  onContainerInspect(res: ContainerInspectMessage) {
+    const key = Agent.containerPrefixNameOf(res)
+
+    const watcher = this.inspectionWatchers.get(key)
+    if (!watcher) {
+      return
+    }
+
+    watcher.next(res)
+    watcher.complete()
+
+    this.inspectionWatchers.delete(key)
   }
 
   startUpdate(tag: string, options: AgentUpdateOptions) {

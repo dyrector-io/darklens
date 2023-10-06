@@ -30,9 +30,9 @@ const DyoTextArea = (props: DyoTextAreaProps) => {
         id={id ?? name}
         className={clsx(
           className,
-          'bg-lens-medium p-4 ring-2 rounded-md focus:outline-none focus:lens-dark',
+          'bg-lens-surface-5 p-4 ring-2 rounded-md focus:outline-none focus:lens-dark',
           grow ? null : 'w-80',
-          error ? 'text-lens-bright ring-lens-error-red' : 'text-lens-bright ring-lens-light-grey',
+          error ? 'text-lens-text-0 ring-lens-error-red' : 'text-lens-text-0 ring-lens-surface-4',
         )}
       >
         {children}

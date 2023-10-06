@@ -106,7 +106,12 @@
 
   "event": "Event",
   "data": "Data",
+  "log": "Log",
   "logOf": "Log of {{name}}",
+  "inspectOf": "Inspection of {{name}}",
 
-  "openSource": "is an open-source project."
+  "openSource": "is an open-source project.",
+
+  "key": "Key",
+  "value": "Value"
 }

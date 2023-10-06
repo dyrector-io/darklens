@@ -18,7 +18,7 @@ import {
   containerPrefixNameOf,
   imageName,
 } from 'src/models'
-import { nodeContainerLogUrl } from 'src/routes'
+import { nodeContainerInspectUrl, nodeContainerLogUrl } from 'src/routes'
 import { utcDateToLocale } from 'src/utils'
 import clsx from 'clsx'
 import { useTranslation } from 'react-i18next'
@@ -28,6 +28,7 @@ import start from 'src/assets/start.svg'
 import stop from 'src/assets/stop.svg'
 import trashCan from 'src/assets/trash-can.svg'
 import note from 'src/assets/note.svg'
+import book from 'src/assets/book.svg'
 
 interface NodeContainersListProps {
   state: NodeDetailsState
@@ -74,6 +75,7 @@ const NodeContainersList = (props: NodeContainersListProps) => {
   const itemBuilder = (container: Container) => {
     const name = containerPrefixNameOf(container.id)
     const targetState = state.containerTargetStates[name]
+    const containerPortsText = containerPortsToString(container.ports)
 
     return [
       <span>{name}</span>,
@@ -82,9 +84,11 @@ const NodeContainersList = (props: NodeContainersListProps) => {
       <span>{container.reason}</span>,
       <span>{utcDateToLocale(container.createdAt)}</span>,
       !container.ports ? null : (
-        <span className="block overflow-hidden truncate">{containerPortsToString(container.ports)}</span>
+        <span className="block overflow-hidden truncate" title={containerPortsText}>
+          {containerPortsText}
+        </span>
       ),
-      <div className="flex flex-wrap gap-1 justify-end items-center">
+      <div className="flex gap-1 justify-end items-center">
         {targetState ? (
           <LoadingIndicator />
         ) : (
@@ -115,9 +119,14 @@ const NodeContainersList = (props: NodeContainersListProps) => {
             />
 
             {container.state && (
-              <Link to={nodeContainerLogUrl(state.node.id, container.id)}>
-                <DyoIcon className="align-bottom" src={note} alt={t('logs')} size="md" />
-              </Link>
+              <>
+                <Link to={nodeContainerLogUrl(state.node.id, container.id)}>
+                  <DyoIcon className="align-bottom" src={note} alt={t('logs')} size="md" />
+                </Link>
+                <Link to={nodeContainerInspectUrl(state.node.id, container.id)}>
+                  <DyoIcon className="align-bottom" src={book} alt={t('inspect')} size="md" />
+                </Link>
+              </>
             )}
 
             <DyoImgButton
@@ -132,14 +141,14 @@ const NodeContainersList = (props: NodeContainersListProps) => {
     ]
   }
 
-  const columnWidths = ['w-2/12', 'w-3/12', 'w-1/12', 'w-1/12', '', '', 'w-40']
-  const defaultHeaderClass = 'uppercase text-lens-bright text-sm font-semibold bg-lens-medium-eased px-2 py-3 h-11'
+  const columnWidths = ['w-2/12', 'w-3/12', 'w-1/12', 'w-1/12', '', '', 'w-48']
+  const defaultHeaderClass = 'uppercase text-lens-text-0 text-sm font-semibold bg-lens-surface-4 px-2 py-3 h-11'
   const headerClasses = [
     clsx('rounded-tl-lg pl-6', defaultHeaderClass),
     ...Array.from({ length: headers.length - 2 }).map(() => defaultHeaderClass),
     clsx('rounded-tr-lg pr-6 text-center', defaultHeaderClass),
   ]
-  const defaultItemClass = 'h-12 min-h-min text-lens-light-eased p-2'
+  const defaultItemClass = 'h-12 min-h-min text-lens-text-1 p-2'
   const itemClasses = [
     clsx('pl-6', defaultItemClass),
     ...Array.from({ length: headers.length - 2 }).map(() => defaultItemClass),

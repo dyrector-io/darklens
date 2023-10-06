@@ -8,7 +8,7 @@ export const DyoLabel = (props: DyoLabelProps) => {
   const { className, textColor, children, ...forwardedProps } = props
 
   return (
-    <label {...forwardedProps} className={clsx(className, textColor ?? 'text-lens-light-eased')}>
+    <label {...forwardedProps} className={clsx(className, textColor ?? 'text-lens-text-1')}>
       {children}
     </label>
   )

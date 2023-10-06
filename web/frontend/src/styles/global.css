@@ -14,7 +14,7 @@
 html,
 body {
   font-family: 'Poppins', sans-serif;
-  background-color: #161d31;
+  background-color: #192428;
 }
 
 * {
@@ -39,5 +39,5 @@ body {
 }
 
 ::-webkit-scrollbar-corner {
-  background: #161d31;
+  background: #192428;
 }

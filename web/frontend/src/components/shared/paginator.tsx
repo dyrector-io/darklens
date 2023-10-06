@@ -71,9 +71,9 @@ const Paginator = (props: PaginatorProps) => {
   return (
     <div className="flex justify-between my-2 items-center">
       <div>
-        <a className="text-lens-light-eased mx-4">{t('itemsPerPage')}</a>
+        <a className="text-lens-text-1 mx-4">{t('itemsPerPage')}</a>
         <select
-          className="bg-transparent h-8 ring-2 ring-lens-light-grey rounded-md !text-white focus:outline-none"
+          className="bg-transparent h-8 ring-2 ring-lens-surface-4 rounded-md !text-white focus:outline-none"
           onChange={e => {
             const newMaxPage = Math.ceil(length / pageSizes[e.target.value]) - 1
             const newPagination: PaginationSettings = {
@@ -87,14 +87,14 @@ const Paginator = (props: PaginatorProps) => {
           value={pageSizes.indexOf(pagination.pageSize)}
         >
           {pageSizes.map((v, i) => (
-            <option key={v} value={i} className="bg-lens-medium">
+            <option key={v} value={i} className="bg-lens-surface-5">
               {v}
             </option>
           ))}
         </select>
       </div>
       <div className="flex items-center mx-4">
-        <a className="text-lens-light-eased mr-8">{t('showingItems', { pageFrom, pageTo, total: length })}</a>
+        <a className="text-lens-text-1 mr-8">{t('showingItems', { pageFrom, pageTo, total: length })}</a>
         <DyoButton
           className="w-8 text-xl"
           onClick={() => onPageChanged({ type: 'first' })}
@@ -115,7 +115,7 @@ const Paginator = (props: PaginatorProps) => {
         </DyoButton>
         {pagination.pageNumber - 2 >= 0 && (
           <DyoButton
-            className="w-8 text-l text-lens-light-eased"
+            className="w-8 text-l text-lens-text-1"
             onClick={() => onPageChanged({ type: 'exact', page: pagination.pageNumber - 2 })}
             text
             thin
@@ -126,7 +126,7 @@ const Paginator = (props: PaginatorProps) => {
         )}
         {pagination.pageNumber - 1 >= 0 && (
           <DyoButton
-            className="w-8 text-l text-lens-light-eased"
+            className="w-8 text-l text-lens-text-1"
             onClick={() => onPageChanged({ type: 'previous' })}
             text
             thin
@@ -144,7 +144,7 @@ const Paginator = (props: PaginatorProps) => {
         />
         {pagination.pageNumber + 1 <= maxPage && (
           <DyoButton
-            className="w-8 text-l text-lens-light-eased"
+            className="w-8 text-l text-lens-text-1"
             onClick={() => onPageChanged({ type: 'next' })}
             text
             thin
@@ -155,7 +155,7 @@ const Paginator = (props: PaginatorProps) => {
         )}
         {pagination.pageNumber + 2 <= maxPage && (
           <DyoButton
-            className="w-8 text-l text-lens-light-eased"
+            className="w-8 text-l text-lens-text-1"
             onClick={() => onPageChanged({ type: 'exact', page: pagination.pageNumber + 2 })}
             text
             thin

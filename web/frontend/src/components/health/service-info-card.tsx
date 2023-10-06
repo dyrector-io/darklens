@@ -29,7 +29,7 @@ const ServiceInfoCard = (props: ServiceStatusCardProps) => {
 
       <ServiceStatusTag className="mx-auto mt-12" status={info.status} />
 
-      <span className="text-lens-bright mx-auto mt-4">{`${t('version')}: ${info.version ?? t('unknown')}`}</span>
+      <span className="text-lens-text-0 mx-auto mt-4">{`${t('version')}: ${info.version ?? t('unknown')}`}</span>
     </DyoCard>
   )
 }

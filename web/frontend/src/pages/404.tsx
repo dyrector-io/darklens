@@ -23,7 +23,7 @@ const Page404 = () => {
             {t('oops')}
           </DyoHeading>
 
-          <p className="text-center text-lens-light font-semibold my-6">{t('nothingYet')}</p>
+          <p className="text-center text-lens-text-2 font-semibold my-6">{t('nothingYet')}</p>
 
           <DyoButton className="px-12" outlined onClick={navigateToIndex}>
             {t('common:back')}

@@ -79,14 +79,14 @@ const NodeContainerLogPage = (props: NodeContainerLogPageProps) => {
   return (
     <Page title={t('log')}>
       <PageHeading pageLink={pageLink} sublinks={sublinks}>
-        <DyoButton className="ml-auto px-6 mr-2" secondary href={nodeDetailsUrl(node.id)}>
+        <DyoButton className="ml-auto px-6" secondary href={nodeDetailsUrl(node.id)}>
           {t('back')}
         </DyoButton>
       </PageHeading>
 
       <DyoCard className="p-4">
         <div className="flex mb-4 justify-between items-start">
-          <DyoHeading element="h4" className="text-xl text-lens-bright">
+          <DyoHeading element="h4" className="text-xl text-lens-text-0">
             {t('logOf', { name: prefix ? `${prefix}-${name}` : name })}
           </DyoHeading>
         </div>

@@ -80,7 +80,7 @@ export const DyoList = <T,>(props: DyoListProps<T>) => {
                   key={`${key}-header-${index}`}
                   className={clsx(
                     'table-cell text-left align-middle',
-                    headerClassNames[index] ?? 'text-lens-bright font-bold h-8 mb-4 ml-2 mr-auto',
+                    headerClassNames[index] ?? 'text-lens-text-0 font-bold h-8 mb-4 ml-2 mr-auto',
                     columnWidths ? columnWidths[index] ?? '' : '',
                   )}
                 >
@@ -98,8 +98,8 @@ export const DyoList = <T,>(props: DyoListProps<T>) => {
                   key={`${key}-${colIndex}-${rowIndex}`}
                   className={clsx(
                     'table-cell align-middle',
-                    !noSeparator ? 'border-t-2 border-lens-light-grey' : null,
-                    itemClassNames[colIndex] ?? 'h-12 min-h-min text-lens-light-eased p-2',
+                    !noSeparator ? 'border-t-2 border-lens-surface-4' : null,
+                    itemClassNames[colIndex] ?? 'h-12 min-h-min text-lens-text-1 p-2',
                   )}
                   onClick={cellClick ? () => cellClick(propsData[rowIndex], rowIndex, colIndex) : undefined}
                 >
@@ -110,7 +110,7 @@ export const DyoList = <T,>(props: DyoListProps<T>) => {
           ))}
         </div>
       </div>
-      <div className={clsx(footerClassName)}>{footer}</div>
+      {footer && <div className={clsx(footerClassName)}>{footer}</div>}
     </>
   )
 }

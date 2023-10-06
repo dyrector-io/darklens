@@ -29,7 +29,7 @@ const DyoToggle = (props: DyoToggleProps) => {
   return (
     <div className={clsx('flex', className ?? 'w-full')}>
       {label && (
-        <label className={clsx(labelClassName ?? 'text-lens-light-eased mr-4', 'align-middle')}>
+        <label className={clsx(labelClassName ?? 'text-lens-text-1 mr-4', 'align-middle')}>
           {checked ? checkedLabel : uncheckedLabel}
         </label>
       )}
@@ -41,7 +41,7 @@ const DyoToggle = (props: DyoToggleProps) => {
         name={name}
         disabled={disabled}
         className={`${
-          checked ? 'bg-lens-turquoise' : 'bg-lens-light'
+          checked ? 'bg-lens-turquoise' : 'bg-lens-surface-2'
         } relative inline-flex items-center h-6 rounded-full w-11 outline-none`}
         onClick={onToggle}
       >

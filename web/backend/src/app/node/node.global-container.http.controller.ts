@@ -21,7 +21,7 @@ import {
   ROUTE_NODES,
   ROUTE_NODE_ID,
 } from './node.const'
-import { ContainerDto } from './node.dto'
+import { ContainerDto, ContainerInspectionDto } from './node.dto'
 import NodeService from './node.service'
 
 @Controller(`${ROUTE_NODES}/${ROUTE_NODE_ID}/${ROUTE_CONTAINERS}`)
@@ -41,6 +41,19 @@ export default class NodeGlobalContainerHttpController {
   @ApiForbiddenResponse({ description: 'Unauthorized request for containers.' })
   async getContainers(@NodeId() nodeId: string, @Query('prefix') prefix?: string): Promise<ContainerDto[]> {
     return await this.service.getContainers(nodeId, prefix)
+  }
+
+  @Get(`${ROUTE_NAME}/inspect`)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    description: 'Request must include `nodeId`, and the `name` of the container.',
+    summary: 'Inspect a specific container on a node.',
+  })
+  @ApiBadRequestResponse({ description: 'Bad request for container inspect.' })
+  @ApiForbiddenResponse({ description: 'Unauthorized request for container inspect.' })
+  @UuidParams(PARAM_NODE_ID)
+  async inspectContainer(@NodeId() nodeId: string, @Name() name: string): Promise<ContainerInspectionDto> {
+    return await this.service.inspectContainer(nodeId, GLOBAL_PREFIX, name)
   }
 
   @Post(`${ROUTE_NAME}/start`)

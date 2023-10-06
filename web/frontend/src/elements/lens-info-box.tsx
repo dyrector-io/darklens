@@ -25,7 +25,7 @@ const InfoBox = (props: React.PropsWithChildren<InfoBoxProps>) => {
     <div
       className={clsx(
         `${types[type].color}`,
-        'bg-lens-medium-eased text-lens-bright p-4 border-l-4 rounded-r-lg',
+        'bg-lens-surface-4 text-lens-text-0 p-4 border-l-4 rounded-r-lg',
         className,
       )}
     >

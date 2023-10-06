@@ -18,7 +18,7 @@ const Filters = (props: FiltersProps) => {
 
   return (
     <DyoCard className="flex flex-col p-6">
-      <DyoHeading element="h3" className="text-xl text-lens-bright">
+      <DyoHeading element="h3" className="text-xl text-lens-text-0">
         {t('common:filters')}
       </DyoHeading>
 

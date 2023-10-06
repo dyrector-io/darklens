@@ -36,11 +36,11 @@ const Breadcrumb = (props: BreadcrumbProps) => {
 
   return (
     <div key="breadcrumb" className="flex flex-row items-center w-1/2 flex-grow">
-      <DyoHeading element="h2" className="text-2xl text-lens-bright">
+      <DyoHeading element="h2" className="text-2xl text-lens-text-0">
         {page}
       </DyoHeading>
 
-      <div className="bg-lens-bright w-px h-8 mx-6" />
+      <div className="bg-lens-surface-2 w-px h-8 mx-6" />
 
       <Link to={homeMenu?.link ?? ROUTE_INDEX}>
         <DyoIcon

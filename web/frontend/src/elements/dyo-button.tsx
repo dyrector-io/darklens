@@ -45,14 +45,14 @@ const DyoButton = (props: DyoButtonProps) => {
     : outlined
     ? 'ring-lens-turquoise'
     : 'bg-lens-turquoise'
-  const disabledColor = outlined ? 'ring-lens-light-grey-muted' : 'bg-lens-light-grey-muted'
+  const disabledColor = outlined ? 'ring-lens-surface-3' : 'bg-lens-surface-3'
 
   const color = text ? 'bg-transparent' : disabled ? disabledColor : colorClassName ?? defaultColor
 
   const defaultTextColor =
     text || outlined ? (secondary ? 'text-lens-warning-orange' : 'text-lens-turquoise') : 'text-white'
 
-  const textColor = disabled ? 'text-lens-light' : textColorClassName ?? defaultTextColor
+  const textColor = disabled ? 'text-lens-text-2' : textColorClassName ?? defaultTextColor
 
   const ring = outlined && !text ? 'ring-2' : null
   const border = underlined ? 'border-b-2 border-lens-turquoise' : null

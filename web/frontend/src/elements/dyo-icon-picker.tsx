@@ -65,7 +65,7 @@ const DyoIconPicker = (props: DyoIconPickerProps) => {
           key={icon}
           type="button"
           className={clsx(
-            icon === selected ? 'border-1 ring-2 ring-lens-turquoise bg-lens-light-grey rounded-full' : null,
+            icon === selected ? 'border-1 ring-2 ring-lens-turquoise bg-lens-surface-4 rounded-full' : null,
             'p-2 leading-[0px]',
           )}
           onClick={() => onSelectIcon(icon)}

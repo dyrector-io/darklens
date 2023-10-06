@@ -149,7 +149,7 @@ const NodesPage = () => {
             <DyoNodeCard className="p-6 h-40" key={`node-${index}`} node={it} titleHref={nodeDetailsUrl(it.id)} />
           ))}
           <div
-            className="h-40 rounded-lg ring-2 ring-lens-light-grey flex flex-col items-center justify-center cursor-pointer"
+            className="h-40 rounded-lg ring-2 ring-lens-surface-4 flex flex-col items-center justify-center cursor-pointer"
             onClick={() => setCreating(true)}
           >
             <DyoIcon src={plusIcon} size="xxl" alt="" />

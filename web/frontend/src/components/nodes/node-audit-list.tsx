@@ -22,8 +22,8 @@ interface NodeAuditListProps {
 
 type NodeAuditLogSorting = 'createdAt' | 'event'
 
-const defaultHeaderClass = 'uppercase text-lens-bright text-sm font-semibold bg-lens-medium-eased px-2 py-3 h-11'
-const defaultItemClass = 'h-12 min-h-min text-lens-light-eased p-2'
+const defaultHeaderClass = 'uppercase text-lens-text-0 text-sm font-semibold bg-lens-surface-4 px-2 py-3 h-11'
+const defaultItemClass = 'h-12 min-h-min text-lens-text-1 p-2'
 const columnWidths = ['w-2/12', 'w-48', '', 'w-24']
 const sixDays = 1000 * 60 * 60 * 24 * 6 // ms * minutes * hours * day * six
 const defaultPagination: PaginationSettings = { pageNumber: 0, pageSize: 10 }
@@ -141,7 +141,7 @@ const NodeAuditList = (props: NodeAuditListProps) => {
       {!showInfo ? null : (
         <DyoModal
           className="w-1/2 h-1/2"
-          titleClassName="pl-4 font-lens-medium text-xl text-lens-bright mb-3"
+          titleClassName="pl-4 font-lens-medium text-xl text-lens-text-0 mb-3"
           title={`${t(`auditEvents.${showInfo.event}`)} | ${utcDateToLocale(showInfo.createdAt)}`}
           open={!!showInfo}
           onClose={() => setShowInfo(null)}
