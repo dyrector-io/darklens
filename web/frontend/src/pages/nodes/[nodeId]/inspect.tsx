@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useParams } from 'react-router-dom'
 import { Page } from 'src/components/layout'
+import InspectTableView from 'src/components/nodes/inspect-table-view'
 import { BreadcrumbLink } from 'src/components/shared/breadcrumb'
-import JsonEditor from 'src/components/shared/json-editor-dynamic-module'
+import JsonEditor from 'src/components/shared/json-editor'
 import PageHeading from 'src/components/shared/page-heading'
 import DyoButton from 'src/elements/dyo-button'
 import { DyoCard } from 'src/elements/dyo-card'
@@ -30,14 +31,15 @@ interface ContainerInspectPageProps {
   name: string
 }
 
+type ViewState = 'table' | 'json'
+
 const NodeContainerInspectPage = (props: ContainerInspectPageProps) => {
   const { inspect, node, prefix, name } = props
 
-  const { t } = useTranslation('common')
   const { t } = useTranslation('nodes')
+  const [viewState, setViewState] = useState<ViewState>('table')
 
   const pageLink: BreadcrumbLink = {
-    name: t('nodes'),
     name: t('common:nodes'),
     url: ROUTE_NODES,
   }
@@ -48,32 +50,53 @@ const NodeContainerInspectPage = (props: ContainerInspectPageProps) => {
       url: `${nodeDetailsUrl(node.id)}`,
     },
     {
-      name: t('log'),
       name: t('common:log'),
       url: `${nodeContainerInspectUrl(node.id, { prefix, name })}`,
     },
   ]
 
   return (
-    <Page title={t('image')}>
     <Page title={t('common:inspect')}>
       <PageHeading pageLink={pageLink} sublinks={sublinks}>
         <DyoButton className="ml-auto px-6" secondary href={nodeDetailsUrl(node.id)}>
-          {t('back')}
           {t('common:back')}
         </DyoButton>
       </PageHeading>
 
       <DyoCard className="p-4">
         <div className="flex mb-4 justify-between items-start">
-          <DyoHeading element="h4" className="text-xl text-lens-bright">
-            {t('inspectOf', { name: prefix ? `${prefix}-${name}` : name })}
           <DyoHeading element="h4" className="text-xl text-lens-text-0">
             {t('common:inspectOf', { name: prefix ? `${prefix}-${name}` : name })}
           </DyoHeading>
+
+          <div className="flex">
+            <DyoButton
+              text
+              thin
+              textColor="text-lens-text-0"
+              underlined={viewState === 'table'}
+              onClick={() => setViewState('table')}
+              heightClassName="pb-2"
+              className="mx-4"
+            >
+              {t('table')}
+            </DyoButton>
+
+            <DyoButton
+              text
+              thin
+              textColor="text-lens-text-0"
+              underlined={viewState === 'json'}
+              onClick={() => setViewState('json')}
+              className="mx-4"
+              heightClassName="pb-2"
+            >
+              {t('json')}
+            </DyoButton>
+          </div>
         </div>
 
-        <JsonEditor value={inspect} disabled />
+        {viewState === 'table' ? <InspectTableView inspect={inspect} /> : <JsonEditor value={inspect} disabled />}
       </DyoCard>
     </Page>
   )
