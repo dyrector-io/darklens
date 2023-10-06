@@ -16,17 +16,19 @@
 
 ## Getting started
 
-1. Enter `docker run -p 8000:8000 -d ghcr.io/dyrector-io/darklens:latest` in terminal
+1. Enter `docker run -p 8000:8000 -p 5000:5000 -e AGENT_INSECURE=true -d ghcr.io/dyrector-io/darklens:latest` in terminal
 2. Open `localhost:8000` in browser
 3. Enjoy!
 
 ### Other options
 
-* Start without authorization: `docker run -p 8000:8000 -p 5000:5000 -e DISABLE_AUTH=true -d ghcr.io/dyrector-io/darklens:latest`
-* Select a stronger JWT secret: `docker run -p 8000:8000 -p 5000:5000 -e JWT_SECRET=supersecret -d ghcr.io/dyrector-io/darklens:latest`
-* Run on a public domain: `docker run -p 8000:8000 -p 5000:5000 -e PUBLIC_URL=example.com AGENT_ADDRESS=example.com:5000 -d ghcr.io/dyrector-io/darklens:latest`
+* Start without authorization: `docker run -p 8000:8000 -p 5000:5000 -e AGENT_INSECURE=true -e DISABLE_AUTH=true -d ghcr.io/dyrector-io/darklens:latest`
+* Select a stronger JWT secret: `docker run -p 8000:8000 -p 5000:5000 -e AGENT_INSECURE=true -e JWT_SECRET=supersecret -d ghcr.io/dyrector-io/darklens:latest`
+* Run on a public domain: `docker run -p 8000:8000 -p 5000:5000 -e AGENT_INSECURE=true -e PUBLIC_URL=example.com AGENT_ADDRESS=example.com:5000 -d ghcr.io/dyrector-io/darklens:latest`
     * Note: Agents require gRPC port 5000 to connect to the service
-* Persist data: `docker run -p 8000:8000 -p 5000:5000 -v darklens-data:/var/lib/darklens -d ghcr.io/dyrector-io/darklens:latest`
+* Persist data: `docker run -p 8000:8000 -p 5000:5000 -e AGENT_INSECURE=true -v darklens-data:/var/lib/darklens -d ghcr.io/dyrector-io/darklens:latest`
+* Use secure agents: `docker run -p 8000:8000 -p 5000:5000 -d ghcr.io/dyrector-io/darklens:latest`
+    * Note: This requires HTTPS termination using Traefik or NGINX
 
 ## Agent install
 

@@ -69,7 +69,7 @@ export default class AgentInstaller {
     const configLocalDeploymentNetwork = this.configService.get<string>('LOCAL_DEPLOYMENT_NETWORK')
     const disableForcePull = this.configService.get<boolean>('AGENT_INSTALL_SCRIPT_DISABLE_PULL', false)
     const agentImageTag = this.configService.get<string>('AGENT_IMAGE', getAgentVersionFromPackage(this.configService))
-    const debugMode = process.env.NODE_ENV !== PRODUCTION
+    const debugMode = process.env.NODE_ENV !== PRODUCTION || this.configService.get<boolean>('AGENT_INSECURE', false)
 
     const installScriptParams: InstallScriptConfig = {
       name: this.node.name.toLowerCase().replace(/\s/g, ''),
