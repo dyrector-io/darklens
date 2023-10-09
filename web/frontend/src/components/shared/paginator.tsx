@@ -87,7 +87,7 @@ const Paginator = (props: PaginatorProps) => {
           value={pageSizes.indexOf(pagination.pageSize)}
         >
           {pageSizes.map((v, i) => (
-            <option key={v} value={i} className="bg-lens-surface-5">
+            <option key={v} value={i} className="bg-lens-surface-6">
               {v}
             </option>
           ))}

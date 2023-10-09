@@ -20,7 +20,7 @@ const KeyValueTable = (props: KeyValueTableProps) => {
 
   const headers = ['common:key', 'common:value']
 
-  const defaultHeaderClass = 'uppercase text-lens-text-0 text-sm font-semibold bg-lens-surface-3.5 px-2 py-3 h-11'
+  const defaultHeaderClass = 'uppercase text-lens-text-0 text-sm font-semibold bg-lens-surface-5 px-2 py-3 h-11'
   const headerClasses = [clsx('rounded-tl-lg pl-4', defaultHeaderClass), clsx('rounded-tr-lg pr-4', defaultHeaderClass)]
 
   const columnWidths = ['w-1/2', 'w-1/2']
@@ -37,7 +37,7 @@ const KeyValueTable = (props: KeyValueTableProps) => {
 
   return (
     <DyoList
-      className="bg-lens-surface-4"
+      className="bg-lens-surface-6"
       headers={headers.map(it => t(it))}
       headerClassName={headerClasses}
       columnWidths={columnWidths}
@@ -66,7 +66,7 @@ const MountsTable = (props: MountsTableProps) => {
     'mountsInfo.propagation',
   ]
 
-  const defaultHeaderClass = 'uppercase text-lens-text-0 text-sm font-semibold bg-lens-surface-3.5 px-2 py-3 h-11'
+  const defaultHeaderClass = 'uppercase text-lens-text-0 text-sm font-semibold bg-lens-surface-5 px-2 py-3 h-11'
   const headerClasses = [
     clsx('rounded-tl-lg pl-4', defaultHeaderClass),
     ...Array.from({ length: headers.length - 2 }).map(() => defaultHeaderClass),
@@ -96,7 +96,7 @@ const MountsTable = (props: MountsTableProps) => {
 
   return (
     <DyoList
-      className="bg-lens-surface-4"
+      className="bg-lens-surface-6"
       headers={headers.map(it => t(it))}
       headerClassName={headerClasses}
       columnWidths={columnWidths}
@@ -123,13 +123,13 @@ const InspectTableView = (props: InspectTableViewProps) => {
     State: state,
     Mounts: mounts,
   } = inspect
-  const { Env: env, Labels: labels, Image: image, Hostname: hostname } = config
-  const { Networks: networks, IPAddress: ipAddress } = networkSettings
-  const { Status: status, ExitCode: exitCode } = state
+  const { Env: env, Labels: labels, Image: image, Hostname: hostname } = config ?? {}
+  const { Networks: networks, IPAddress: ipAddress } = networkSettings ?? {}
+  const { Status: status, ExitCode: exitCode } = state ?? {}
 
   const { t } = useTranslation('nodes')
 
-  const envTableData = env.map(it => {
+  const envTableData = (env ?? []).map(it => {
     const split = it.split('=')
     return {
       key: split[0],
@@ -137,7 +137,7 @@ const InspectTableView = (props: InspectTableViewProps) => {
     }
   })
 
-  const labelsTableData = Object.entries(labels).map(([key, value]) => ({ key, value: value as string }))
+  const labelsTableData = Object.entries(labels ?? {}).map(([key, value]) => ({ key, value: value as string }))
 
   const general: KeyValue[] = [
     {
@@ -178,7 +178,7 @@ const InspectTableView = (props: InspectTableViewProps) => {
     },
   ]
 
-  const networkTableData = Object.entries(networks).map(([networkName, network]) => {
+  const networkTableData = Object.entries(networks ?? {}).map(([networkName, network]) => {
     const { IPAddress: ip, Gateway: gateway } = network as any
 
     return {
@@ -212,7 +212,7 @@ const InspectTableView = (props: InspectTableViewProps) => {
       </div>
       <div className="flex flex-col">
         <DyoLabel className="text-lg">{t('mounts')}</DyoLabel>
-        <MountsTable data={mounts} />
+        <MountsTable data={mounts ?? []} />
       </div>
     </>
   )

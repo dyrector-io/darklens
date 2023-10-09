@@ -1,12 +1,11 @@
 import { Page } from 'src/components/layout'
 import DyoNodeCard from 'src/components/nodes/dyo-node-card'
 import EditNodeSection from 'src/components/nodes/edit-node-section'
-import { BreadcrumbLink } from 'src/components/shared/breadcrumb'
 import PageHeading from 'src/components/shared/page-heading'
 import { EnumFilter, enumFilterFor, TextFilter, textFilterFor, useFilters } from 'src/hooks/use-filters'
 import useWebSocket from 'src/hooks/use-websocket'
-import { DyoNode, NODE_STATUS_VALUES, NodeEventMessage, NodeStatus, WS_TYPE_NODE_EVENT } from 'src/models'
-import { API_NODES, nodeDetailsUrl, ROUTE_NODES, WS_NODES } from 'src/routes'
+import { DyoNode, NODE_STATUS_VALUES, NodeDetails, NodeEventMessage, NodeStatus, WS_TYPE_NODE_EVENT } from 'src/models'
+import { API_NODES, nodeApiDetailsUrl, nodeDetailsUrl, WS_NODES } from 'src/routes'
 import { useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
@@ -17,7 +16,9 @@ import DyoButton from 'src/elements/dyo-button'
 import { DyoSelect } from 'src/elements/dyo-select'
 import { DyoInput } from 'src/elements/dyo-input'
 import { DyoLabel } from 'src/elements/dyo-label'
-import { useBackendGet } from 'src/hooks/use-backend'
+import { useBackendDelete, useBackendGet } from 'src/hooks/use-backend'
+import useConfirmation from 'src/hooks/use-confirmation'
+import { DyoConfirmationModal } from 'src/elements/dyo-modal'
 
 type NodeFilter = TextFilter & EnumFilter<NodeStatus>
 
@@ -25,7 +26,9 @@ const NodesPage = () => {
   const { t } = useTranslation('nodes')
 
   const backendGet = useBackendGet()
+  const backendDelete = useBackendDelete()
 
+  const [confirmationModal, confirm] = useConfirmation()
   const [loading, setLoading] = useState<boolean>(true)
   const filters = useFilters<DyoNode, NodeFilter>({
     filters: [
@@ -35,7 +38,8 @@ const NodesPage = () => {
     initialData: [],
   })
 
-  const [creating, setCreating] = useState(false)
+  const [creating, setCreating] = useState<boolean>(false)
+  const [editing, setEditing] = useState<NodeDetails>(null)
   const submitRef = useRef<() => Promise<any>>()
 
   const socket = useWebSocket(WS_NODES, {
@@ -92,17 +96,49 @@ const NodesPage = () => {
     filters.setItems(newNodes)
   }
 
-  const pageLink: BreadcrumbLink = {
-    name: t('common:nodes'),
-    url: ROUTE_NODES,
+  const onEditNode = async (node: DyoNode) => {
+    const details = await backendGet<NodeDetails>(nodeApiDetailsUrl(node.id))
+    if (!details.ok) {
+      return
+    }
+
+    setEditing(details.data!)
+  }
+
+  const onDeleteNode = async (node: DyoNode) => {
+    const confirmed = await confirm({
+      title: t('common:areYouSureDeleteName', { name: node.name }),
+      description: t('common:proceedYouLoseAllDataToName', {
+        name: node.name,
+      }),
+      confirmText: t('common:delete'),
+      confirmColor: 'bg-lens-error-red',
+    })
+    if (!confirmed) {
+      return
+    }
+
+    const res = await backendDelete(nodeApiDetailsUrl(node.id))
+    if (!res) {
+      return
+    }
+
+    filters.setItems([...filters.items.filter(it => it.id !== node.id)])
   }
 
   return (
     <Page title={t('common:nodes')} className="flex-1 flex flex-col">
-      <PageHeading pageLink={pageLink}>
-        {creating ? (
+      <PageHeading title={t('common:nodes')}>
+        {editing || creating ? (
           <>
-            <DyoButton className="ml-auto px-4" secondary onClick={() => setCreating(false)}>
+            <DyoButton
+              className="ml-auto px-4"
+              secondary
+              onClick={() => {
+                setEditing(null)
+                setCreating(false)
+              }}
+            >
               {t('common:discard')}
             </DyoButton>
 
@@ -137,8 +173,8 @@ const NodesPage = () => {
         )}
       </PageHeading>
 
-      {creating ? (
-        <EditNodeSection submitRef={submitRef} onNodeEdited={onNodeEdited} />
+      {editing || creating ? (
+        <EditNodeSection node={editing} submitRef={submitRef} onNodeEdited={onNodeEdited} />
       ) : loading ? (
         <div className="flex-1 flex items-center justify-center">
           <LoadingIndicator size="xl" />
@@ -146,7 +182,14 @@ const NodesPage = () => {
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4 mt-2">
           {filters.filtered.map((it, index) => (
-            <DyoNodeCard className="p-6 h-40" key={`node-${index}`} node={it} titleHref={nodeDetailsUrl(it.id)} />
+            <DyoNodeCard
+              className="p-6 h-40"
+              key={`node-${index}`}
+              node={it}
+              titleHref={nodeDetailsUrl(it.id)}
+              onEdit={() => onEditNode(it)}
+              onDelete={() => onDeleteNode(it)}
+            />
           ))}
           <div
             className="h-40 rounded-lg ring-2 ring-lens-surface-4 flex flex-col items-center justify-center cursor-pointer"
@@ -157,6 +200,8 @@ const NodesPage = () => {
           </div>
         </div>
       )}
+
+      <DyoConfirmationModal config={confirmationModal} />
     </Page>
   )
 }

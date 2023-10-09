@@ -46,12 +46,17 @@ export type NodeDetails = DyoNode & {
   updatable: boolean
 }
 
-export const nodeConnectionOf = (node: DyoNode): NodeConnection => ({
-  address: node.address,
-  status: node.status,
-  connectedAt: node.connectedAt,
-  version: node.version,
-})
+export const nodeConnectionOf = (node: DyoNode): NodeConnection =>
+  node === null
+    ? ({
+        status: 'unreachable',
+      } as NodeConnection)
+    : {
+        address: node.address,
+        status: node.status,
+        connectedAt: node.connectedAt,
+        version: node.version,
+      }
 
 export type CreateNode = {
   name: string

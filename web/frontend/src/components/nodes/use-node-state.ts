@@ -21,12 +21,15 @@ const filterWsNodeId = (nodeId: string) => (message: WsMessage<Pick<NodeEventMes
   return message
 }
 
-const useNodeState = <T extends DyoNode | NodeDetails>(initialState: T): [T, (node: T) => void] => {
+const useNodeState = <T extends DyoNode | NodeDetails>(
+  initialState: T | null,
+  nodeId?: string,
+): [T, (node: T) => void] => {
   const [node, setNode] = useState<T>(initialState)
-  const [connection, setConnection] = useState<NodeConnection>(nodeConnectionOf(initialState))
+  const [connection, setConnection] = useState<NodeConnection>(() => nodeConnectionOf(initialState))
 
   const sock = useWebSocket(WS_NODES, {
-    transformReceive: filterWsNodeId(node.id),
+    transformReceive: filterWsNodeId(node.id ?? nodeId),
   })
 
   sock.on(WS_TYPE_NODE_EVENT, setConnection)

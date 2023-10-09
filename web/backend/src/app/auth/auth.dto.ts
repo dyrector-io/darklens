@@ -1,5 +1,10 @@
 import { IsString, MinLength } from 'class-validator'
 
+export interface AuthToken {
+  sub: string
+  username: string
+}
+
 export class LoginDto {
   @IsString()
   @MinLength(1)

@@ -104,5 +104,10 @@
     "mode": "Mode",
     "rw": "RW",
     "propagation": "Propagation"
+  },
+
+  "viewMode": {
+    "table": "Table",
+    "json": "JSON"
   }
 }

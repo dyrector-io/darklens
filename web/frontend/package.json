@@ -17,12 +17,7 @@
     "format": "prettier --write \"./**/*.tsx\" \"./**/*.ts\"",
     "build": "react-scripts build",
     "start": "react-scripts start",
-    "test:e2e": "playwright test",
-    "test:e2e-debug": "DEBUG=1 playwright test --debug",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:cov": "jest --coverage",
-    "install:x64": "npm install --target_arch=x64"
+    "lint": "eslint src/**/*.ts src/**/*.tsx"
   },
   "dependencies": {
     "clsx": "^2.0.0",

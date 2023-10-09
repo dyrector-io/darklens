@@ -10,7 +10,7 @@ export const DyoCard = (props: DyoCardProps) => {
 
   return (
     <div
-      className={clsx(className ?? 'p-8', 'card rounded-lg bg-lens-surface-5', shadowClassName ?? 'shadow-lg')}
+      className={clsx(className ?? 'p-8', 'card rounded-lg bg-lens-surface-6', shadowClassName ?? 'shadow-lg')}
       {...forwardedProps}
     >
       {children}

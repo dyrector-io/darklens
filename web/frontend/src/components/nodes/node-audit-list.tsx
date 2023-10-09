@@ -4,33 +4,47 @@ import DyoIcon from 'src/elements/dyo-icon'
 import { DyoList } from 'src/elements/dyo-list'
 import DyoModal from 'src/elements/dyo-modal'
 import { useThrottling } from 'src/hooks/use-throttleing'
-import { NodeAuditLog, NodeAuditLogList, NodeAuditLogQuery } from 'src/models'
+import {
+  NODE_EVENT_TYPE_VALUES,
+  NodeAuditLog,
+  NodeAuditLogList,
+  NodeAuditLogQuery,
+  NodeDetails,
+  NodeEventType,
+} from 'src/models'
 import { getEndOfToday, utcDateToLocale } from 'src/utils'
 import clsx from 'clsx'
 import { useEffect, useState } from 'react'
 import JsonEditor from '../shared/json-editor'
 import { dateSort, sortHeaderBuilder, stringSort, useSorting } from 'src/hooks/use-sorting'
 import { nodeApiAuditUrl } from 'src/routes'
-import { NodeDetailsState } from './use-node-details-state'
 import { useTranslation } from 'react-i18next'
 import eye from 'src/assets/eye.svg'
 import { useBackendGet } from 'src/hooks/use-backend'
+import { DyoLabel } from 'src/elements/dyo-label'
+import { DyoSelect } from 'src/elements/dyo-select'
+import DyoDatePicker from 'src/elements/dyo-date-picker'
 
 interface NodeAuditListProps {
-  state: NodeDetailsState
+  node: NodeDetails
+}
+
+export type NodeAuditFilter = {
+  from: Date
+  to: Date
+  eventType: NodeEventType
 }
 
 type NodeAuditLogSorting = 'createdAt' | 'event'
 
-const defaultHeaderClass = 'uppercase text-lens-text-0 text-sm font-semibold bg-lens-surface-4 px-2 py-3 h-11'
+const defaultHeaderClass = 'uppercase text-lens-text-0 text-sm font-semibold bg-lens-surface-5 px-2 py-3 h-11'
 const defaultItemClass = 'h-12 min-h-min text-lens-text-1 p-2'
 const columnWidths = ['w-2/12', 'w-48', '', 'w-24']
 const sixDays = 1000 * 60 * 60 * 24 * 6 // ms * minutes * hours * day * six
 const defaultPagination: PaginationSettings = { pageNumber: 0, pageSize: 10 }
 
 const NodeAuditList = (props: NodeAuditListProps) => {
-  const { state } = props
-  const { node, auditFilter } = state
+  const { node } = props
 
   const { t } = useTranslation('nodes')
   const throttle = useThrottling(1000)
@@ -43,6 +57,12 @@ const NodeAuditList = (props: NodeAuditListProps) => {
   const [data, setData] = useState<NodeAuditLog[]>([])
   const [pagination, setPagination] = useState<PaginationSettings>(defaultPagination)
   const [showInfo, setShowInfo] = useState<NodeAuditLog>(null)
+
+  const [auditFilter, setAuditFilter] = useState<NodeAuditFilter>({
+    from: new Date(endOfToday.getTime() - sixDays),
+    to: new Date(endOfToday),
+    eventType: null,
+  })
 
   const fetchData = async () => {
     const { from, to } = auditFilter
@@ -63,6 +83,23 @@ const NodeAuditList = (props: NodeAuditListProps) => {
     } else {
       setData([])
     }
+  }
+
+  const onAuditFilterChange = (filter: Partial<NodeAuditFilter>) => {
+    setAuditFilter({
+      ...auditFilter,
+      ...filter,
+    })
+  }
+
+  const onAuditDateChange = dates => {
+    const [start, end] = dates
+    if (end !== null) end.setHours(23, 59, 59, 999) // end of the day
+
+    onAuditFilterChange({
+      from: start,
+      to: end,
+    })
   }
 
   const sorting = useSorting<NodeAuditLog, NodeAuditLogSorting>(data, {
@@ -117,6 +154,36 @@ const NodeAuditList = (props: NodeAuditListProps) => {
 
   return (
     <>
+      <div className="flex flex-row mb-4 mt-8 items-center">
+        <DyoLabel className="text-lg flex-1">{t('logs')}</DyoLabel>
+
+        <DyoSelect
+          className="mr-4"
+          value={auditFilter.eventType ?? 'none'}
+          onChange={it =>
+            onAuditFilterChange({
+              eventType: it.target.value === 'none' ? null : (it.target.value as NodeEventType),
+            })
+          }
+        >
+          {['none', ...NODE_EVENT_TYPE_VALUES].map(it => (
+            <option key={it} value={it}>
+              {t(`auditEvents.${it}`)}
+            </option>
+          ))}
+        </DyoSelect>
+
+        <DyoDatePicker
+          selectsRange
+          startDate={auditFilter.from}
+          endDate={auditFilter.to}
+          onChange={onAuditDateChange}
+          shouldCloseOnSelect={false}
+          maxDate={new Date()}
+          className="w-1/4"
+        />
+      </div>
+
       <DyoCard className="relative overflow-auto">
         <DyoList
           noSeparator

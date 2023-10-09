@@ -9,9 +9,9 @@ const DyoDatePicker = forwardRef((props: ReactDatePickerProps<never, boolean>, r
 
   const { t } = useTranslation('common')
 
-  const days = t('daysOfTheWeekShort', null, { returnObjects: true }) as string[]
+  const days = t('daysOfTheWeekShort', { returnObjects: true, defaultValue: null }) as string[]
 
-  const months = t('months', null, { returnObjects: true }) as string[]
+  const months = t('months', { returnObjects: true, defaultValue: null }) as string[]
 
   const dateFormat = getUserDateFormat(t('dateFormat'))
 

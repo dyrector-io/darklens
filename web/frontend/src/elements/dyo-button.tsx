@@ -45,7 +45,7 @@ const DyoButton = (props: DyoButtonProps) => {
     : outlined
     ? 'ring-lens-turquoise'
     : 'bg-lens-turquoise'
-  const disabledColor = outlined ? 'ring-lens-surface-3' : 'bg-lens-surface-3'
+  const disabledColor = outlined ? 'ring-lens-surface-4' : 'bg-lens-surface-3'
 
   const color = text ? 'bg-transparent' : disabled ? disabledColor : colorClassName ?? defaultColor
 

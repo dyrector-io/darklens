@@ -56,10 +56,10 @@ export const DyoInput = forwardRef((props: DyoInputProps, ref: ForwardedRef<HTML
           id={id ?? name}
           className={clsx(
             className,
-            'bg-lens-surface-5 h-11 p-4 ring-2 rounded-md focus:outline-none focus:lens-dark',
+            'bg-lens-surface-6 h-11 p-4 ring-2 rounded-md focus:outline-none focus:lens-dark',
             grow ? 'w-full' : 'w-80',
             disabled
-              ? 'text-lens-text-3 ring-lens-light-ring cursor-not-allowed'
+              ? 'text-lens-text-3 ring-lens-surface-4 cursor-not-allowed'
               : error
               ? 'text-lens-text-0 ring-lens-error-red'
               : 'text-lens-text-0 ring-lens-surface-4',

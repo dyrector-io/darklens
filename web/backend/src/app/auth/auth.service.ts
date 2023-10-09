@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import * as bcrypt from 'bcrypt'
 import { CruxConflictException, CruxUnauthorizedException } from 'src/exception/crux-exception'
+import { AuthToken } from './auth.dto'
 import { UserService } from './user.service'
 
 @Injectable()
@@ -19,7 +20,7 @@ export default class AuthService {
       throw new CruxUnauthorizedException()
     }
 
-    const payload = { sub: user.id, username: user.name }
+    const payload: AuthToken = { sub: user.id, username: user.name }
     return await this.jwtService.signAsync(payload)
   }
 
@@ -32,7 +33,7 @@ export default class AuthService {
     const passwordHash = await this.hashPassword(pass)
     const userId = await this.usersService.create(username, passwordHash)
 
-    const payload = { sub: userId, username, }
+    const payload: AuthToken = { sub: userId, username }
     return await this.jwtService.signAsync(payload)
   }
 

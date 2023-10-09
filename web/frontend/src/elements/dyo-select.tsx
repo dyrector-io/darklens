@@ -26,8 +26,8 @@ export const DyoSelect = forwardRef((props: DyoSelectProps, ref: ForwardedRef<HT
           {...forwaredProps}
           ref={ref}
           className={clsx(
-            'w-full cursor-pointer appearance-none bg-lens-surface-5 h-11 pl-4 p-2 ring-2 rounded-md focus:outline-none focus:lens-dark',
-            props.disabled ? 'text-lens-text-3 ring-lens-light-ring' : 'text-lens-text-0 ring-lens-surface-4',
+            'w-full cursor-pointer appearance-none bg-lens-surface-6 h-11 pl-4 p-2 ring-2 rounded-md focus:outline-none focus:lens-dark',
+            props.disabled ? 'text-lens-text-3 ring-lens-surface-4' : 'text-lens-text-0 ring-lens-surface-4',
           )}
         />
         <div className="pointer-events-none pr-2 absolute h-[24px] right-0 top-1/2 transform -translate-y-1/2">

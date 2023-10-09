@@ -98,7 +98,7 @@ export const DyoList = <T,>(props: DyoListProps<T>) => {
                   key={`${key}-${colIndex}-${rowIndex}`}
                   className={clsx(
                     'table-cell align-middle',
-                    !noSeparator ? 'border-t-2 border-lens-surface-4' : null,
+                    !noSeparator ? 'border-t-2 border-lens-surface-5' : null,
                     itemClassNames[colIndex] ?? 'h-12 min-h-min text-lens-text-1 p-2',
                   )}
                   onClick={cellClick ? () => cellClick(propsData[rowIndex], rowIndex, colIndex) : undefined}

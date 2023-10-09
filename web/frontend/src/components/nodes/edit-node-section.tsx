@@ -15,6 +15,7 @@ import useNodeState from './use-node-state'
 import { WS_NODES, nodeApiTokenUrl } from 'src/routes'
 import { useTranslation } from 'react-i18next'
 import { useBackendDelete } from 'src/hooks/use-backend'
+import NodeAuditList from './node-audit-list'
 
 interface EditNodeSectionProps {
   className?: string
@@ -31,7 +32,6 @@ const EditNodeSection = (props: EditNodeSectionProps) => {
   const backendDelete = useBackendDelete()
 
   const [revokeModalConfig, confirmTokenRevoke] = useConfirmation()
-
   const [node, setNode] = useNodeState(
     propsNode ??
       ({
@@ -40,8 +40,6 @@ const EditNodeSection = (props: EditNodeSectionProps) => {
         status: 'unreachable',
       } as NodeDetails),
   )
-
-  const editing = !!node.id
 
   const onNodeEdited = (newNode: NodeDetails, shouldClose?: boolean) => {
     setNode(newNode)
@@ -109,6 +107,8 @@ const EditNodeSection = (props: EditNodeSectionProps) => {
     onNodeEdited(newNode)
   }
 
+  const editing = !!node.id
+
   return (
     <>
       <div className={clsx(className, 'flex flex-row gap-4')}>
@@ -142,6 +142,8 @@ const EditNodeSection = (props: EditNodeSectionProps) => {
           )}
         </div>
       </div>
+
+      {propsNode && <NodeAuditList node={node} />}
 
       <DyoConfirmationModal config={revokeModalConfig} className="w-1/4" />
     </>

@@ -16,26 +16,17 @@ import {
   WS_TYPE_CONTAINER_COMMAND,
   WS_TYPE_DELETE_CONTAINER,
   WS_TYPE_WATCH_CONTAINERS_STATE,
-  NodeEventType,
 } from 'src/models'
-import { getEndOfToday, utcDateToLocale } from 'src/utils'
+import { utcDateToLocale } from 'src/utils'
 import { useEffect, useState } from 'react'
 import { PaginationSettings } from '../shared/paginator'
 import useNodeState from './use-node-state'
 import { nodeWsDetailsUrl } from 'src/routes'
 import { useTranslation } from 'react-i18next'
 
-const sixDays = 1000 * 60 * 60 * 24 * 6 // ms * minutes * hours * day * six
-
-export type NodeDetailsSection = 'editing' | 'containers' | 'logs'
+export type NodeDetailsSection = 'editing' | 'containers'
 
 export type ContainerTargetStates = { [key: string]: ContainerState } // containerName to targetState
-
-export type NodeAuditFilter = {
-  from: Date
-  to: Date
-  eventType: NodeEventType
-}
 
 export type NodeDetailsState = {
   section: NodeDetailsSection
@@ -45,41 +36,33 @@ export type NodeDetailsState = {
   containerFilters: FilterConfig<Container, TextFilter>
   containerPagination: PaginationSettings
   containerItems: Container[]
-  auditFilter: NodeAuditFilter
 }
 
 export type NodeDetailsActions = {
-  onNodeEdited: (node: NodeDetails, shouldClose?: boolean) => void
+  setNode: (node: NodeDetails) => void
   setSection: (section: NodeDetailsSection) => void
-  setEditing: (editing: boolean) => void
   setContainerPagination: (pagination: PaginationSettings) => void
   onStartContainer: (container: Container) => void
   onStopContainer: (container: Container) => void
   onRestartContainer: (container: Container) => void
   onDeleteContainer: (container: Container) => void
-  onAuditFilterChange: (filter: Partial<NodeAuditFilter>) => void
 }
 
-export type NodeDetailsStateOptions = {
-  node: NodeDetails
-}
-
-const useNodeDetailsState = (options: NodeDetailsStateOptions): [NodeDetailsState, NodeDetailsActions] => {
+const useNodeDetailsState = (nodeId: string): [NodeDetailsState, NodeDetailsActions] => {
   const { t } = useTranslation('common')
 
   const [section, setSection] = useState<NodeDetailsSection>('containers')
-  const [node, setNode] = useNodeState(options.node)
+  const [node, setNode] = useNodeState(
+    {
+      name: '',
+      description: '',
+      status: 'unreachable',
+    } as NodeDetails,
+    nodeId,
+  )
   const [confirmationModal, confirm] = useConfirmation()
 
-  const sock = useWebSocket(nodeWsDetailsUrl(node.id))
-
-  const onNodeEdited = (newNode: NodeDetails, shouldClose?: boolean) => {
-    if (shouldClose) {
-      setSection('containers')
-    }
-
-    setNode(newNode)
-  }
+  const sock = useWebSocket(nodeWsDetailsUrl(nodeId))
 
   const [containerTargetStates, setContainerTargetStates] = useState<ContainerTargetStates>({})
   const [containerPagination, setContainerPagination] = useState<PaginationSettings>({
@@ -99,13 +82,6 @@ const useNodeDetailsState = (options: NodeDetailsStateOptions): [NodeDetailsStat
         utcDateToLocale(it.createdAt),
       ]),
     ],
-  })
-
-  const endOfToday = getEndOfToday()
-  const [auditFilter, setAuditFilter] = useState<NodeAuditFilter>({
-    from: new Date(endOfToday.getTime() - sixDays),
-    to: new Date(endOfToday),
-    eventType: null,
   })
 
   const currentPageNumber =
@@ -154,15 +130,6 @@ const useNodeDetailsState = (options: NodeDetailsStateOptions): [NodeDetailsStat
       setContainerTargetStates(newTargetStates)
     }
   })
-
-  const onAuditFilterChange = (filter: Partial<NodeAuditFilter>) => {
-    setAuditFilter({
-      ...auditFilter,
-      ...filter,
-    })
-  }
-
-  const setEditing = (editing: boolean) => setSection(editing ? 'editing' : 'containers')
 
   const sendContainerCommand = (container: Container, operation: ContainerOperation) => {
     sock.send(WS_TYPE_CONTAINER_COMMAND, {
@@ -227,18 +194,15 @@ const useNodeDetailsState = (options: NodeDetailsStateOptions): [NodeDetailsStat
       containerPagination,
       containerItems,
       confirmationModal,
-      auditFilter,
     },
     {
-      onNodeEdited,
+      setNode,
       setSection,
-      setEditing,
       setContainerPagination,
       onStartContainer,
       onStopContainer,
       onRestartContainer,
       onDeleteContainer,
-      onAuditFilterChange,
     },
   ]
 }
