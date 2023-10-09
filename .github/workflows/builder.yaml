@@ -2,9 +2,6 @@ name: product_builder
 on:
   push:
     branches: [main]
-    tags: ['*']
-  pull_request:
-    types: [edited, opened, synchronize, reopened]
 permissions:
   contents: read
   pull-requests: read
@@ -29,14 +26,22 @@ jobs:
         working-directory: ${{ env.BUILD_WORKING_DIRECTORY }}
     environment: Workflow - Protected
     steps:
+      - name: Login to GHCR
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_PAT }}
       - name: Checkout
         uses: actions/checkout@v3
-      # fixes: fatal: unsafe repository
+        # fixes: fatal: unsafe repository
       - name: Adding workspace
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Docker build
-      # latest tag for now
+        # latest tag for now
         run: docker build -t ${GITHUB_REGISTRY}/${IMAGE_NAME}:latest .
+      - name: Push docker image to GHCR Registry
+        run: docker image push -a ${GITHUB_REGISTRY}/${IMAGE_NAME}:latest
       - name: Docker save
         run: docker save ${GITHUB_REGISTRY}/${IMAGE_NAME}:latest | zstd > darklens.zstd
       - name: Artifact upload
