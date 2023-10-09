@@ -2,10 +2,6 @@ name: product_builder
 on:
   push:
     branches: [main]
-permissions:
-  contents: read
-  pull-requests: read
-  packages: read
 env:
   GITHUB_REGISTRY: ghcr.io
   IMAGE_NAME: dyrector-io/darklens
@@ -42,10 +38,3 @@ jobs:
         run: docker build -t ${GITHUB_REGISTRY}/${IMAGE_NAME}:latest .
       - name: Push docker image to GHCR Registry
         run: docker image push ${GITHUB_REGISTRY}/${IMAGE_NAME}:latest
-      - name: Docker save
-        run: docker save ${GITHUB_REGISTRY}/${IMAGE_NAME}:latest | zstd > darklens.zstd
-      - name: Artifact upload
-        uses: actions/upload-artifact@v3
-        with:
-          name: darklens
-          path: ${{ env.BUILD_WORKING_DIRECTORY }}/darklens.zstd

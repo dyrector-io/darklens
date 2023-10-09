@@ -29,6 +29,8 @@ RUN npm run build && \
 # Create image
 FROM docker.io/library/node:20.5.0-alpine3.17 AS RUNNER
 
+LABEL org.opencontainers.image.source=https://github.com/dyrector-io/darklens
+
 ENV NODE_ENV production
 ENV TZ UTC
 
