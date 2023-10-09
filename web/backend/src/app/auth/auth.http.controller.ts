@@ -5,7 +5,7 @@ import { Request, Response } from 'express'
 import { CruxGoneException, CruxNotFoundException, CruxUnauthorizedException } from 'src/exception/crux-exception'
 import { LoginDto, ProfileDto } from './auth.dto'
 import { AUTH_COOKIE, AuthGuard, AuthUser, Public, isAuthDisabled } from './auth.guard'
-import { AuthService } from './auth.service'
+import AuthService from './auth.service'
 import { UserService } from './user.service'
 
 const ROUTE_AUTH = 'auth'

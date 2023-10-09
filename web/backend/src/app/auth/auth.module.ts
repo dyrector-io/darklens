@@ -4,8 +4,8 @@ import { APP_GUARD } from '@nestjs/core'
 import { JwtModule } from '@nestjs/jwt'
 import PrismaService from 'src/services/prisma.service'
 import { AuthGuard } from './auth.guard'
-import { AuthController } from './auth.http.controller'
-import { AuthService } from './auth.service'
+import AuthController from './auth.http.controller'
+import AuthService from './auth.service'
 import { UserService } from './user.service'
 
 export const AuthJwtModule = JwtModule.registerAsync({
