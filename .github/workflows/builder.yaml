@@ -41,7 +41,7 @@ jobs:
         # latest tag for now
         run: docker build -t ${GITHUB_REGISTRY}/${IMAGE_NAME}:latest .
       - name: Push docker image to GHCR Registry
-        run: docker image push -a ${GITHUB_REGISTRY}/${IMAGE_NAME}:latest
+        run: docker image push ${GITHUB_REGISTRY}/${IMAGE_NAME}:latest
       - name: Docker save
         run: docker save ${GITHUB_REGISTRY}/${IMAGE_NAME}:latest | zstd > darklens.zstd
       - name: Artifact upload
