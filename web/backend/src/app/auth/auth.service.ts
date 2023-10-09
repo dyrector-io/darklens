@@ -5,7 +5,7 @@ import { CruxConflictException, CruxUnauthorizedException } from 'src/exception/
 import { UserService } from './user.service'
 
 @Injectable()
-export class AuthService {
+export default class AuthService {
   constructor(
     private usersService: UserService,
     private jwtService: JwtService,
@@ -32,7 +32,7 @@ export class AuthService {
     const passwordHash = await this.hashPassword(pass)
     const userId = await this.usersService.create(username, passwordHash)
 
-    const payload = { sub: userId, username: username }
+    const payload = { sub: userId, username, }
     return await this.jwtService.signAsync(payload)
   }
 

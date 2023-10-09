@@ -12,7 +12,7 @@ const ROUTE_AUTH = 'auth'
 
 @Controller(ROUTE_AUTH)
 @ApiTags(ROUTE_AUTH)
-export class AuthController {
+export default class AuthController {
   constructor(
     private authService: AuthService,
     private configService: ConfigService,

@@ -25,53 +25,54 @@ const handleFetch = <TRes>(opts: HandleFetchOptions) => {
 
   return new Promise<BackendFetch<TRes | Response>>(resolve => {
     try {
-      fetch(url, request).then(res => {
-        if (res.ok) {
-          if (rawResponse) {
+      fetch(url, request)
+        .then(res => {
+          if (res.ok) {
+            if (rawResponse) {
+              resolve({
+                ok: true,
+                data: res,
+              })
+              return
+            }
+
+            if (res.status === 204) {
+              resolve({
+                ok: true,
+              })
+              return
+            }
+
+            res.json().then(data =>
+              resolve({
+                ok: true,
+                data,
+              }),
+            )
+            return
+          }
+
+          if (res.status === 401) {
+            nav(ROUTE_LOGIN)
             resolve({
-              ok: true,
-              data: res,
+              ok: false,
             })
             return
           }
 
-          if (res.status === 204) {
-            resolve({
-              ok: true,
-            })
-            return
-          }
-
-          res.json().then(data =>
-            resolve({
-              ok: true,
-              data,
-            }),
-          )
-          return
-        }
-
-        if (res.status === 401) {
-          nav(ROUTE_LOGIN)
+          errorHandler(res)
           resolve({
             ok: false,
           })
-          return
-        }
-
-        errorHandler(res)
-        resolve({
-          ok: false,
         })
-      })
-      .catch(() => {
-        toast(t('oops'))
-        nav(ROUTE_STATUS)
+        .catch(() => {
+          toast(t('oops'))
+          nav(ROUTE_STATUS)
 
-        resolve({
-          ok: false,
+          resolve({
+            ok: false,
+          })
         })
-      })
     } catch (err) {
       if (err.status === 401) {
         nav(ROUTE_LOGIN)
