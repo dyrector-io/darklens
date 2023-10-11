@@ -19,6 +19,10 @@ LDFLAGS := -ldflags "-X '${PACKAGE}/internal/version.BuildTimestamp=${BUILD_TIME
   -X '${PACKAGE}/internal/version.CommitHash=${ORG_GOLANG_HASH}'\
   -extldflags '-static'"
 
+.PHONY: binfmt
+binfmt:
+	docker run --privileged --rm tonistiigi/binfmt --install arm64,amd64
+
 .PHONY: protogen
 protogen:| protogen-agent protogen-backend
 
