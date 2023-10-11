@@ -7,7 +7,7 @@ env:
   SERVICE_IMAGE_NAME: dyrector-io/darklens
   AGENT_IMAGE_NAME: dyrector-io/darklens/agent
   SERVICE_WORKING_DIRECTORY: web
-  AGENT_WORKING_DIRECTORY: agent
+  AGENT_WORKING_DIRECTORY: .
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
