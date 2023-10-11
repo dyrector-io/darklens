@@ -12,8 +12,20 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 jobs:
+  setup:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+    outputs:
+      tag: ${{ steps.find-version.outputs.version }}
+    steps:
+      - name: Find version
+        id: find-version
+        working-directory: .
+        run: echo "version=`cat ./web/backend/package.json | jq -r '.version'`"
   service-build:
     runs-on: ubuntu-22.04
+    needs: [setup]
     permissions:
       packages: write
       contents: read
@@ -32,16 +44,15 @@ jobs:
           password: ${{ secrets.GHCR_PAT }}
       - name: Checkout
         uses: actions/checkout@v3
-        # fixes: fatal: unsafe repository
       - name: Adding workspace
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Docker build
-        # latest tag for now
-        run: docker build -t ${GITHUB_REGISTRY}/${SERVICE_IMAGE_NAME}:latest .
+        run: docker build -t ${GITHUB_REGISTRY}/${SERVICE_IMAGE_NAME}:${{ needs.setup.outputs.tag }} .
       - name: Push docker image to GHCR Registry
-        run: docker image push ${GITHUB_REGISTRY}/${SERVICE_IMAGE_NAME}:latest
+        run: docker image push ${GITHUB_REGISTRY}/${SERVICE_IMAGE_NAME}:${{ needs.setup.outputs.tag }}
   agent-build:
     runs-on: ubuntu-22.04
+    needs: [setup]
     permissions:
       packages: write
       contents: read
@@ -65,7 +76,6 @@ jobs:
           key: ${{ runner.os }}-golang-${{ hashFiles('go.sum') }}
       - name: Checkout
         uses: actions/checkout@v3
-        # fixes: fatal: unsafe repository
       - name: Adding workspace
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Load go mod
@@ -82,7 +92,7 @@ jobs:
         run: make build-agent
         # TODO: Env for version
       - name: Push agent image to GHCR Registry
-        run: docker image push ${GITHUB_REGISTRY}/${AGENT_IMAGE_NAME}:latest
+        run: docker image push ${GITHUB_REGISTRY}/${AGENT_IMAGE_NAME}:${{ needs.setup.outputs.tag }}
       - name: Save Golang caches
         uses: actions/cache/save@v3
         with:

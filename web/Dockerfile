@@ -39,7 +39,6 @@ ENV DATABASE file:/var/lib/darklens/data.db
 ENV JWT_SECRET super-secret
 ENV AGENT_ADDRESS http://host.docker.internal:5000
 ENV PUBLIC_URL http://localhost:8000
-ENV AGENT_IMAGE latest
 
 RUN apk --update add tzdata openssl1.1-compat
 
