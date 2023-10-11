@@ -58,6 +58,7 @@ const EditNodeCard = (props: EditNodeCardProps) => {
             ...values,
             id: node.id,
             status: node.status,
+            hasToken: node.hasToken,
           } as NodeDetails
         }
 

@@ -7,9 +7,7 @@
 
   "add": "Add node",
   "new": "New node",
-  "tips": "Nodes are the environments where you plan to run your applications.",
-
-  "nodeAlreadyInUse": "This node is already in use in some deployments.",
+  "tips": "Nodes are the environments where your applications are running.",
 
   "agentInstall": "Agent installation",
   "generateScript": "Generate script",
@@ -18,13 +16,9 @@
   "status": "Status",
   "lastConnected": "Last connected",
   "whatScriptDoesHeader": "What does this script do?",
-  "scriptExplanation": "The following 'Generate script' button will create a one-liner and script that will install our agent to the target host with the selected parameters.",
+  "scriptExplanation": "The following 'Generate script' button will create a one-liner and script that will install our agent to the target host.",
   "requirements": "Requirements",
   "agentSettings": "Agent settings",
-  "installReq": {
-    "k8s": ["A kubernetes cluster", "kubectl authenticated, active context selected", "Ability to run these commands"],
-    "docker": ["A linux host/VPS", "Docker or podman installed on host", "Ability to execute the script on host"]
-  },
   "youCanInstall": "You can install an agent on your environment by running a script generated here. You're able to generate one after saving this node.",
   "connection": "Connection",
   "connectionExplanation": "If the setup was successful, you will see your node appear here.",
@@ -34,10 +28,6 @@
   "version": "Version",
   "versionUnknown": "Unkown version",
   "technology": "Technology",
-  "technologies": {
-    "docker": "Docker Host",
-    "k8s": "Kubernetes Cluster"
-  },
   "type": "Type",
   "installScript": {
     "shell": "Shell",
@@ -46,10 +36,6 @@
   "hostAddress": "Server address",
   "hostAddressExplanation": "Enter the scheme, address or domain and the port where the agent will reach Darklens from your node. If no scheme is provided https will be used by default.",
   "optionalLeaveEmptyForDefaults": "Optional, leave empty for default paths",
-  "update": "Update",
-  "updateAvailable": "There is an update available for your node. You can update it with the update button below.",
-  "updateRequired": "This agent is incompatible with the current version of dyrector.io. You can update it with the update button below.",
-  "updateError": "Failed to update agent: {{error}}",
   "ports": "Ports (External -> Internal)",
   "in-progress": "In progress",
 
