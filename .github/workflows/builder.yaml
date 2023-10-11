@@ -46,7 +46,7 @@ jobs:
       packages: write
       contents: read
     container:
-      image: ghcr.io/dyrector-io/dyrectorio/builder-images/nodejs:1
+      image: ghcr.io/dyrector-io/dyrectorio/builder-images/golang:2
     defaults:
       run:
         working-directory: ${{ env.AGENT_WORKING_DIRECTORY }}
@@ -83,3 +83,8 @@ jobs:
         # TODO: Env for version
       - name: Push agent image to GHCR Registry
         run: docker image push ${GITHUB_REGISTRY}/${AGENT_IMAGE_NAME}:latest
+      - name: Save Golang caches
+        uses: actions/cache/save@v3
+        with:
+          path: /go
+          key: ${{ runner.os }}-golang-${{ hashFiles('go.sum') }}
