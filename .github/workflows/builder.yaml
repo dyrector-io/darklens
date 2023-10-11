@@ -58,6 +58,11 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GHCR_PAT }}
+      - name: Setup Golang caches
+        uses: actions/cache/restore@v3
+        with:
+          path: /go
+          key: ${{ runner.os }}-golang-${{ hashFiles('go.sum') }}
       - name: Checkout
         uses: actions/checkout@v3
         # fixes: fatal: unsafe repository
