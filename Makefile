@@ -15,6 +15,8 @@ endif
 GOPARAMS:= CGO_ENABLED=0
 
 PACKAGE := github.com/dyrector-io/darklens/golang
+BUILD_TIMESTAMP="$(shell date -u +"%Y-%m-%dT%H:%M:%SZ" | tr -d "[:blank:]")"
+ORG_GOLANG_HASH="$(shell git rev-parse --short HEAD:../golang)"
 LDFLAGS := -ldflags "-X '${PACKAGE}/internal/version.BuildTimestamp=${BUILD_TIMESTAMP}'\
   -X '${PACKAGE}/internal/version.CommitHash=${ORG_GOLANG_HASH}'\
   -extldflags '-static'"

@@ -49,9 +49,12 @@ jobs:
       - name: Adding workspace
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Docker build
-        run: docker build -t ${GITHUB_REGISTRY}/${SERVICE_IMAGE_NAME}:${{ needs.setup.outputs.tag }} .
-      - name: Push docker image to GHCR Registry
-        run: docker image push ${GITHUB_REGISTRY}/${SERVICE_IMAGE_NAME}:${{ needs.setup.outputs.tag }}
+        run: docker build -t ${GITHUB_REGISTRY}/${SERVICE_IMAGE_NAME}:latest .
+      - name: Push images to GHCR Registry
+        run: |
+          docker tag ${GITHUB_REGISTRY}/${SERVICE_IMAGE_NAME}:latest ${GITHUB_REGISTRY}/${SERVICE_IMAGE_NAME}:${{ needs.setup.outputs.tag }}
+          docker image push ${GITHUB_REGISTRY}/${SERVICE_IMAGE_NAME}:latest
+          docker image push ${GITHUB_REGISTRY}/${SERVICE_IMAGE_NAME}:${{ needs.setup.outputs.tag }}
   agent-build:
     runs-on: ubuntu-22.04
     needs: [setup]
@@ -92,9 +95,13 @@ jobs:
         run: make binfmt
       - name: Build agents
         run: make build-agent
-        # TODO: Env for version
-      - name: Push agent image to GHCR Registry
-        run: docker image push ${GITHUB_REGISTRY}/${AGENT_IMAGE_NAME}:${{ needs.setup.outputs.tag }}
+        env:
+          IMAGE_VERSION: latest
+      - name: Push images to GHCR Registry
+        run: |
+          docker tag ${GITHUB_REGISTRY}/${AGENT_IMAGE_NAME}:latest ${GITHUB_REGISTRY}/${AGENT_IMAGE_NAME}:${{ needs.setup.outputs.tag }}
+          docker image push ${GITHUB_REGISTRY}/${AGENT_IMAGE_NAME}:latest
+          docker image push ${GITHUB_REGISTRY}/${AGENT_IMAGE_NAME}:${{ needs.setup.outputs.tag }}
       - name: Save Golang caches
         uses: actions/cache/save@v3
         with:
