@@ -1,23 +1,20 @@
 import { Logger } from '@nestjs/common'
+import { Node } from '@prisma/client'
 import { catchError, finalize, Observable, of, Subject, Subscription, throwError, timeout, TimeoutError } from 'rxjs'
 import { NodeConnectionStatus } from 'src/app/node/node.dto'
+import { CruxInternalServerErrorException, CruxPreconditionFailedException } from 'src/exception/crux-exception'
 import {
-  CruxConflictException,
-  CruxInternalServerErrorException,
-  CruxPreconditionFailedException,
-} from 'src/exception/crux-exception'
-import { AgentCommand, AgentInfo, CloseReason } from 'src/grpc/protobuf/proto/agent'
-import {
+  AgentCommand,
+  AgentInfo,
+  CloseReason,
   ContainerCommandRequest,
-  ContainerIdentifier,
+  ContainerDeleteRequest,
   ContainerInspectMessage,
-  DeleteContainersRequest,
   Empty,
-} from 'src/grpc/protobuf/proto/common'
+} from 'src/grpc/protobuf/proto/agent'
 import { CONTAINER_DELETE_TIMEOUT, DEFAULT_CONTAINER_LOG_TAIL } from 'src/shared/const'
 import GrpcNodeConnection from 'src/shared/grpc-node-connection'
 import { AgentToken } from './agent-token'
-import AgentUpdate, { AgentUpdateOptions } from './agent-update'
 import ContainerLogStream, { ContainerLogStreamCompleter } from './container-log-stream'
 import ContainerStatusWatcher, { ContainerStatusStreamCompleter } from './container-status-watcher'
 import { BufferedSubject } from './utils'
@@ -27,6 +24,10 @@ export type AgentOptions = {
   connection: GrpcNodeConnection
   info: AgentInfo
   outdated: boolean
+}
+
+export type CreateAgentOptions = Omit<AgentOptions, 'eventChannel'> & {
+  node: Node
 }
 
 export type AgentTokenReplacement = {
@@ -39,17 +40,13 @@ export class Agent {
 
   private readonly commandChannel = new BufferedSubject<AgentCommand>()
 
-  private statusWatchers: Map<string, ContainerStatusWatcher> = new Map()
+  private statusWatcher: ContainerStatusWatcher = null
 
   private inspectionWatchers: Map<string, Subject<ContainerInspectMessage>> = new Map()
 
   private deleteContainersRequests: Map<string, Subject<Empty>> = new Map()
 
   private logStreams: Map<string, ContainerLogStream> = new Map()
-
-  private update: AgentUpdate | null = null
-
-  private replacementToken: AgentTokenReplacement | null = null
 
   private statusSubscriber: Subscription
 
@@ -77,10 +74,6 @@ export class Agent {
     return this.info.version
   }
 
-  get publicKey(): string {
-    return this.info.publicKey
-  }
-
   get ready(): boolean {
     return this.getConnectionStatus() === 'connected'
   }
@@ -97,27 +90,11 @@ export class Agent {
       return 'unreachable'
     }
 
-    if (this.updating) {
-      return 'updating'
-    }
-
     if (this.outdated) {
       return 'outdated'
     }
 
     return 'connected'
-  }
-
-  get updating() {
-    if (!this.update) {
-      return false
-    }
-    if (!this.update.expired) {
-      return true
-    }
-
-    this.update = null
-    return false
   }
 
   close(reason?: CloseReason) {
@@ -132,43 +109,23 @@ export class Agent {
     this.commandChannel.complete()
   }
 
-  replaceToken(replacement: AgentTokenReplacement) {
-    if (this.replacementToken) {
-      throw new CruxConflictException({
-        message: 'Token replacement is already in progress',
-        property: 'token',
-      })
-    }
-
-    this.replacementToken = replacement
-
-    this.commandChannel.next({
-      replaceToken: {
-        token: replacement.signedToken,
-      },
-    })
-  }
-
-  upsertContainerStatusWatcher(prefix: string, oneShot: boolean): ContainerStatusWatcher {
+  upsertContainerStatusWatcher(oneShot: boolean): ContainerStatusWatcher {
     this.throwIfCommandsAreDisabled()
 
-    let watcher = this.statusWatchers.get(prefix)
-    if (!watcher) {
-      watcher = new ContainerStatusWatcher(prefix, oneShot)
-      this.statusWatchers.set(prefix, watcher)
-      watcher.start(this.commandChannel)
+    if (!this.statusWatcher) {
+      this.statusWatcher = new ContainerStatusWatcher(oneShot)
+      this.statusWatcher.start(this.commandChannel)
     }
 
-    return watcher
+    return this.statusWatcher
   }
 
-  upsertContainerLogStream(container: ContainerIdentifier): ContainerLogStream {
+  upsertContainerLogStream(key: string): ContainerLogStream {
     this.throwIfCommandsAreDisabled()
 
-    const key = Agent.containerPrefixNameOf(container)
     let stream = this.logStreams.get(key)
     if (!stream) {
-      stream = new ContainerLogStream(container, DEFAULT_CONTAINER_LOG_TAIL)
+      stream = new ContainerLogStream(key, DEFAULT_CONTAINER_LOG_TAIL)
       this.logStreams.set(key, stream)
       stream.start(this.commandChannel)
     }
@@ -184,15 +141,16 @@ export class Agent {
     } as AgentCommand)
   }
 
-  deleteContainers(request: DeleteContainersRequest): Observable<Empty> {
+  deleteContainers(request: ContainerDeleteRequest): Observable<Empty> {
     this.throwIfCommandsAreDisabled()
 
-    const reqId = Agent.containerDeleteRequestToRequestId(request)
+    const key = request.name
+
     const result = new Subject<Empty>()
-    this.deleteContainersRequests.set(reqId, result)
+    this.deleteContainersRequests.set(key, result)
 
     this.commandChannel.next({
-      deleteContainers: request,
+      containerDelete: request,
     } as AgentCommand)
 
     return result.pipe(
@@ -200,7 +158,7 @@ export class Agent {
       catchError(err => {
         if (err instanceof TimeoutError) {
           result.complete()
-          this.deleteContainersRequests.delete(reqId)
+          this.deleteContainersRequests.delete(key)
           return of(Empty)
         }
 
@@ -224,7 +182,9 @@ export class Agent {
   }
 
   onDisconnected() {
-    this.statusWatchers.forEach(it => it.stop())
+    if (this.statusWatcher) {
+      this.statusWatcher.stop()
+    }
     this.logStreams.forEach(it => it.stop())
     this.commandChannel.complete()
 
@@ -237,8 +197,8 @@ export class Agent {
     })
   }
 
-  onContainerStateStreamStarted(prefix: string): [ContainerStatusWatcher, ContainerStatusStreamCompleter] {
-    const watcher = this.statusWatchers.get(prefix)
+  onContainerStateStreamStarted(): [ContainerStatusWatcher, ContainerStatusStreamCompleter] {
+    const watcher = this.statusWatcher
     if (!watcher) {
       return [null, null]
     }
@@ -246,19 +206,17 @@ export class Agent {
     return [watcher, watcher.onNodeStreamStarted()]
   }
 
-  onContainerStatusStreamFinished(prefix: string) {
-    const watcher = this.statusWatchers.get(prefix)
+  onContainerStatusStreamFinished() {
+    const watcher = this.statusWatcher
     if (!watcher) {
       return
     }
 
-    this.statusWatchers.delete(prefix)
+    this.statusWatcher = null
     watcher.onNodeStreamFinished()
   }
 
-  onContainerLogStreamStarted(id: ContainerIdentifier): [ContainerLogStream, ContainerLogStreamCompleter] {
-    const key = Agent.containerPrefixNameOf(id)
-
+  onContainerLogStreamStarted(key: string): [ContainerLogStream, ContainerLogStreamCompleter] {
     const stream = this.logStreams.get(key)
     if (!stream) {
       return [null, null]
@@ -267,8 +225,7 @@ export class Agent {
     return [stream, stream.onNodeStreamStarted()]
   }
 
-  onContainerLogStreamFinished(id: ContainerIdentifier) {
-    const key = Agent.containerPrefixNameOf(id)
+  onContainerLogStreamFinished(key: string) {
     const watcher = this.logStreams.get(key)
     if (!watcher) {
       return
@@ -278,13 +235,8 @@ export class Agent {
     watcher.onNodeStreamFinished()
   }
 
-  getContainerInspection(prefix: string, name: string): Observable<ContainerInspectMessage> {
+  getContainerInspection(key: string): Observable<ContainerInspectMessage> {
     this.throwIfCommandsAreDisabled()
-
-    const key = Agent.containerPrefixNameOf({
-      prefix,
-      name,
-    })
 
     let watcher = this.inspectionWatchers.get(key)
     if (!watcher) {
@@ -293,10 +245,7 @@ export class Agent {
 
       this.commandChannel.next({
         containerInspect: {
-          container: {
-            prefix,
-            name,
-          },
+          name: key,
         },
       } as AgentCommand)
     }
@@ -322,7 +271,7 @@ export class Agent {
   }
 
   onContainerInspect(res: ContainerInspectMessage) {
-    const key = Agent.containerPrefixNameOf(res)
+    const key = res.name
 
     const watcher = this.inspectionWatchers.get(key)
     if (!watcher) {
@@ -335,100 +284,23 @@ export class Agent {
     this.inspectionWatchers.delete(key)
   }
 
-  startUpdate(tag: string, options: AgentUpdateOptions) {
-    if (this.updating) {
-      throw new CruxPreconditionFailedException({
-        message: 'Node is already updating',
-        property: 'id',
-        value: this.id,
-      })
-    }
+  onContainerDeleted(request: ContainerDeleteRequest) {
+    const key = request.name
 
-    this.update = new AgentUpdate(options)
-    this.replacementToken = options
-    this.update.start(this.commandChannel, tag)
-  }
-
-  onUpdateAborted(error?: string) {
-    this.update = null
-    this.replacementToken = null
-
-    this.eventChannel.next({
-      id: this.id,
-      status: this.getConnectionStatus(),
-      error,
-    })
-  }
-
-  onUpdateCompleted(connection: GrpcNodeConnection) {
-    this.update.complete(connection)
-
-    try {
-      this.statusSubscriber.unsubscribe()
-
-      this.close(CloseReason.SELF_DESTRUCT)
-    } catch {
-      /* empty */
-    }
-
-    this.update = null
-    this.eventChannel.next({
-      id: this.id,
-      status: this.getConnectionStatus(),
-    })
-  }
-
-  onContainerDeleted(request: DeleteContainersRequest) {
-    const reqId = Agent.containerDeleteRequestToRequestId(request)
-    const result = this.deleteContainersRequests.get(reqId)
+    const result = this.deleteContainersRequests.get(key)
     if (result) {
-      this.deleteContainersRequests.delete(reqId)
+      this.deleteContainersRequests.delete(key)
       result.complete()
     }
   }
 
-  /**
-   * returns with the new token
-   */
-  onTokenReplaced(): AgentTokenReplacement {
-    if (!this.replacementToken) {
-      throw new CruxPreconditionFailedException({
-        message: 'Replacement was not requested',
-      })
-    }
-
-    const replacement = this.replacementToken
-    const { token, signedToken } = replacement
-
-    this.connection.onTokenReplaced(token, signedToken)
-
-    this.replacementToken = null
-    return replacement
-  }
-
   debugInfo(logger: Logger) {
     logger.verbose(`Agent id: ${this.id}, open: ${!this.commandChannel.closed}`)
-    logger.verbose(`Watchers: ${this.statusWatchers.size}`)
+    logger.verbose(`Wathcing: ${this.statusWatcher ? 'yes' : 'no'}`)
     logger.verbose(`Log streams: ${this.logStreams.size}`)
   }
 
   private throwIfCommandsAreDisabled() {
-    if (this.updating) {
-      throw new CruxPreconditionFailedException({
-        message: 'Node is updating',
-        property: 'id',
-        value: this.id,
-      })
-    }
-
-    if (this.replacementToken) {
-      throw new CruxPreconditionFailedException({
-        message: 'Node is replacing connection token',
-        property: 'id',
-        value: this.id,
-      })
-    }
-
     if (this.outdated) {
       throw new CruxPreconditionFailedException({
         message: 'Node is outdated',
@@ -437,17 +309,6 @@ export class Agent {
       })
     }
   }
-
-  private static containerDeleteRequestToRequestId(request: DeleteContainersRequest): string {
-    if (request.container) {
-      return Agent.containerPrefixNameOf(request.container)
-    }
-
-    return request.prefix
-  }
-
-  public static containerPrefixNameOf = (id: ContainerIdentifier): string =>
-    !id.prefix ? id.name : `${id.prefix}-${id.name}`
 }
 
 export type AgentConnectionMessage = {

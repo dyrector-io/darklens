@@ -6,7 +6,6 @@ import {
   Container,
   ContainerCommandMessage,
   ContainerOperation,
-  containerPrefixNameOf,
   ContainersStateListMessage,
   ContainerState,
   DeleteContainerMessage,
@@ -73,8 +72,7 @@ const useNodeDetailsState = (nodeId: string): [NodeDetailsState, NodeDetailsActi
     initialData: [],
     filters: [
       textFilterFor<Container>(it => [
-        it.id.name,
-        it.id.prefix,
+        it.name,
         it.state,
         it.reason,
         it.imageName,
@@ -91,7 +89,7 @@ const useNodeDetailsState = (nodeId: string): [NodeDetailsState, NodeDetailsActi
 
   useEffect(() => {
     if (node.status === 'connected') {
-      sock.send(WS_TYPE_WATCH_CONTAINERS_STATE, { prefix: '' } as WatchContainerStatusMessage)
+      sock.send(WS_TYPE_WATCH_CONTAINERS_STATE, {} as WatchContainerStatusMessage)
     }
   }, [node.status, sock])
 
@@ -117,8 +115,7 @@ const useNodeDetailsState = (nodeId: string): [NodeDetailsState, NodeDetailsActi
       ...containerTargetStates,
     }
     message.containers.forEach(container => {
-      const { state } = container
-      const name = containerPrefixNameOf(container.id)
+      const { state, name } = container
 
       const targetState = containerTargetStates[name]
       if (targetState && targetState === state) {
@@ -133,7 +130,7 @@ const useNodeDetailsState = (nodeId: string): [NodeDetailsState, NodeDetailsActi
 
   const sendContainerCommand = (container: Container, operation: ContainerOperation) => {
     sock.send(WS_TYPE_CONTAINER_COMMAND, {
-      container: container.id,
+      container: container.name,
       operation,
     } as ContainerCommandMessage)
   }
@@ -143,7 +140,7 @@ const useNodeDetailsState = (nodeId: string): [NodeDetailsState, NodeDetailsActi
       ...containerTargetStates,
     }
 
-    const name = containerPrefixNameOf(container.id)
+    const { name } = container
     newTargetStates[name] = state
     setContainerTargetStates(newTargetStates)
   }
@@ -166,7 +163,7 @@ const useNodeDetailsState = (nodeId: string): [NodeDetailsState, NodeDetailsActi
   const onDeleteContainer = async (container: Container) => {
     const confirmed = await confirm({
       title: t('areYouSure'),
-      description: t('areYouSureDeleteName', { name: containerPrefixNameOf(container.id) }),
+      description: t('areYouSureDeleteName', { name: container.name }),
       confirmText: t('delete'),
       confirmColor: 'bg-lens-error-red',
     })
@@ -176,7 +173,7 @@ const useNodeDetailsState = (nodeId: string): [NodeDetailsState, NodeDetailsActi
     }
 
     sock.send(WS_TYPE_DELETE_CONTAINER, {
-      container: container.id,
+      container: container.name,
     } as DeleteContainerMessage)
   }
 

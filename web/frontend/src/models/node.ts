@@ -1,5 +1,5 @@
 import { PaginationQuery } from './common'
-import { Container, ContainerCommand, ContainerIdentifier } from './container'
+import { Container, ContainerCommand } from './container'
 
 export const NODE_INSTALL_SCRIPT_TYPE_VALUES = ['shell', 'powershell'] as const
 export type NodeInstallScriptType = (typeof NODE_INSTALL_SCRIPT_TYPE_VALUES)[number]
@@ -66,19 +66,13 @@ export type CreateNode = {
 
 export type UpdateNode = CreateNode
 
-export type NodeInstallTraefik = {
-  acmeEmail: string
-}
-
 export type NodeGenerateScript = {
-  rootPath?: string
   scriptType: NodeInstallScriptType
-  dagentTraefik?: NodeInstallTraefik
+  hostAddress?: string
 }
 
 export type NodeDeleteContainer = {
-  container?: ContainerIdentifier
-  prefix?: string
+  container: string
 }
 
 export type NodeAuditLogQuery = PaginationQuery & {
@@ -113,19 +107,16 @@ export type NodeEventMessage = {
 }
 
 export const WS_TYPE_WATCH_CONTAINERS_STATE = 'watch-containers-state'
-export type WatchContainerStatusMessage = {
-  prefix?: string
-}
+export type WatchContainerStatusMessage = {}
 
 export const WS_TYPE_CONTAINERS_STATE_LIST = 'containers-state-list'
 export type ContainersStateListMessage = {
-  prefix: string
   containers: Container[]
 }
 
 export const WS_TYPE_WATCH_CONTAINER_LOG = 'watch-container-log'
 export type WatchContainerLogMessage = {
-  container: ContainerIdentifier
+  container: string
 }
 
 export const WS_TYPE_CONTAINER_LOG = 'container-log'
@@ -135,12 +126,7 @@ export type ContainerLogMessage = {
 
 export const WS_TYPE_DELETE_CONTAINER = 'delete-container'
 export type DeleteContainerMessage = {
-  container: ContainerIdentifier
-}
-
-export const WS_TYPE_UPDATE_AGENT = 'update-agent'
-export type UpdateNodeAgentMessage = {
-  id: string
+  container: string
 }
 
 export const WS_TYPE_CONTAINER_COMMAND = 'container-command'

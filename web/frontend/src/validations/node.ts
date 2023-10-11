@@ -22,4 +22,5 @@ export const nodeGenerateScriptSchema = yup.object().shape({
     })
     .nullable()
     .default(null),
+  hostAddress: yup.string().label('nodes:hostAddress'),
 })

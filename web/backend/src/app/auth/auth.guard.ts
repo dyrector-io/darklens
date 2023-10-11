@@ -14,7 +14,7 @@ export const Public = () => SetMetadata(IS_PUBLIC_KEY, true)
 
 export const AuthUser = createParamDecorator((_: unknown, ctx: ExecutionContext) => {
   const request = ctx.switchToHttp().getRequest()
-  const user = request['user'] as AuthToken
+  const user = request.user as AuthToken
   return user?.sub
 })
 
@@ -52,7 +52,7 @@ export class AuthGuard implements CanActivate {
         return false
       }
 
-      request['user'] = payload
+      ;(request as any).user = payload
     } catch {
       AuthGuard.logger.warn(`Token is invalid`)
       return false

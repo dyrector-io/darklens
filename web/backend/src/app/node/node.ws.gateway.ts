@@ -1,9 +1,8 @@
-import { SubscribeMessage, WebSocketGateway } from '@nestjs/websockets'
+import { WebSocketGateway } from '@nestjs/websockets'
 import { Observable, from, map, mergeAll } from 'rxjs'
 import { WsAuthorize, WsMessage, WsSubscribe } from 'src/websockets/common'
 import { UseGlobalWsFilters, UseGlobalWsGuards } from 'src/websockets/decorators/ws.gateway.decorators'
-import SocketMessage from 'src/websockets/decorators/ws.socket-message.decorator'
-import { NodeEventMessage, UpdateNodeMessage, WS_TYPE_NODE_EVENT } from './node.message'
+import { NodeEventMessage, WS_TYPE_NODE_EVENT } from './node.message'
 import NodeService from './node.service'
 
 @WebSocketGateway({
@@ -31,10 +30,5 @@ export default class NodeWebSocketGateway {
         return msg
       }),
     )
-  }
-
-  @SubscribeMessage('update-agent')
-  async updateAgent(@SocketMessage() message: UpdateNodeMessage): Promise<void> {
-    await this.service.updateAgent(message.id)
   }
 }

@@ -94,20 +94,15 @@ export type AuditLogQuery = PaginationQuery & {
 }
 
 // node
-export type ContainerLogParams = {
-  prefix?: string
-  name?: string
-}
-
-export const nodeContainerLogUrl = (id: string, params: ContainerLogParams) =>
+export const nodeContainerLogUrl = (id: string, name: string) =>
   appendUrlParams(`/nodes/${id}/log`, {
-    ...params,
+    name,
     anchor: null,
   })
 
-export const nodeContainerInspectUrl = (id: string, params: ContainerLogParams) =>
+export const nodeContainerInspectUrl = (id: string, name: string) =>
   appendUrlParams(`/nodes/${id}/inspect`, {
-    ...params,
+    name,
     anchor: null,
   })
 
@@ -121,9 +116,7 @@ export const nodeApiAuditUrl = (id: string, query: AuditLogQuery) => urlQuery(`$
 
 export const nodeApiTokenUrl = (id: string) => `${nodeApiDetailsUrl(id)}/token`
 
-export const nodeApiInspectUrl = (id: string, prefix?: string, name?: string) =>
-  prefix
-    ? `${nodeApiDetailsUrl(id)}/${prefix}/containers/${name}/inspect`
-    : `${nodeApiDetailsUrl(id)}/containers/${name}/inspect`
+export const nodeApiInspectUrl = (id: string, name: string) =>
+  `${nodeApiDetailsUrl(id)}/containers/${encodeURIComponent(name)}/inspect`
 
 export const nodeWsDetailsUrl = (id: string) => `${WS_NODES}/${id}`

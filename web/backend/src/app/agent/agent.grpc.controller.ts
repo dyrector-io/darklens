@@ -1,23 +1,18 @@
 import { Metadata } from '@grpc/grpc-js'
 import { Controller, UseFilters, UseGuards, UseInterceptors } from '@nestjs/common'
-import { EMPTY, Observable } from 'rxjs'
+import { Observable } from 'rxjs'
 import GrpcExceptionFilter from 'src/filters/grpc.exception-filter'
 import {
-  AgentAbortUpdate,
   AgentCommand,
   AgentControllerMethods,
   AgentInfo,
-  AgentController as GrpcAgentController,
-} from 'src/grpc/protobuf/proto/agent'
-import {
+  ContainerDeleteRequest,
   ContainerInspectMessage,
   ContainerLogMessage,
   ContainerStateListMessage,
-  DeleteContainersRequest,
-  DeploymentStatusMessage,
   Empty,
-  ListSecretsResponse,
-} from 'src/grpc/protobuf/proto/common'
+  AgentController as GrpcAgentController,
+} from 'src/grpc/protobuf/proto/agent'
 import PrismaErrorInterceptor from 'src/interceptors/prisma-error-interceptor'
 import { NodeGrpcCall } from 'src/shared/grpc-node-connection'
 import AgentService from './agent.service'
@@ -35,27 +30,11 @@ export default class AgentController implements GrpcAgentController {
     return this.service.handleConnect(call.connection, request)
   }
 
-  deploymentStatus(
-    _request: Observable<DeploymentStatusMessage>,
-    _metadata: Metadata,
-    _call: NodeGrpcCall,
-  ): Observable<Empty> {
-    return EMPTY
-  }
-
   containerState(request: Observable<ContainerStateListMessage>, _: Metadata, call: NodeGrpcCall): Observable<Empty> {
     return this.service.handleContainerState(call.connection, request)
   }
 
-  secretList(_request: ListSecretsResponse, _metadata: Metadata, _call: NodeGrpcCall): Observable<Empty> {
-    return EMPTY
-  }
-
-  abortUpdate(request: AgentAbortUpdate, _: Metadata, call: NodeGrpcCall): Empty {
-    return this.service.updateAborted(call.connection, request)
-  }
-
-  deleteContainers(request: DeleteContainersRequest, _: Metadata, call: NodeGrpcCall): Empty {
+  deleteContainer(request: ContainerDeleteRequest, _: Metadata, call: NodeGrpcCall): Empty {
     return this.service.containersDeleted(call.connection, request)
   }
 
@@ -65,9 +44,5 @@ export default class AgentController implements GrpcAgentController {
 
   containerInspect(request: ContainerInspectMessage, _: Metadata, call: NodeGrpcCall): Observable<Empty> {
     return this.service.handleContainerInspect(call.connection, request)
-  }
-
-  async tokenReplaced(_: Empty, __: Metadata, call: NodeGrpcCall): Promise<Empty> {
-    return await this.service.tokenReplaced(call.connection)
   }
 }

@@ -107,11 +107,3 @@ dist
 .tern-port
 
 .vscode
-
-# playwright test results
-e2e_results
-
-# playwright
-e2e/screenshots
-e2e/utils/dagent
-storageState.json

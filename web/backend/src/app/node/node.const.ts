@@ -1,7 +1,5 @@
 import { Param, PipeTransform, Type } from '@nestjs/common'
 
-export const GLOBAL_PREFIX = ''
-
 export const ROUTE_NODES = 'nodes'
 export const ROUTE_NODE_ID = ':nodeId'
 export const ROUTE_CONTAINERS = 'containers'

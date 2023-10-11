@@ -17,7 +17,7 @@ const createSwaggerConfig = (configService: ConfigService): Omit<OpenAPIObject, 
     )
     .addTag(
       'nodes',
-      'Nodes are the deployment targets. Nodes are registered by installing at least one of the agents - crane for Kubernetes, dagent for Docker. These agents connect the platform to your node. One team can have as many nodes as they like.</br></br>Node installation takes place with Shell or PowerShell scripts, which can be created or revoked. More details in dyrector.io platform [documentation](https://docs.dyrector.io/get-started/components#node).',
+      'Nodes are the deployment targets. Nodes are registered by installing the Docker agent. These agents connect the platform to your node. One team can have as many nodes as they like.</br></br>Node installation takes place with Shell or PowerShell scripts, which can be created or revoked. More details in dyrector.io platform [documentation](https://docs.dyrector.io/get-started/components#node).',
     )
     .addTag(
       'health',

@@ -3,7 +3,6 @@ import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { JwtModule } from '@nestjs/jwt'
 import PrismaService from 'src/services/prisma.service'
-import { AGENT_STRATEGY_TYPES } from './agent.connection-strategy.provider'
 import AgentController from './agent.grpc.controller'
 import AgentService from './agent.service'
 
@@ -13,9 +12,6 @@ export const AgentJwtModule = JwtModule.registerAsync({
   useFactory: async (configService: ConfigService) => ({
     secret: configService.get('JWT_SECRET'),
     signOptions: { issuer: configService.get('AGENT_ADDRESS') },
-    verifyOptions: {
-      issuer: configService.get('AGENT_ADDRESS'),
-    },
   }),
 })
 
@@ -23,6 +19,6 @@ export const AgentJwtModule = JwtModule.registerAsync({
   imports: [HttpModule, AgentJwtModule],
   exports: [AgentService],
   controllers: [AgentController],
-  providers: [AgentService, PrismaService, ...AGENT_STRATEGY_TYPES],
+  providers: [AgentService, PrismaService],
 })
 export default class AgentModule {}

@@ -19,13 +19,12 @@ type NodeContainerLogPageParams = {
 }
 
 type NodeContainerLogPageQuery = {
-  prefix?: string
-  name?: string
+  name: string
 }
 
 const NodeContainerLogPage = () => {
   const { nodeId } = useParams<NodeContainerLogPageParams>()
-  const { prefix, name } = useQuery<NodeContainerLogPageQuery>()
+  const { name } = useQuery<NodeContainerLogPageQuery>()
 
   const { t } = useTranslation('common')
 
@@ -34,10 +33,7 @@ const NodeContainerLogPage = () => {
   const sock = useWebSocket(nodeWsDetailsUrl(nodeId), {
     onOpen: () => {
       const request: WatchContainerLogMessage = {
-        container: {
-          prefix,
-          name,
-        },
+        container: name,
       }
 
       sock.send(WS_TYPE_WATCH_CONTAINER_LOG, request)
@@ -50,7 +46,7 @@ const NodeContainerLogPage = () => {
 
   return (
     <Page title={t('log')}>
-      <PageHeading title={t('logOf', { name: prefix ? `${prefix}-${name}` : name })} backTo={nodeDetailsUrl(nodeId)} />
+      <PageHeading title={t('logOf', { name })} backTo={nodeDetailsUrl(nodeId)} />
 
       <EventsTerminal events={log} formatEvent={it => [it.log]} />
     </Page>

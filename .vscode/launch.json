@@ -19,6 +19,14 @@
             "envFile": "${workspaceFolder}/web/backend/.env",
             "cwd": "${workspaceRoot}/web/backend",
             "console": "integratedTerminal",
-        }
+        },
+        {
+            "name": "Debug agent",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}/agent/cmd",
+            "cwd": "${workspaceFolder}/agent/cmd"
+        },
     ]
 }

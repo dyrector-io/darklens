@@ -42,44 +42,6 @@ case $(uname) in
 esac
 
 set_environment() {
-  # Set folder for persisting data
-  PERSISTENCE_FOLDER_SETTING="{{#if rootPath}}{{{rootPath}}}{{/if}}"
-  if [ -z "${PERSISTENCE_FOLDER:-}" ]; then
-    if [ -z "${PERSISTENCE_FOLDER_SETTING:-}" ]; then
-      case $PLATFORM in
-        OSX*)
-          echo "Detected: Mac OS X"
-          PERSISTENCE_FOLDER=~/.dyrectorio-persistence/
-          ;;
-        LINUX*)
-          echo "Detected: Linux"
-          if [ "$ROOTLESS" = "false" ]; then
-            PERSISTENCE_FOLDER=/srv/dyrectorio-persistence/
-          else
-            PERSISTENCE_FOLDER=~/.dyrectorio-persistence/
-          fi
-          ;;
-        WINDOWS*)
-          echo "Detected: Windows(mingw64)"
-          PERSISTENCE_FOLDER="C:/.dyrectorio-persistence"
-          ;;
-        *)
-          echo "Not supported OS and PERSISTENCE_FOLDER is not set!"
-          exit 1
-          ;;
-      esac
-    else
-      PERSISTENCE_FOLDER=$PERSISTENCE_FOLDER_SETTING
-    fi
-  fi
-
-  mkdir -p "$PERSISTENCE_FOLDER"
-
-  if [ "$PLATFORM" = "WINDOWS" ]; then
-    PERSISTENCE_FOLDER_TMP=$(echo "$PERSISTENCE_FOLDER" | tr '[:upper:]' '[:lower:]')
-    PERSISTENCE_FOLDER=$(echo "/run/desktop/mnt/host/${PERSISTENCE_FOLDER_TMP}" | tr -d ":")
-  fi
-
   if [ -z "${CRI_EXECUTABLE:-}" ]; then
     if ! command -v docker >/dev/null 2>&1; then
       if ! command -v podman >/dev/null 2>&1; then
@@ -107,7 +69,7 @@ set_environment() {
   fi
 }
 
-dagent_clean() {
+agent_clean() {
   if [ -n "$($CRI_EXECUTABLE container list --filter name=^{{name}}$ --filter=status=running --filter=status=restarting --filter=status=paused --format '\{{ .Names }}' 2>/dev/null)" ]; then
     set +e
     echo "Stopping existing dyrector.io agent ({{name}})..."
@@ -131,11 +93,11 @@ dagent_clean() {
   fi
 }
 
-dagent_install() {
-  echo "Installing dyrector.io agent ({{name}})..."
+agent_install() {
+  echo "Installing Darklens Agent ({{name}})..."
 
   if ! {{disableForcePull}}; then
-    $CRI_EXECUTABLE pull ghcr.io/dyrector-io/dyrectorio/agent/dagent:{{agentImageTag}}
+    $CRI_EXECUTABLE pull ghcr.io/dyrector-io/darklens/agent:{{agentImageTag}}
   fi
 
   $CRI_EXECUTABLE run \
@@ -144,22 +106,11 @@ dagent_install() {
     --network {{networkName}} \
     {{/if}}
     -e GRPC_TOKEN='{{token}}' \
-    -e NAME='{{name}}' \
-    {{#if traefik}}
-    -e TRAEFIK_ENABLED='true' \
-    -e TRAEFIK_ACME_MAIL='{{traefik.acmeEmail}}' \
-    -e TRAEFIK_TLS='true' \
-    {{/if}}
-    -e DATA_MOUNT_PATH="$PERSISTENCE_FOLDER" \
-    {{#if debugMode}}
-    -e DEBUG='true' \
-    {{/if}}
     -e HOST_DOCKER_SOCK_PATH="$HOST_DOCKER_SOCK_PATH" \
     --add-host=host.docker.internal:host-gateway \
     --name '{{name}}' \
-    -v "$PERSISTENCE_FOLDER/":/srv/dagent \
     -v "$HOST_DOCKER_SOCK_PATH":/var/run/docker.sock \
-    -d ghcr.io/dyrector-io/dyrectorio/agent/dagent:{{agentImageTag}}
+    -d ghcr.io/dyrector-io/darklens/agent:{{agentImageTag}}
 
   if [ -z "${ORIGINAL_PATHCONV_CONFIG+x}" ]; then
     unset MSYS_NO_PATHCONV
@@ -170,6 +121,6 @@ dagent_install() {
 
 set_environment
 
-dagent_clean
+agent_clean
 
-dagent_install
+agent_install

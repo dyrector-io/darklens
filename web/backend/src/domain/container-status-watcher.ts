@@ -1,9 +1,11 @@
 import { finalize, Observable, startWith, Subject } from 'rxjs'
-import { Agent } from 'src/domain/agent'
 import { CruxPreconditionFailedException } from 'src/exception/crux-exception'
-import { AgentCommand } from 'src/grpc/protobuf/proto/agent'
-import { ContainerState, ContainerStateItem, ContainerStateListMessage } from 'src/grpc/protobuf/proto/common'
-import GrpcNodeConnection from 'src/shared/grpc-node-connection'
+import {
+  AgentCommand,
+  ContainerState,
+  ContainerStateItem,
+  ContainerStateListMessage,
+} from 'src/grpc/protobuf/proto/agent'
 
 export type ContainerStatusStreamCompleter = Subject<unknown>
 
@@ -16,10 +18,7 @@ export default class ContainerStatusWatcher {
 
   private state: Record<string, ContainerStateItem> = {}
 
-  constructor(
-    private prefix: string,
-    private oneShot: boolean,
-  ) {}
+  constructor(private oneShot: boolean) {}
 
   start(commandChannel: Subject<AgentCommand>) {
     if (this.started) {
@@ -28,7 +27,6 @@ export default class ContainerStatusWatcher {
 
     commandChannel.next({
       containerState: {
-        prefix: this.prefix,
         oneShot: this.oneShot,
       },
     } as AgentCommand)
@@ -37,9 +35,7 @@ export default class ContainerStatusWatcher {
 
   update(status: ContainerStateListMessage) {
     if (status.data) {
-      const removedIds = status.data
-        .filter(it => it.state === ContainerState.REMOVED)
-        .map(it => Agent.containerPrefixNameOf(it.id))
+      const removedIds = status.data.filter(it => it.state === ContainerState.REMOVED).map(it => it.name)
       const updated = status.data.filter(it => it.state !== ContainerState.REMOVED)
 
       const stateMap = Object.keys(this.state)
@@ -50,7 +46,7 @@ export default class ContainerStatusWatcher {
         }, {})
 
       this.state = updated.reduce((map, it) => {
-        map[Agent.containerPrefixNameOf(it.id)] = it
+        map[it.name] = it
         return map
       }, stateMap)
     }
@@ -79,9 +75,7 @@ export default class ContainerStatusWatcher {
   onNodeStreamStarted(): ContainerStatusStreamCompleter {
     if (this.completer) {
       throw new CruxPreconditionFailedException({
-        message: `There is already a container status stream connection for prefix`,
-        property: GrpcNodeConnection.META_FILTER_PREFIX,
-        value: this.prefix,
+        message: 'There is already a container status stream running',
       })
     }
 
@@ -107,7 +101,6 @@ export default class ContainerStatusWatcher {
 
   private mapStateToMessage(): ContainerStateListMessage {
     return {
-      prefix: this.prefix,
       data: Object.values(this.state),
     }
   }

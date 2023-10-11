@@ -14,13 +14,8 @@ export type ContainerPort = {
   external: number
 }
 
-export type ContainerIdentifier = {
-  prefix?: string
-  name: string
-}
-
 export type Container = {
-  id: ContainerIdentifier
+  name: string
   imageName: string
   imageTag: string
   createdAt: string
@@ -33,7 +28,7 @@ export type Container = {
 export type ContainerOperation = 'start' | 'stop' | 'restart'
 
 export type ContainerCommand = {
-  container: ContainerIdentifier
+  container: string
   operation: ContainerOperation
 }
 
@@ -91,21 +86,9 @@ export const containerPortsToString = (ports: ContainerPort[], truncateAfter: nu
   return result.join(', ')
 }
 
-export const containerPrefixNameOf = (id: ContainerIdentifier): string =>
-  !id.prefix ? id.name : `${id.prefix}-${id.name}`
-
 export const containerIsStartable = (state: ContainerState) => state !== 'running' && state !== 'removing'
 export const containerIsStopable = (state: ContainerState) => state === 'running' || state === 'paused'
 export const containerIsRestartable = (state: ContainerState) => state === 'running'
-
-export const serviceCategoryIsHidden = (it: string | null) => it && it.startsWith('_')
-export const kubeNamespaceIsSystem = (it: string | null) => it && it === 'kube-system'
-export const containerIsHidden = (it: Container) => {
-  const serviceCategory = it.labels['org.dyrectorio.service-category']
-  const kubeNamespace = it.labels['io.kubernetes.pod.namespace']
-
-  return serviceCategoryIsHidden(serviceCategory) || kubeNamespaceIsSystem(kubeNamespace)
-}
 
 export const imageName = (name: string, tag?: string): string => {
   if (!tag) {

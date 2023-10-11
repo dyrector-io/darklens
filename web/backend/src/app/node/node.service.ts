@@ -12,15 +12,14 @@ import {
   of,
   timeout,
 } from 'rxjs'
-import { Agent, AgentConnectionMessage } from 'src/domain/agent'
+import { AgentConnectionMessage } from 'src/domain/agent'
 import {
   ContainerCommandRequest,
-  ContainerIdentifier,
+  ContainerDeleteRequest,
   ContainerOperation,
   ContainerStateListMessage,
-  DeleteContainersRequest,
   containerOperationToJSON,
-} from 'src/grpc/protobuf/proto/common'
+} from 'src/grpc/protobuf/proto/agent'
 import PrismaService from 'src/services/prisma.service'
 import AgentService from '../agent/agent.service'
 import {
@@ -36,12 +35,7 @@ import {
   UpdateNodeDto,
 } from './node.dto'
 import NodeMapper from './node.mapper'
-import {
-  ContainerLogMessage,
-  ContainersStateListMessage,
-  WatchContainerLogMessage,
-  WatchContainersStateMessage,
-} from './node.message'
+import { ContainerLogMessage, ContainersStateListMessage, WatchContainerLogMessage } from './node.message'
 
 @Injectable()
 export default class NodeService {
@@ -128,12 +122,7 @@ export default class NodeService {
       },
     })
 
-    const installer = await this.agentService.startInstallation(
-      node,
-      req.rootPath ?? null,
-      req.scriptType,
-      req.dagentTraefik ?? null,
-    )
+    const installer = await this.agentService.startInstallation(node, req.scriptType, req.hostAddress ?? null)
 
     return this.mapper.installerToDto(installer)
   }
@@ -172,10 +161,8 @@ export default class NodeService {
     return events.pipe(mergeWith(of(currentEvents).pipe(mergeAll())))
   }
 
-  watchContainersState(nodeId: string, message: WatchContainersStateMessage): Observable<ContainersStateListMessage> {
-    const { prefix } = message
-
-    return this.upsertAndWatchStateWatcher(nodeId, prefix, false).pipe(
+  watchContainersState(nodeId: string): Observable<ContainersStateListMessage> {
+    return this.upsertAndWatchStateWatcher(nodeId, false).pipe(
       map(it => this.mapper.containerStateMessageToContainerMessage(it)),
     )
   }
@@ -183,9 +170,7 @@ export default class NodeService {
   watchContainerLog(nodeId: string, message: WatchContainerLogMessage): Observable<ContainerLogMessage> {
     const { container } = message
 
-    this.logger.debug(
-      `Opening container log stream for container: ${nodeId} - ${Agent.containerPrefixNameOf(container)}}`,
-    )
+    this.logger.debug(`Opening container log stream for container: ${nodeId} - ${container}}`)
 
     const agent = this.agentService.getByIdOrThrow(nodeId)
 
@@ -194,64 +179,22 @@ export default class NodeService {
     return stream.watch()
   }
 
-  async updateAgent(id: string): Promise<void> {
-    await this.agentService.updateAgent(id)
+  async startContainer(nodeId: string, name: string): Promise<void> {
+    await this.sendContainerOperation(nodeId, name, ContainerOperation.START_CONTAINER)
   }
 
-  async startContainer(nodeId: string, prefix: string, name: string): Promise<void> {
-    await this.sendContainerOperation(
-      nodeId,
-      {
-        prefix,
-        name,
-      },
-      ContainerOperation.START_CONTAINER,
-    )
+  async stopContainer(nodeId: string, name: string): Promise<void> {
+    await this.sendContainerOperation(nodeId, name, ContainerOperation.STOP_CONTAINER)
   }
 
-  async stopContainer(nodeId: string, prefix: string, name: string): Promise<void> {
-    await this.sendContainerOperation(
-      nodeId,
-      {
-        prefix,
-        name,
-      },
-      ContainerOperation.STOP_CONTAINER,
-    )
+  async restartContainer(nodeId: string, name: string): Promise<void> {
+    await this.sendContainerOperation(nodeId, name, ContainerOperation.RESTART_CONTAINER)
   }
 
-  async restartContainer(nodeId: string, prefix: string, name: string): Promise<void> {
-    await this.sendContainerOperation(
-      nodeId,
-      {
-        prefix,
-        name,
-      },
-      ContainerOperation.RESTART_CONTAINER,
-    )
-  }
-
-  async deleteAllContainers(nodeId: string, prefix: string): Promise<Observable<void>> {
+  async deleteContainer(nodeId: string, name: string): Promise<Observable<void>> {
     const agent = this.agentService.getByIdOrThrow(nodeId)
-    const cmd: DeleteContainersRequest = {
-      prefix,
-    }
-
-    await this.agentService.createAgentAudit(nodeId, 'containerCommand', {
-      operation: 'deleteContainers',
-      ...cmd,
-    })
-
-    return agent.deleteContainers(cmd).pipe(map(() => undefined))
-  }
-
-  async deleteContainer(nodeId: string, prefix: string, name: string): Promise<Observable<void>> {
-    const agent = this.agentService.getByIdOrThrow(nodeId)
-    const cmd: DeleteContainersRequest = {
-      container: {
-        prefix: prefix ?? '',
-        name,
-      },
+    const cmd: ContainerDeleteRequest = {
+      name,
     }
 
     await this.agentService.createAgentAudit(nodeId, 'containerCommand', {
@@ -262,9 +205,9 @@ export default class NodeService {
     return agent.deleteContainers(cmd).pipe(map(() => undefined))
   }
 
-  async getContainers(nodeId: string, prefix?: string): Promise<ContainerDto[]> {
+  async getContainers(nodeId: string): Promise<ContainerDto[]> {
     try {
-      const states = this.upsertAndWatchStateWatcher(nodeId, prefix, true).pipe(
+      const states = this.upsertAndWatchStateWatcher(nodeId, true).pipe(
         map(list => list.data?.map(it => this.mapper.containerStateItemToDto(it))),
         filter(it => it && it.length > 0),
         timeout(5000),
@@ -283,28 +226,24 @@ export default class NodeService {
     }
   }
 
-  private upsertAndWatchStateWatcher(
-    nodeId: string,
-    prefix: string,
-    oneShot: boolean,
-  ): Observable<ContainerStateListMessage> {
-    this.logger.debug(`Opening container state stream for node - prefix: ${nodeId} - ${prefix}`)
+  private upsertAndWatchStateWatcher(nodeId: string, oneShot: boolean): Observable<ContainerStateListMessage> {
+    this.logger.debug(`Opening container state stream for node: ${nodeId}`)
 
     const agent = this.agentService.getByIdOrThrow(nodeId)
-    const watcher = agent.upsertContainerStatusWatcher(prefix ?? '', oneShot)
+    const watcher = agent.upsertContainerStatusWatcher(oneShot)
 
     return watcher.watch()
   }
 
   private async sendContainerOperation(
     nodeId: string,
-    container: ContainerIdentifier,
+    container: string,
     operation: ContainerOperation,
   ): Promise<void> {
     const agent = this.agentService.getByIdOrThrow(nodeId)
 
     const command: ContainerCommandRequest = {
-      container,
+      name: container,
       operation,
     }
 
@@ -362,9 +301,9 @@ export default class NodeService {
     }
   }
 
-  async inspectContainer(nodeId: string, prefix: string, name: string): Promise<ContainerInspectionDto> {
+  async inspectContainer(nodeId: string, name: string): Promise<ContainerInspectionDto> {
     const agent = this.agentService.getByIdOrThrow(nodeId)
-    const watcher = agent.getContainerInspection(prefix, name)
+    const watcher = agent.getContainerInspection(name)
     const inspectionMessage = await lastValueFrom(watcher)
 
     return this.mapper.containerInspectionMessageToDto(inspectionMessage)

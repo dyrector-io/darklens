@@ -10,12 +10,10 @@ import { dateSort, enumSort, sortHeaderBuilder, stringSort, useSorting } from 's
 import {
   CONTAINER_STATE_VALUES,
   Container,
-  containerIsHidden,
   containerIsRestartable,
   containerIsStartable,
   containerIsStopable,
   containerPortsToString,
-  containerPrefixNameOf,
   imageName,
 } from 'src/models'
 import { nodeContainerInspectUrl, nodeContainerLogUrl } from 'src/routes'
@@ -33,13 +31,12 @@ import book from 'src/assets/book.svg'
 interface NodeContainersListProps {
   state: NodeDetailsState
   actions: NodeDetailsActions
-  showHidden?: boolean
 }
 
 type ContainerSorting = 'name' | 'imageTag' | 'state' | 'reason' | 'createdAt'
 
 const NodeContainersList = (props: NodeContainersListProps) => {
-  const { state, actions, showHidden } = props
+  const { state, actions } = props
   const { containerItems } = state
 
   const { t } = useTranslation('nodes')
@@ -55,12 +52,10 @@ const NodeContainersList = (props: NodeContainersListProps) => {
       createdAt: dateSort,
     },
     fieldGetters: {
-      name: it => containerPrefixNameOf(it.id),
+      name: it => it.name,
       imageTag: it => imageName(it.imageName, it.imageTag),
     },
   })
-
-  const listItems = showHidden ? sorting.items : sorting.items.filter(it => !containerIsHidden(it))
 
   const headers = [
     'common:name',
@@ -73,7 +68,7 @@ const NodeContainersList = (props: NodeContainersListProps) => {
   ]
 
   const itemBuilder = (container: Container) => {
-    const name = containerPrefixNameOf(container.id)
+    const { name } = container
     const targetState = state.containerTargetStates[name]
     const containerPortsText = containerPortsToString(container.ports)
 
@@ -120,10 +115,10 @@ const NodeContainersList = (props: NodeContainersListProps) => {
 
             {container.state && (
               <>
-                <Link to={nodeContainerLogUrl(state.node.id, container.id)}>
+                <Link to={nodeContainerLogUrl(state.node.id, container.name)}>
                   <DyoIcon className="align-bottom" src={note} alt={t('logs')} size="md" />
                 </Link>
-                <Link to={nodeContainerInspectUrl(state.node.id, container.id)}>
+                <Link to={nodeContainerInspectUrl(state.node.id, container.name)}>
                   <DyoIcon className="align-bottom" src={book} alt={t('inspect')} size="md" />
                 </Link>
               </>
@@ -162,7 +157,7 @@ const NodeContainersList = (props: NodeContainersListProps) => {
         headerClassName={headerClasses}
         columnWidths={columnWidths}
         itemClassName={itemClasses}
-        data={listItems}
+        data={sorting.items}
         itemBuilder={itemBuilder}
         headerBuilder={sortHeaderBuilder<Container, ContainerSorting>(
           sorting,
@@ -179,7 +174,7 @@ const NodeContainersList = (props: NodeContainersListProps) => {
         footer={
           <Paginator
             onChanged={actions.setContainerPagination}
-            length={listItems.length}
+            length={sorting.items.length}
             defaultPagination={{
               pageNumber: 0,
               pageSize: 10,

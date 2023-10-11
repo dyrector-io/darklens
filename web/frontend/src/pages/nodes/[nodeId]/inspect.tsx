@@ -17,13 +17,12 @@ type NodeContainerInspectPageParams = {
 }
 
 type NodeContainerInspectPageQuery = {
-  prefix?: string
   name?: string
 }
 
 const NodeContainerInspectPage = () => {
   const { nodeId } = useParams<NodeContainerInspectPageParams>()
-  const { prefix, name } = useQuery<NodeContainerInspectPageQuery>()
+  const { name } = useQuery<NodeContainerInspectPageQuery>()
   const [inspect, setInspect] = useState<{ data: object; node: NodeDetails }>(null)
 
   const { t } = useTranslation('nodes')
@@ -33,7 +32,7 @@ const NodeContainerInspectPage = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const res = await backendGet<NodeContainerInspection>(nodeApiInspectUrl(nodeId, prefix, name))
+      const res = await backendGet<NodeContainerInspection>(nodeApiInspectUrl(nodeId, name))
       if (!res.ok) {
         return
       }
@@ -53,10 +52,7 @@ const NodeContainerInspectPage = () => {
 
   return (
     <Page title={t('common:inspect')}>
-      <PageHeading
-        title={t('common:inspectOf', { name: prefix ? `${prefix}-${name}` : name })}
-        backTo={nodeDetailsUrl(nodeId)}
-      >
+      <PageHeading title={t('common:inspectOf', { name })} backTo={nodeDetailsUrl(nodeId)}>
         {inspect && <InspectViewModeToggle viewMode={viewMode} onViewModeChanged={setViewMode} />}
       </PageHeading>
 

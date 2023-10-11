@@ -17,7 +17,6 @@ import {
   WS_TYPE_CONTAINERS_STATE_LIST,
   WS_TYPE_CONTAINER_LOG,
   WatchContainerLogMessage,
-  WatchContainersStateMessage,
 } from './node.message'
 import NodeService from './node.service'
 
@@ -41,21 +40,18 @@ export default class NodeContainerWebSocketGateway {
   async containerCommand(@NodeId() nodeId: string, @SocketMessage() message: ContainerCommandMessage): Promise<void> {
     const { container, operation } = message
     if (operation === 'start') {
-      await this.service.startContainer(nodeId, container.prefix, container.name)
+      await this.service.startContainer(nodeId, container)
     } else if (operation === 'stop') {
-      await this.service.stopContainer(nodeId, container.prefix, container.name)
+      await this.service.stopContainer(nodeId, container)
     } else if (operation === 'restart') {
-      await this.service.restartContainer(nodeId, container.prefix, container.name)
+      await this.service.restartContainer(nodeId, container)
     }
   }
 
   @AuditLogLevel('disabled')
   @SubscribeMessage('watch-containers-state')
-  watchContainersState(
-    @NodeId() nodeId: string,
-    @SocketMessage() message: WatchContainersStateMessage,
-  ): Observable<WsMessage<ContainersStateListMessage>> {
-    return this.service.watchContainersState(nodeId, message).pipe(
+  watchContainersState(@NodeId() nodeId: string): Observable<WsMessage<ContainersStateListMessage>> {
+    return this.service.watchContainersState(nodeId).pipe(
       map(it => {
         const msg: WsMessage<ContainersStateListMessage> = {
           type: WS_TYPE_CONTAINERS_STATE_LIST,
@@ -89,6 +85,6 @@ export default class NodeContainerWebSocketGateway {
   async deleteContainer(@NodeId() nodeId: string, @SocketMessage() message: DeleteContainerMessage): Promise<void> {
     const { container } = message
 
-    await this.service.deleteContainer(nodeId, container.prefix, container.name)
+    await this.service.deleteContainer(nodeId, container)
   }
 }

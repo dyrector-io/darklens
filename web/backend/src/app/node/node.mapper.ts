@@ -11,7 +11,7 @@ import {
   ContainerStateListMessage,
   ContainerState as ProtoContainerState,
   containerStateToJSON,
-} from 'src/grpc/protobuf/proto/common'
+} from 'src/grpc/protobuf/proto/agent'
 import { BasicProperties } from '../../shared/dtos/shared.dto'
 import AgentService from '../agent/agent.service'
 import {
@@ -92,14 +92,13 @@ export default class NodeMapper {
 
   containerStateMessageToContainerMessage(list: ContainerStateListMessage): ContainersStateListMessage {
     return {
-      prefix: list.prefix ?? '',
       containers: list.data?.map(it => this.containerStateItemToDto(it)) ?? [],
     }
   }
 
   containerStateItemToDto(it: ContainerStateItem): ContainerDto {
     return {
-      id: it.id,
+      name: it.name,
       command: it.command,
       createdAt: fromTimestamp(it.createdAt),
       state: this.containerStateToDto(it.state),
@@ -111,7 +110,6 @@ export default class NodeMapper {
           internal: port.internal,
           external: port.external,
         })) ?? [],
-      labels: it.labels ?? {},
     }
   }
 

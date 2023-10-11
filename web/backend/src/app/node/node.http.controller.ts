@@ -197,20 +197,6 @@ export default class NodeHttpController {
     return await this.service.revokeToken(nodeId)
   }
 
-  @Post(`${ROUTE_NODE_ID}/update`)
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({
-    description: "Request must include the node's `name` in body.",
-    summary: 'Update the agent.',
-  })
-  @ApiNoContentResponse({ description: 'Node details modified.' })
-  @ApiBadRequestResponse({ description: 'Bad request for node details.' })
-  @ApiForbiddenResponse({ description: 'Unauthorized request for node details.' })
-  @UuidParams(PARAM_NODE_ID)
-  async updateNodeAgent(@NodeId() nodeId: string) {
-    await this.service.updateAgent(nodeId)
-  }
-
   @Get(`${ROUTE_NODE_ID}/audit`)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({

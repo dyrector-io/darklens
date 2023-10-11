@@ -6,7 +6,6 @@ import { DyoHeading } from 'src/elements/dyo-heading'
 import DyoIcon from 'src/elements/dyo-icon'
 import { DyoInput } from 'src/elements/dyo-input'
 import { DyoLabel } from 'src/elements/dyo-label'
-import DyoToggle from 'src/elements/dyo-toggle'
 import TimeLabel from 'src/elements/time-label'
 import useDyoFormik from 'src/hooks/use-dyo-formik'
 import useTimer from 'src/hooks/use-timer'
@@ -63,9 +62,8 @@ const DyoNodeSetup = (props: DyoNodeSetupProps) => {
 
   const formik = useDyoFormik<NodeGenerateScript>({
     initialValues: {
-      rootPath: '',
       scriptType: 'shell',
-      dagentTraefik: null,
+      hostAddress: '',
     },
     validationSchema: nodeGenerateScriptSchema,
     t,
@@ -93,8 +91,6 @@ const DyoNodeSetup = (props: DyoNodeSetupProps) => {
     },
   })
 
-  const onTraefikChanged = it => formik.setFieldValue('dagentTraefik', it ? {} : null)
-
   return (
     <DyoCard>
       <DyoHeading element="h4" className="text-lg text-lens-text-0 mb-2">
@@ -109,51 +105,20 @@ const DyoNodeSetup = (props: DyoNodeSetupProps) => {
         {!node.install ? (
           <>
             <div className="flex flex-col">
-              <DyoHeading element="h4" className="text-lg text-lens-text-0 flex flex-row items-center">
-                <DyoToggle
-                  className="mr-2 my-2"
-                  labelClassName="text-lens-text-1 mr-4"
-                  name="traefik"
-                  checked={!!formik.values.dagentTraefik}
-                  onCheckedChange={onTraefikChanged}
-                />
-
-                {t('traefik')}
-              </DyoHeading>
-
-              <p className="text-sm text-lens-text-3 mb-2.5">{t('traefikExplanation')}</p>
-
-              {formik.values.dagentTraefik && (
-                <div className="mb-2">
-                  <DyoLabel className="text-md mb-2" textColor="text-lens-text-0">
-                    {t('traefikAcmeEmail')}
-                  </DyoLabel>
-
-                  <DyoInput
-                    name="dagentTraefik.acmeEmail"
-                    className="max-w-lg mb-2.5"
-                    grow
-                    value={formik.values.dagentTraefik.acmeEmail ?? ''}
-                    onChange={formik.handleChange}
-                    message={formik.errors.dagentTraefik ? formik.errors.dagentTraefik.acmeEmail : null}
-                  />
-                </div>
-              )}
-
               <DyoLabel className="text-lg mb-2.5" textColor="text-lens-text-0">
-                {t('persistentDataPath')}
+                {t('hostAddress')}
               </DyoLabel>
 
               <DyoInput
-                name="rootPath"
+                name="hostAddress"
                 placeholder={t('optionalLeaveEmptyForDefaults')}
                 className="max-w-lg mb-2.5"
                 grow
-                value={formik.values.rootPath}
+                value={formik.values.hostAddress}
                 onChange={formik.handleChange}
-                message={formik.errors.rootPath}
+                message={formik.errors.hostAddress}
               />
-              <p className="text-sm text-lens-text-3 mb-2.5">{t('persistentDataExplanation')}</p>
+              <p className="text-sm text-lens-text-3 mb-2.5">{t('hostAddressExplanation')}</p>
 
               <DyoHeading element="h4" className="text-lg text-lens-text-0 mb-2">
                 {t('type')}

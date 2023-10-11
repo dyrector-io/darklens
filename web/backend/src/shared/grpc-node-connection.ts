@@ -8,15 +8,9 @@ import { CruxBadRequestException } from 'src/exception/crux-exception'
 
 const nestjsClientStreamEndCallWorkaround = () => {}
 export default class GrpcNodeConnection {
-  public static META_NODE_TOKEN = 'dyo-node-token'
+  public static META_NODE_TOKEN = 'lens-node-token'
 
-  public static META_DEPLOYMENT_ID = 'dyo-deployment-id'
-
-  public static META_FILTER_PREFIX = 'dyo-filter-prefix'
-
-  public static META_CONTAINER_PREFIX = 'dyo-container-prefix'
-
-  public static META_CONTAINER_NAME = 'dyo-container-name'
+  public static META_CONTAINER_NAME = 'lens-container-name'
 
   private statusChannel = new Subject<NodeConnectionStatus>()
 

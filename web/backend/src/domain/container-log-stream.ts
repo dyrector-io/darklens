@@ -1,8 +1,6 @@
 import { finalize, Observable, startWith, Subject } from 'rxjs'
 import { CruxPreconditionFailedException } from 'src/exception/crux-exception'
-import { AgentCommand } from 'src/grpc/protobuf/proto/agent'
-import { ContainerIdentifier, ContainerLogMessage } from 'src/grpc/protobuf/proto/common'
-import GrpcNodeConnection from 'src/shared/grpc-node-connection'
+import { AgentCommand, ContainerLogMessage } from 'src/grpc/protobuf/proto/agent'
 
 export type ContainerLogStreamCompleter = Subject<unknown>
 
@@ -14,7 +12,7 @@ export default class ContainerLogStream {
   private completer: ContainerLogStreamCompleter = null
 
   constructor(
-    private container: ContainerIdentifier,
+    private name: string,
     private tail: number,
   ) {}
 
@@ -25,7 +23,7 @@ export default class ContainerLogStream {
 
     commandChannel.next({
       containerLog: {
-        container: this.container,
+        name: this.name,
         streaming: true,
         tail: this.tail,
       },
@@ -62,8 +60,8 @@ export default class ContainerLogStream {
     if (this.completer) {
       throw new CruxPreconditionFailedException({
         message: 'There is already a container status stream connection for container',
-        property: GrpcNodeConnection.META_FILTER_PREFIX,
-        value: `${this.container.prefix ?? ''}-${this.container.name}`,
+        property: 'name',
+        value: this.name,
       })
     }
 

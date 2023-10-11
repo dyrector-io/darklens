@@ -37,7 +37,4 @@ CREATE TABLE "User" (
 CREATE UNIQUE INDEX "Node_name_key" ON "Node"("name");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "NodeToken_nodeId_key" ON "NodeToken"("nodeId");
-
--- CreateIndex
 CREATE UNIQUE INDEX "User_name_key" ON "User"("name");

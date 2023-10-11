@@ -122,10 +122,13 @@ const InspectTableView = (props: InspectTableViewProps) => {
     NetworkSettings: networkSettings,
     State: state,
     Mounts: mounts,
+    HostConfig: hostConfig,
   } = inspect
   const { Env: env, Labels: labels, Image: image, Hostname: hostname } = config ?? {}
   const { Networks: networks, IPAddress: ipAddress } = networkSettings ?? {}
   const { Status: status, ExitCode: exitCode } = state ?? {}
+  const { RestartPolicy: restartPolicy } = hostConfig ?? {}
+  const { Name: restartPolicyName } = restartPolicy ?? {}
 
   const { t } = useTranslation('nodes')
 
@@ -175,6 +178,10 @@ const InspectTableView = (props: InspectTableViewProps) => {
     {
       key: 'inspectGeneral.ip',
       value: ipAddress === '' ? '-' : ipAddress,
+    },
+    {
+      key: 'inspectGeneral.restartPolicy',
+      value: restartPolicyName ?? '-',
     },
   ]
 

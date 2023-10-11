@@ -1,30 +1,29 @@
-import { Inject, Injectable, Logger, forwardRef } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { JwtService } from '@nestjs/jwt'
 import { Observable, Subject, concatAll, finalize, from, map, of, startWith, takeUntil } from 'rxjs'
 import { SemVer, coerce } from 'semver'
-import { Agent, AgentConnectionMessage, AgentTokenReplacement } from 'src/domain/agent'
+import { Agent, AgentConnectionMessage, AgentTokenReplacement, CreateAgentOptions } from 'src/domain/agent'
 import AgentInstaller from 'src/domain/agent-installer'
-import { generateAgentToken } from 'src/domain/agent-token'
+import { AgentToken, generateAgentToken } from 'src/domain/agent-token'
 import { BasicNode } from 'src/domain/node'
-import { CruxNotFoundException } from 'src/exception/crux-exception'
-import { AgentAbortUpdate, AgentCommand, AgentInfo, CloseReason } from 'src/grpc/protobuf/proto/agent'
+import { CruxBadRequestException, CruxConflictException, CruxNotFoundException } from 'src/exception/crux-exception'
 import {
-  ContainerIdentifier,
+  AgentCommand,
+  AgentInfo,
+  CloseReason,
+  ContainerDeleteRequest,
   ContainerInspectMessage,
   ContainerLogMessage,
   ContainerStateListMessage,
-  DeleteContainersRequest,
   Empty,
-} from 'src/grpc/protobuf/proto/common'
+} from 'src/grpc/protobuf/proto/agent'
 import PrismaService from 'src/services/prisma.service'
 import GrpcNodeConnection from 'src/shared/grpc-node-connection'
-import { getAgentVersionFromPackage, getPackageVersion } from 'src/shared/package'
+import { getPackageVersion } from 'src/shared/package'
 import { AGENT_SUPPORTED_MINIMUM_VERSION } from '../../shared/const'
-import { DagentTraefikOptionsDto, NodeConnectionStatus, NodeEventTypeEnum, NodeScriptTypeDto } from '../node/node.dto'
-import AgentConnectionStrategyProvider from './agent.connection-strategy.provider'
+import { NodeConnectionStatus, NodeEventTypeEnum, NodeScriptTypeDto } from '../node/node.dto'
 import { AgentKickReason } from './agent.dto'
-import AgentConnectionLegacyStrategy from './connection-strategies/agent.connection.legacy.strategy'
 
 @Injectable()
 export default class AgentService {
@@ -37,8 +36,6 @@ export default class AgentService {
   private eventChannel: Subject<AgentConnectionMessage> = new Subject()
 
   constructor(
-    @Inject(forwardRef(() => AgentConnectionStrategyProvider))
-    private readonly connectionStrategies: AgentConnectionStrategyProvider,
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
@@ -79,9 +76,8 @@ export default class AgentService {
 
   async startInstallation(
     node: BasicNode,
-    rootPath: string | null,
     scriptType: NodeScriptTypeDto,
-    traefik: DagentTraefikOptionsDto | null,
+    hostAddress: string | null,
   ): Promise<AgentInstaller> {
     let installer = this.getInstallerByNodeId(node.id)
     if (installer) {
@@ -95,14 +91,12 @@ export default class AgentService {
     }
 
     // generate new installer
-    const token = generateAgentToken(node.id, 'install')
+    const token = generateAgentToken(node.id, hostAddress)
 
     installer = new AgentInstaller(this.configService, node, {
       token,
       signedToken: this.jwtService.sign(token),
-      rootPath,
       scriptType,
-      dagentTraefikAcmeEmail: traefik?.acmeEmail,
     })
 
     this.installers.set(node.id, installer)
@@ -131,7 +125,7 @@ export default class AgentService {
 
   async kick(nodeId: string, reason: AgentKickReason): Promise<void> {
     const agent = this.getById(nodeId)
-    agent?.close(reason === 'revoke-token' ? CloseReason.REVOKE_TOKEN : CloseReason.SHUTDOWN)
+    agent?.close(CloseReason.SHUTDOWN)
 
     await this.createAgentAudit(nodeId, 'kicked', {
       reason,
@@ -147,11 +141,10 @@ export default class AgentService {
     request: Observable<ContainerStateListMessage>,
   ): Observable<Empty> {
     const agent = this.getByIdOrThrow(connection.nodeId)
-    const prefix = connection.getStringMetadataOrThrow(GrpcNodeConnection.META_FILTER_PREFIX)
 
-    const [watcher, completer] = agent.onContainerStateStreamStarted(prefix)
+    const [watcher, completer] = agent.onContainerStateStreamStarted()
     if (!watcher) {
-      this.logger.warn(`${agent.id} - There was no watcher for ${prefix}`)
+      this.logger.warn(`${agent.id} - There was no watcher`)
 
       completer.next(undefined)
       return completer
@@ -160,54 +153,23 @@ export default class AgentService {
     return request.pipe(
       // necessary, because of: https://github.com/nestjs/nest/issues/8111
       startWith({
-        prefix,
         data: [],
       }),
       map(it => {
-        this.logger.verbose(`${agent.id} - Container status update - ${prefix}`)
+        this.logger.verbose(`${agent.id} - Container status update`)
 
         watcher.update(it)
         return Empty
       }),
       finalize(() => {
-        agent.onContainerStatusStreamFinished(prefix)
-        this.logger.debug(`${agent.id} - Container status listening finished: ${prefix}`)
+        agent.onContainerStatusStreamFinished()
+        this.logger.debug(`${agent.id} - Container status listening finished`)
       }),
       takeUntil(completer),
     )
   }
 
-  async updateAgent(id: string): Promise<void> {
-    const agent = this.getByIdOrThrow(id)
-    const tag = this.getAgentImageTag()
-
-    const token = generateAgentToken(id, 'connection')
-
-    const signedToken = this.jwtService.sign(token)
-
-    agent.startUpdate(tag, {
-      token,
-      signedToken,
-      startedAt: new Date(),
-    })
-
-    await this.createAgentAudit(id, 'update', {
-      fromVersion: agent.version,
-      tag,
-    })
-  }
-
-  updateAborted(connection: GrpcNodeConnection, request: AgentAbortUpdate): Empty {
-    this.logger.warn(`Agent updated aborted for '${connection.nodeId}' with error: '${request.error}'`)
-
-    const agent = this.getByIdOrThrow(connection.nodeId)
-
-    agent.onUpdateAborted(request.error)
-
-    return Empty
-  }
-
-  containersDeleted(connection: GrpcNodeConnection, request: DeleteContainersRequest): Empty {
+  containersDeleted(connection: GrpcNodeConnection, request: ContainerDeleteRequest): Empty {
     this.logger.log(`Containers deleted on '${connection.nodeId}'`)
 
     const agent = this.getByIdOrThrow(connection.nodeId)
@@ -219,16 +181,9 @@ export default class AgentService {
   handleContainerLog(connection: GrpcNodeConnection, request: Observable<ContainerLogMessage>): Observable<Empty> {
     const agent = this.getByIdOrThrow(connection.nodeId)
 
-    const containerPrefix = connection.getStringMetadata(GrpcNodeConnection.META_CONTAINER_PREFIX)
-    const containerName = connection.getStringMetadata(GrpcNodeConnection.META_CONTAINER_NAME)
+    const key = connection.getStringMetadata(GrpcNodeConnection.META_CONTAINER_NAME)
 
-    const container: ContainerIdentifier = {
-      prefix: containerPrefix ?? '',
-      name: containerName,
-    }
-
-    const key = Agent.containerPrefixNameOf(container)
-    const [stream, completer] = agent.onContainerLogStreamStarted(container)
+    const [stream, completer] = agent.onContainerLogStreamStarted(key)
     if (!stream) {
       this.logger.warn(`${agent.id} - There was no stream for ${key}`)
 
@@ -247,7 +202,7 @@ export default class AgentService {
         return Empty
       }),
       finalize(() => {
-        agent.onContainerLogStreamFinished(container)
+        agent.onContainerLogStreamFinished(key)
         this.logger.debug(`${agent.id} - Container log listening finished: ${key}`)
       }),
       takeUntil(completer),
@@ -260,30 +215,6 @@ export default class AgentService {
     agent.onContainerInspect(request)
 
     return of(Empty)
-  }
-
-  async tokenReplaced(connection: GrpcNodeConnection): Promise<Empty> {
-    const agent = this.getByIdOrThrow(connection.nodeId)
-
-    const replacement = agent.onTokenReplaced()
-    const { token } = replacement
-
-    await this.prisma.nodeToken.upsert({
-      where: {
-        nodeId: agent.id,
-      },
-      create: {
-        nodeId: agent.id,
-        nonce: token.nonce,
-      },
-      update: {
-        nonce: token.nonce,
-      },
-    })
-
-    await this.createAgentAudit(agent.id, 'tokenReplaced')
-
-    return Empty
   }
 
   agentVersionSupported(version: string): boolean {
@@ -360,7 +291,7 @@ export default class AgentService {
 
       this.agents.set(agent.id, agent)
 
-      this.logger.log(`Agent joined with id: ${agent.id}, version: ${agent.version} key: ${!!agent.publicKey}`)
+      this.logger.log(`Agent joined with id: ${agent.id}, version: ${agent.version}`)
       this.logServiceInfo()
 
       await this.createAgentAudit(agent.id, 'connected', agent.info)
@@ -373,18 +304,49 @@ export default class AgentService {
     connection: GrpcNodeConnection,
     request: AgentInfo,
   ): Promise<Observable<AgentCommand>> {
-    const strategy = this.connectionStrategies.select(connection)
-    const agent = await strategy.execute(connection, request)
-    this.logger.verbose('Connection strategy completed')
+    const token = this.jwtService.decode(connection.jwt) as AgentToken
 
-    if (agent.id === AgentConnectionLegacyStrategy.LEGACY_NONCE) {
-      // self destruct message is already in the queue
-      // we just have to return the command channel
-
-      // command channel is already completed so no need for onDisconnected() call
-      this.logger.verbose('Crashing legacy agent intercepted.')
-      return agent.onConnected(AgentConnectionLegacyStrategy.CONNECTION_STATUS_LISTENER)
+    const nodeId = token.sub
+    if (request.id !== nodeId) {
+      throw new CruxBadRequestException({
+        message: 'Node id mismatch.',
+      })
     }
+
+    const node = await this.prisma.node.findFirst({
+      where: {
+        id: nodeId,
+      },
+    })
+    if (!node) {
+      throw new CruxBadRequestException({
+        message: 'Node not found.',
+      })
+    }
+
+    const connectedAgent = this.getById(nodeId)
+    if (connectedAgent) {
+      throw new CruxConflictException({
+        message: 'Agent is already connected.',
+        property: 'id',
+      })
+    }
+
+    const outdated = !this.agentVersionSupported(request.version)
+    if (outdated) {
+      this.logger.warn(
+        `Agent ('${request.id}') connected with unsupported version '${
+          request.version
+        }', package is '${getPackageVersion(this.configService)}'`,
+      )
+    }
+
+    const agent = await this.createAgent({
+      connection,
+      info: request,
+      node,
+      outdated,
+    })
 
     await this.onAgentConnectionStatusChange(agent, agent.outdated ? 'outdated' : 'connected')
 
@@ -409,8 +371,24 @@ export default class AgentService {
     }
   }
 
-  private getAgentImageTag() {
-    return this.configService.get<string>('AGENT_IMAGE') ?? getAgentVersionFromPackage(this.configService)
+  protected async createAgent(options: CreateAgentOptions): Promise<Agent> {
+    const { connection, node } = options
+
+    const eventChannel = await this.getNodeEvents()
+    const agent = new Agent({
+      ...options,
+      eventChannel,
+    })
+
+    await this.prisma.node.update({
+      where: { id: node.id },
+      data: {
+        address: connection.address,
+        connectedAt: connection.connectedAt,
+      },
+    })
+
+    return agent
   }
 
   private logServiceInfo(): void {

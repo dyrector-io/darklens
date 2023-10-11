@@ -9,7 +9,7 @@ import {
   CruxPreconditionFailedException,
   CruxUnauthorizedException,
 } from 'src/exception/crux-exception'
-import { JWT_EXPIRATION_MILLIS, PRODUCTION } from 'src/shared/const'
+import { JWT_EXPIRATION_MILLIS } from 'src/shared/const'
 import { getAgentVersionFromPackage } from 'src/shared/package'
 import { Agent, AgentOptions } from './agent'
 import { AgentToken } from './agent-token'
@@ -19,8 +19,6 @@ export type AgentInstallerOptions = {
   token: AgentToken
   signedToken: string
   scriptType: NodeScriptType
-  rootPath?: string | null
-  dagentTraefikAcmeEmail?: string | null
 }
 
 export default class AgentInstaller {
@@ -69,20 +67,12 @@ export default class AgentInstaller {
     const configLocalDeploymentNetwork = this.configService.get<string>('LOCAL_DEPLOYMENT_NETWORK')
     const disableForcePull = this.configService.get<boolean>('AGENT_INSTALL_SCRIPT_DISABLE_PULL', false)
     const agentImageTag = this.configService.get<string>('AGENT_IMAGE', getAgentVersionFromPackage(this.configService))
-    const debugMode = process.env.NODE_ENV !== PRODUCTION || this.configService.get<boolean>('AGENT_INSECURE', false)
 
     const installScriptParams: InstallScriptConfig = {
       name: this.node.name.toLowerCase().replace(/\s/g, ''),
       token: this.options.signedToken,
       network: configLocalDeployment,
       networkName: configLocalDeploymentNetwork,
-      debugMode,
-      rootPath: this.options.rootPath,
-      traefik: this.options.dagentTraefikAcmeEmail
-        ? {
-            acmeEmail: this.options.dagentTraefikAcmeEmail,
-          }
-        : undefined,
       disableForcePull,
       agentImageTag,
     }
@@ -150,14 +140,7 @@ export type InstallScriptConfig = {
   token: string
   network: string
   networkName: string
-  debugMode: boolean
   agentImageTag: string
-  rootPath?: string
-  update?: boolean
-  hostname?: string
-  traefik?: {
-    acmeEmail: string
-  }
   disableForcePull?: boolean
 }
 

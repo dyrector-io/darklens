@@ -1,18 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { Type } from 'class-transformer'
-import {
-  IsBoolean,
-  IsDate,
-  IsEmail,
-  IsIn,
-  IsObject,
-  IsOptional,
-  IsString,
-  IsUUID,
-  ValidateNested,
-} from 'class-validator'
+import { IsBoolean, IsDate, IsIn, IsObject, IsOptional, IsString, IsUUID, ValidateNested } from 'class-validator'
 import { PaginatedList, PaginationQuery } from 'src/shared/dtos/paginating'
-import { ContainerIdentifierDto } from '../container/container.dto'
 
 export const NODE_SCRIPT_TYPE_VALUES = ['shell', 'powershell'] as const
 export type NodeScriptTypeDto = (typeof NODE_SCRIPT_TYPE_VALUES)[number]
@@ -20,16 +9,7 @@ export type NodeScriptTypeDto = (typeof NODE_SCRIPT_TYPE_VALUES)[number]
 export const NODE_CONNECTION_STATUS_VALUES = ['unreachable', 'connected', 'outdated', 'updating'] as const
 export type NodeConnectionStatus = (typeof NODE_CONNECTION_STATUS_VALUES)[number]
 
-export const NODE_EVENT_TYPE_VALUES = [
-  'installed',
-  'connected',
-  'left',
-  'kicked',
-  'update',
-  'updateCompleted',
-  'containerCommand',
-  'tokenReplaced',
-] as const
+export const NODE_EVENT_TYPE_VALUES = ['installed', 'connected', 'left', 'kicked', 'containerCommand'] as const
 export type NodeEventTypeEnum = (typeof NODE_EVENT_TYPE_VALUES)[number]
 
 export const CONTAINER_STATE_VALUES = ['running', 'waiting', 'exited'] as const
@@ -124,16 +104,7 @@ export class CreateNodeDto {
 
 export class UpdateNodeDto extends CreateNodeDto {}
 
-export class DagentTraefikOptionsDto {
-  @IsEmail()
-  acmeEmail: string
-}
-
 export class NodeGenerateScriptDto {
-  @IsString()
-  @IsOptional()
-  rootPath?: string
-
   @IsString()
   @IsIn(NODE_SCRIPT_TYPE_VALUES)
   @ApiProperty({
@@ -141,17 +112,16 @@ export class NodeGenerateScriptDto {
   })
   scriptType: NodeScriptTypeDto
 
-  @IsObject()
-  @ValidateNested()
+  @IsString()
   @IsOptional()
-  dagentTraefik?: DagentTraefikOptionsDto
+  hostAddress?: string
 }
 
 export type ContainerOperationDto = 'start' | 'stop' | 'restart'
 
 export class NodeContainerCommandDto {
   @ValidateNested()
-  container: ContainerIdentifierDto
+  container: string
 
   @ValidateNested()
   operation: ContainerOperationDto
@@ -161,7 +131,7 @@ export class NodeDeleteContainerDto {
   @IsObject()
   @IsOptional()
   @ValidateNested()
-  container?: ContainerIdentifierDto
+  container?: string
 
   @IsString()
   @IsOptional()
@@ -175,7 +145,7 @@ export class ContainerPort {
 }
 
 export class ContainerDto {
-  id: ContainerIdentifierDto
+  name: string
 
   command: string
 
@@ -195,8 +165,6 @@ export class ContainerDto {
   imageTag: string
 
   ports: ContainerPort[]
-
-  labels: Record<string, string>
 }
 
 export class NodeAuditLogQueryDto extends PaginationQuery {
