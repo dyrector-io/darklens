@@ -1,4 +1,4 @@
-name: product_builder
+name: builder
 on:
   push:
     branches: [main]
@@ -18,11 +18,13 @@ jobs:
       contents: read
     outputs:
       tag: ${{ steps.find-version.outputs.version }}
+    defaults:
+      run:
+        working-directory: ${{ env.SERVICE_WORKING_DIRECTORY }}
     steps:
       - name: Find version
         id: find-version
-        working-directory: .
-        run: echo "version=`cat ./web/backend/package.json | jq -r '.version'`"
+        run: echo "version=`cat ./backend/package.json | jq -r '.version'`"
   service-build:
     runs-on: ubuntu-22.04
     needs: [setup]
