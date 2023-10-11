@@ -23,6 +23,8 @@ jobs:
       run:
         working-directory: ${{ env.SETUP_WORKING_DIRECTORY }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
       - name: Find version
         id: find-version
         run: echo "version=`cat web/backend/package.json | jq -r '.version'`"
