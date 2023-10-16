@@ -19,6 +19,7 @@ jobs:
       contents: read
     outputs:
       tag: ${{ steps.version.outputs.version }}
+      agent_tag: ${{ steps.version.outputs.short_version }}
     defaults:
       run:
         working-directory: ${{ env.SETUP_WORKING_DIRECTORY }}
@@ -27,7 +28,10 @@ jobs:
         uses: actions/checkout@v3
       - name: Find version
         id: version
-        run: echo "version=`cat web/backend/package.json | jq -r '.version'`" >> "$GITHUB_OUTPUT"
+        run: |
+          export PACKAGE_VERSION=`cat web/backend/package.json | jq -r '.version'`
+          echo "version=$PACKAGE_VERSION" >> "$GITHUB_OUTPUT"
+          echo "short_version=${PACKAGE_VERSION%.*}" >> "$GITHUB_OUTPUT"
   service-build:
     runs-on: ubuntu-22.04
     needs: setup
@@ -102,9 +106,9 @@ jobs:
           IMAGE_VERSION: latest
       - name: Push images to GHCR Registry
         run: |
-          docker tag ${GITHUB_REGISTRY}/${AGENT_IMAGE_NAME}:latest ${GITHUB_REGISTRY}/${AGENT_IMAGE_NAME}:${{ needs.setup.outputs.tag }}
+          docker tag ${GITHUB_REGISTRY}/${AGENT_IMAGE_NAME}:latest ${GITHUB_REGISTRY}/${AGENT_IMAGE_NAME}:${{ needs.setup.outputs.agent_tag }}
           docker image push ${GITHUB_REGISTRY}/${AGENT_IMAGE_NAME}:latest
-          docker image push ${GITHUB_REGISTRY}/${AGENT_IMAGE_NAME}:${{ needs.setup.outputs.tag }}
+          docker image push ${GITHUB_REGISTRY}/${AGENT_IMAGE_NAME}:${{ needs.setup.outputs.agent_tag }}
       - name: Save Golang caches
         uses: actions/cache/save@v3
         with:
