@@ -1,17 +1,35 @@
 import { Metadata } from '@grpc/grpc-js'
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
+import PrismaService from 'src/services/prisma.service'
 import GrpcNodeConnection, { NodeGrpcCall } from 'src/shared/grpc-node-connection'
 
 @Injectable()
 export default class AgentAuthGuard implements CanActivate {
-  constructor(private jwt: JwtService) {}
+  constructor(
+    private jwt: JwtService,
+    private prisma: PrismaService,
+  ) {}
 
-  canActivate(context: ExecutionContext): boolean {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const metadata = context.getArgByIndex<Metadata>(1)
     const call = context.getArgByIndex<NodeGrpcCall>(2)
 
     const connection = new GrpcNodeConnection(metadata, call)
-    return connection.verify(this.jwt)
+    if (!connection.verify(this.jwt)) {
+      return false
+    }
+
+    const node = await this.prisma.node.findFirst({
+      where: {
+        id: connection.nodeId,
+        tokenNonce: connection.tokenNonce,
+      },
+    })
+    if (!node) {
+      return false
+    }
+
+    return true
   }
 }

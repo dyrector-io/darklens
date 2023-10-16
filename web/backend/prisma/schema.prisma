@@ -17,18 +17,11 @@ model Node {
   address        String?
   connectedAt    DateTime?
   disconnectedAt DateTime?
+  tokenNonce     String?
 
   events NodeEvent[]
-  token  NodeToken?
 
   @@unique([name])
-}
-
-model NodeToken {
-  nodeId String @id @unique
-  nonce  String
-
-  node Node @relation(fields: [nodeId], references: [id], onDelete: Cascade)
 }
 
 model NodeEvent {

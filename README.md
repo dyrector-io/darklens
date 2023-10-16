@@ -56,8 +56,13 @@ Ensure data persistence by using Docker volumes to store Darklens data.
 2. Enter a name for your node and click Save
     - This'll be the name of the agent running as a container on your node
 3. On the right side of the screen, select whether you'd like to install the agent with a Shell (UNIX) or a PowerShell (Windows) script
+
+> Note: Shell scripts might not work on Windows using Git Bash.
+
 4. Generate the script and copy & paste it into Shell or PowerShell. Press enter to install the agent
 5. When node status turns green, you're ready to use darklens
+
+> Note: Agents connect to the host defined in their JWT token (`GRPC_TOKEN` environment), by default the `AGENT_ADDRESS` backend environment variable is used, but users can override this value on the UI.
 
 ## Development
 

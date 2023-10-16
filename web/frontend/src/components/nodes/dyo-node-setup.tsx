@@ -58,7 +58,7 @@ const DyoNodeSetup = (props: DyoNodeSetupProps) => {
     onNodeInstallChanged(null)
   }
 
-  const onCopyScript = () => writeToClipboard(t, node.install.command)
+  const onCopyScript = () => writeToClipboard(t, node.install.script)
 
   const formik = useDyoFormik<NodeGenerateScript>({
     initialValues: {
@@ -140,24 +140,20 @@ const DyoNodeSetup = (props: DyoNodeSetupProps) => {
         ) : (
           <>
             <div className="flex flex-col">
-              <DyoLabel className="mt-8 mb-2.5 whitespace-nowrap">{t('command')}</DyoLabel>
+              <DyoLabel className="mb-2.5">{t('script')}</DyoLabel>
 
-              <div className="flex flex-row items-center">
-                <DyoInput
-                  className="bg-gray-900"
-                  containerClassName="flex-1"
-                  readOnly
-                  grow
-                  defaultValue={node.install.command}
-                  onFocus={ev => ev.target.select()}
-                />
+              <div className="h-82 w-full relative">
+                <ShEditor className="h-82 w-full overflow-x-auto" readOnly value={node.install.script} />
 
-                <div onClick={onCopyScript} className="cursor-pointer ml-2 h-11 w-11 flex items-center justify-center">
+                <div
+                  onClick={onCopyScript}
+                  className="absolute right-0 bottom-0 cursor-pointer ml-2 h-11 w-11 flex items-center justify-center"
+                >
                   <DyoIcon size="md" src={copyAlt} alt={t('common:copy')} />
                 </div>
               </div>
 
-              <div className="flex flex-row mt-2">
+              <div className="flex flex-row">
                 <DyoLabel className="text-white mr-2">{t('scriptExpiresIn')}</DyoLabel>
 
                 <TimeLabel textColor="text-lens-turquoise" seconds={remaining} />
@@ -168,12 +164,6 @@ const DyoNodeSetup = (props: DyoNodeSetupProps) => {
               <DyoButton className="px-4 py-2 mr-4" secondary onClick={onDiscard}>
                 {t('common:discard')}
               </DyoButton>
-            </div>
-
-            <div className="flex flex-col">
-              <DyoLabel className="mb-2.5">{t('script')}</DyoLabel>
-
-              <ShEditor className="h-48 mb-4 w-full overflow-x-auto" readOnly value={node.install.script} />
             </div>
           </>
         )}

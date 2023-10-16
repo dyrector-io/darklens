@@ -5,7 +5,6 @@ import { join } from 'path'
 import { cwd } from 'process'
 import {
   CruxBadRequestException,
-  CruxInternalServerErrorException,
   CruxPreconditionFailedException,
   CruxUnauthorizedException,
 } from 'src/exception/crux-exception'
@@ -45,34 +44,13 @@ export default class AgentInstaller {
     return now.getTime() - this.expirationDate.getTime() > JWT_EXPIRATION_MILLIS
   }
 
-  getCommand(): string {
-    const scriptUrl = `${this.configService.get<string>('PUBLIC_URL')}/api/nodes/${this.node.id}/script`
-
-    switch (this.options.scriptType) {
-      case 'shell':
-        return `curl -sL ${scriptUrl} | sh -`
-      case 'powershell':
-        return `Invoke-WebRequest -Uri ${scriptUrl} -Method GET | Select-Object -Expand Content | Invoke-Expression`
-      default:
-        throw new CruxInternalServerErrorException({
-          message: 'Unknown script type',
-          property: 'scriptType',
-          value: this.options.scriptType,
-        })
-    }
-  }
-
   getScript(): string {
-    const configLocalDeployment = this.configService.get<string>('LOCAL_DEPLOYMENT')
-    const configLocalDeploymentNetwork = this.configService.get<string>('LOCAL_DEPLOYMENT_NETWORK')
     const disableForcePull = this.configService.get<boolean>('AGENT_INSTALL_SCRIPT_DISABLE_PULL', false)
     const agentImageTag = this.configService.get<string>('AGENT_IMAGE', getAgentVersionFromPackage(this.configService))
 
     const installScriptParams: InstallScriptConfig = {
       name: this.node.name.toLowerCase().replace(/\s/g, ''),
       token: this.options.signedToken,
-      network: configLocalDeployment,
-      networkName: configLocalDeploymentNetwork,
       disableForcePull,
       agentImageTag,
     }
@@ -138,8 +116,6 @@ export default class AgentInstaller {
 export type InstallScriptConfig = {
   name: string
   token: string
-  network: string
-  networkName: string
   agentImageTag: string
   disableForcePull?: boolean
 }

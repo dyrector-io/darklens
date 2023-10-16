@@ -99,23 +99,22 @@ export default class AgentService {
       scriptType,
     })
 
+    await this.prisma.node.update({
+      where: {
+        id: node.id,
+      },
+      data: {
+        tokenNonce: token.nonce,
+      },
+    })
+
     this.installers.set(node.id, installer)
 
     return installer
   }
 
-  async discardInstaller(nodeId: string): Promise<Empty> {
-    if (!this.installers.has(nodeId)) {
-      throw new CruxNotFoundException({
-        message: 'Installer not found',
-        property: 'installer',
-        value: nodeId,
-      })
-    }
-
+  discardInstaller(nodeId: string) {
     this.installers.delete(nodeId)
-
-    return Empty
   }
 
   async completeInstaller(installer: AgentInstaller) {

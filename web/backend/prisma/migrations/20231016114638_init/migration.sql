@@ -6,14 +6,8 @@ CREATE TABLE "Node" (
     "icon" TEXT,
     "address" TEXT,
     "connectedAt" DATETIME,
-    "disconnectedAt" DATETIME
-);
-
--- CreateTable
-CREATE TABLE "NodeToken" (
-    "nodeId" TEXT NOT NULL PRIMARY KEY,
-    "nonce" TEXT NOT NULL,
-    CONSTRAINT "NodeToken_nodeId_fkey" FOREIGN KEY ("nodeId") REFERENCES "Node" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+    "disconnectedAt" DATETIME,
+    "tokenNonce" TEXT
 );
 
 -- CreateTable

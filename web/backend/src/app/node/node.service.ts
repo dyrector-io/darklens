@@ -68,9 +68,6 @@ export default class NodeService {
       where: {
         id,
       },
-      include: {
-        token: true,
-      },
     })
 
     return this.mapper.detailsToDto(node)
@@ -134,7 +131,16 @@ export default class NodeService {
   }
 
   async discardScript(id: string): Promise<void> {
-    await this.agentService.discardInstaller(id)
+    this.agentService.discardInstaller(id)
+
+    await this.prisma.node.update({
+      where: {
+        id,
+      },
+      data: {
+        tokenNonce: null,
+      },
+    })
   }
 
   async revokeToken(id: string): Promise<void> {
@@ -143,11 +149,11 @@ export default class NodeService {
         id,
       },
       data: {
-        token: {
-          delete: true,
-        },
+        tokenNonce: null,
       },
     })
+
+    this.agentService.discardInstaller(id)
 
     await this.agentService.kick(id, 'revoke-token')
   }

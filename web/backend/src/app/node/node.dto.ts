@@ -66,9 +66,6 @@ export class NodeDto extends BasicNodeDto {
 
 export class NodeInstallDto {
   @IsString()
-  command: string
-
-  @IsString()
   script: string
 
   @IsDate()

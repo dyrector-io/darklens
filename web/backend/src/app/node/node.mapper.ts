@@ -2,7 +2,6 @@ import { Inject, Injectable, forwardRef } from '@nestjs/common'
 import { Node } from '@prisma/client'
 import { AgentConnectionMessage } from 'src/domain/agent'
 import AgentInstaller from 'src/domain/agent-installer'
-import { NodeWithToken } from 'src/domain/node'
 import { fromTimestamp } from 'src/domain/utils'
 import {
   ContainerInspectMessage,
@@ -69,14 +68,14 @@ export default class NodeMapper {
     }
   }
 
-  detailsToDto(node: NodeWithToken): NodeDetailsDto {
+  detailsToDto(node: Node): NodeDetailsDto {
     const installer = this.agentService.getInstallerByNodeId(node.id)
 
     const agent = this.agentService.getById(node.id)
 
     return {
       ...this.toDto(node),
-      hasToken: !!node.token,
+      hasToken: !!node.tokenNonce,
       install: installer ? this.installerToDto(installer) : null,
       updatable: agent && (agent.outdated || !this.agentService.agentVersionIsUpToDate(agent.version)),
     }
@@ -84,7 +83,6 @@ export default class NodeMapper {
 
   installerToDto(installer: AgentInstaller): NodeInstallDto {
     return {
-      command: installer.getCommand(),
       script: installer.getScript(),
       expireAt: installer.expireAt,
     }

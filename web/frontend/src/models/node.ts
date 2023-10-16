@@ -34,7 +34,6 @@ export type DyoNode = NodeConnection & {
 }
 
 export type NodeInstall = {
-  command: string
   script: string
   expireAt: string
 }

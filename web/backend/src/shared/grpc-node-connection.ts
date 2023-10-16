@@ -16,10 +16,10 @@ export default class GrpcNodeConnection {
 
   private token: AgentToken
 
-  private signedToken: string
+  private jwtToken: string
 
   get jwt(): string {
-    return this.signedToken
+    return this.jwtToken
   }
 
   readonly address: string
@@ -28,6 +28,10 @@ export default class GrpcNodeConnection {
 
   get nodeId() {
     return this.token.sub
+  }
+
+  get tokenNonce() {
+    return this.token.nonce
   }
 
   constructor(
@@ -42,7 +46,7 @@ export default class GrpcNodeConnection {
       call.end = nestjsClientStreamEndCallWorkaround
     }
 
-    this.signedToken = this.getStringMetadataOrThrow(GrpcNodeConnection.META_NODE_TOKEN)
+    this.jwtToken = this.getStringMetadataOrThrow(GrpcNodeConnection.META_NODE_TOKEN)
 
     const xRealIp = this.getFirstItemOfStringArrayMetadata('x-real-ip')
     const xForwarderFor = this.getFirstItemOfStringArrayMetadata('x-forwarded-for')
@@ -93,11 +97,6 @@ export default class GrpcNodeConnection {
     }
 
     return value
-  }
-
-  onTokenReplaced(token: AgentToken, signedToken: string) {
-    this.token = token
-    this.signedToken = signedToken
   }
 
   private onClose() {
