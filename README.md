@@ -16,7 +16,7 @@
 
 ## Getting started
 
-1. Enter `docker run -p 8000:8000 -p 5000:5000 --name darklens -d dyrector-io/darklens:latest` in terminal
+1. Enter `docker run -p 8000:8000 -p 5000:5000 --name darklens -d ghcr.io/dyrector-io/darklens:latest` in terminal
 2. Open `localhost:8000` in browser
 3. Enjoy!
 
@@ -28,19 +28,19 @@ Settings provides various configuration options for running darklens, tailor you
 
 Launch Darklens without any authentication or authorization checks. Ideal for quick testing and development.
 
-`docker run -p 8000:8000 -p 5000:5000 -e DISABLE_AUTH=true --name darklens -d dyrector-io/darklens:latest`
+`docker run -p 8000:8000 -p 5000:5000 -e DISABLE_AUTH=true --name darklens -d ghcr.io/dyrector-io/darklens:latest`
 
 #### Select a stronger JWT secret
 
 Enhance security by specifying a custom JWT secret for authentication.
 
-`docker run -p 8000:8000 -p 5000:5000 -e JWT_SECRET=supersecret --name darklens -d dyrector-io/darklens:latest`
+`docker run -p 8000:8000 -p 5000:5000 -e JWT_SECRET=supersecret --name darklens -d ghcr.io/dyrector-io/darklens:latest`
 
 #### Run on a public domain
 
 Configure darklens to run on a public domain with options for specifying a public URL and agent address.
 
-`docker run -p 8000:8000 -p 5000:5000 -e PUBLIC_URL=example.com AGENT_ADDRESS=example.com:5000 --name darklens -d dyrector-io/darklens:latest`
+`docker run -p 8000:8000 -p 5000:5000 -e PUBLIC_URL=example.com AGENT_ADDRESS=example.com:5000 --name darklens -d ghcr.io/dyrector-io/darklens:latest`
 
 > Note: Agents require gRPC port 5000 to connect to the service
 
@@ -48,7 +48,7 @@ Configure darklens to run on a public domain with options for specifying a publi
 
 Ensure data persistence by using Docker volumes to store Darklens data.
 
-`docker run -p 8000:8000 -p 5000:5000 -v darklens-data:/var/lib/darklens --name darklens -d dyrector-io/darklens:latest`
+`docker run -p 8000:8000 -p 5000:5000 -v darklens-data:/var/lib/darklens --name darklens -d ghcr.io/dyrector-io/darklens:latest`
 
 ## Agent install
 
