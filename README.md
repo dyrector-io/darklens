@@ -90,3 +90,7 @@ Ensure data persistence by using Docker volumes to store Darklens data.
     3. The app will be available on `localhost:8000`
 
 > Make sure the `dev-traefik` container is running as it routes the traffic between the frontend and the backend
+
+## Contact us
+
+If you experience any issues, feel free to reach out to us on [Discord](https://discord.gg/pZWbd4fxga).
