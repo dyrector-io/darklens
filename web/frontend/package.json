@@ -37,7 +37,7 @@
     "yup": "^1.2.0"
   },
   "devDependencies": {
-    "@playwright/test": "^1.36.2",
+    "@babel/traverse": ">=7.23.2",
     "@types/google-protobuf": "^3.15.6",
     "@types/jest": "^29.5.3",
     "@types/jsoneditor": "^9.9.0",
